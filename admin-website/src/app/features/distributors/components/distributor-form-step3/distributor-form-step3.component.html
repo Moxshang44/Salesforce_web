@@ -1,0 +1,172 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 3 of 3</span>
+    <button type="button" class="close-btn" (click)="onPrevious()">×</button>
+  </div>
+
+  <form class="routes-form">
+    <!-- Filter Row -->
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">Select Country</label>
+        <select 
+          class="filter-select" 
+          [(ngModel)]="formData.selectedCountry"
+          name="country"
+        >
+          @for (country of countryOptions; track country) {
+            <option [value]="country">{{ country }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Select Zone</label>
+        <select 
+          class="filter-select" 
+          [(ngModel)]="formData.selectedZone"
+          name="zone"
+        >
+          @for (zone of zoneOptions; track zone) {
+            <option [value]="zone">{{ zone }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Select Region</label>
+        <select 
+          class="filter-select" 
+          [(ngModel)]="formData.selectedRegion"
+          name="region"
+        >
+          @for (region of regionOptions; track region) {
+            <option [value]="region">{{ region }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Second Filter Row -->
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">Select Area</label>
+        <select 
+          class="filter-select" 
+          [(ngModel)]="formData.selectedArea"
+          name="area"
+        >
+          @for (area of areaOptions; track area) {
+            <option [value]="area">{{ area }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Select Division</label>
+        <select 
+          class="filter-select" 
+          [(ngModel)]="formData.selectedDivision"
+          name="division"
+        >
+          @for (division of divisionOptions; track division) {
+            <option [value]="division">{{ division }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group"></div>
+    </div>
+
+    <!-- Routes Assignment Section -->
+    <div class="routes-section">
+      <!-- Assigned Routes -->
+      <div class="routes-column">
+        <h3 class="column-title">Assigned Routes ({{ assignedRoutes.length }})</h3>
+        
+        <div class="routes-header">
+          <span class="header-label">Routes Name</span>
+        </div>
+
+        <div class="routes-list">
+          @for (route of assignedRoutes; track route.id) {
+            <div class="route-item">
+              <span class="route-name">{{ route.name }}</span>
+              <button 
+                type="button" 
+                class="btn-assigned"
+                (click)="unassignRoute(route)"
+              >
+                <span class="btn-icon">🔄</span>
+                Assigned
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="pagination-controls">
+          <span class="pagination-text">Showing {{ assignedRoutes.length }} of 10 Routes</span>
+          <div class="pagination-buttons">
+            <button type="button" class="page-btn" [disabled]="assignedCurrentPage === 1">‹</button>
+            <button type="button" class="page-number active">{{ assignedCurrentPage }}</button>
+            <button type="button" class="page-number">{{ assignedCurrentPage + 1 }}</button>
+            <button type="button" class="page-btn" [disabled]="assignedCurrentPage === assignedTotalPages">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Available Routes -->
+      <div class="routes-column">
+        <h3 class="column-title">Available Routes ({{ availableRoutes.length }})</h3>
+        
+        <div class="routes-header">
+          <span class="header-label">Routes Name</span>
+        </div>
+
+        <div class="routes-list">
+          @for (route of availableRoutes; track route.id) {
+            <div class="route-item">
+              <span class="route-name">{{ route.name }}</span>
+              <button 
+                type="button" 
+                class="btn-assign"
+                (click)="assignRoute(route)"
+              >
+                <span class="btn-icon">➕</span>
+                Assign
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="pagination-controls">
+          <span class="pagination-text">Showing {{ availableRoutes.length }} of 9 Routes</span>
+          <div class="pagination-buttons">
+            <button type="button" class="page-btn" [disabled]="availableCurrentPage === 1">‹</button>
+            <button type="button" class="page-number active">{{ availableCurrentPage }}</button>
+            <button type="button" class="page-number">{{ availableCurrentPage + 1 }}</button>
+            <button type="button" class="page-btn" [disabled]="availableCurrentPage === availableTotalPages">›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onPrevious()"
+    >
+      Cancel
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSave()"
+    >
+      Save
+    </button>
+  </div>
+</div>

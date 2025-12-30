@@ -1,0 +1,189 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 2 of 2</span>
+    <button type="button" class="close-btn" (click)="onPrevious()">×</button>
+  </div>
+
+  <form class="distributor-form">
+    <!-- Row 1: Vehicle Counts and Salesman -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">No. of Vehicles (3 Wheelers)</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., 5"
+          [(ngModel)]="formData.vehicles3Wheeler"
+          name="vehicles3Wheeler"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">No. of Vehicles (4 Wheelers)</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., 5"
+          [(ngModel)]="formData.vehicles4Wheeler"
+          name="vehicles4Wheeler"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">No. of Salesman</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., 5"
+          [(ngModel)]="formData.salesmanCount"
+          name="salesmanCount"
+        >
+      </div>
+    </div>
+
+    <!-- Channel Visibility -->
+    <div class="form-section">
+      <label class="section-label">Channel Visibility</label>
+      <div class="checkbox-row">
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.channelVisibility.generalTrade"
+            name="generalTrade"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">General Trade</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.channelVisibility.modernTrade"
+            name="modernTrade"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">Modern Trade</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.channelVisibility.horecaTrade"
+            name="horecaTrade"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">HoReCa Trade</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Row 2: Bank Details -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">Bank Name</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="Axis Bank"
+          [(ngModel)]="formData.bankName"
+          name="bankName"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Bank Branch</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="Khambbhat"
+          [(ngModel)]="formData.bankBranch"
+          name="bankBranch"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">IFSC Code</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., 9830XXXXXXXXX"
+          [(ngModel)]="formData.ifscCode"
+          name="ifscCode"
+        >
+      </div>
+    </div>
+
+    <!-- Employee Route (Account Type) -->
+    <div class="form-section">
+      <label class="section-label">Employee Route</label>
+      <div class="radio-row">
+        <label class="radio-item">
+          <input 
+            type="radio" 
+            name="accountType" 
+            value="Current Account"
+            [(ngModel)]="formData.accountType"
+            class="radio-input"
+          >
+          <span class="radio-label">Current Account</span>
+        </label>
+
+        <label class="radio-item">
+          <input 
+            type="radio" 
+            name="accountType" 
+            value="Saving Account"
+            [(ngModel)]="formData.accountType"
+            class="radio-input"
+          >
+          <span class="radio-label">Saving Account</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Row 3: Account Details -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Account No.</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., 9182000XXXX"
+          [(ngModel)]="formData.accountNumber"
+          name="accountNumber"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Account Name</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., Ancing Agency"
+          [(ngModel)]="formData.accountName"
+          name="accountName"
+        >
+      </div>
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onPrevious()"
+    >
+      Cancel
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSaveAndFinish()"
+    >
+      Save & Next
+    </button>
+  </div>
+</div>
