@@ -1,0 +1,186 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 2 of 2</span>
+  </div>
+
+  <form class="brand-form">
+    <!-- Status and Active -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Status <span class="required">*</span></label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.status"
+          name="status"
+          required
+        >
+          @for (option of statusOptions; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Active Status</label>
+        <label class="toggle-container">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.isActive"
+            name="isActive"
+            class="toggle-checkbox"
+          >
+          <span class="toggle-label">{{ formData.isActive ? 'Active' : 'Inactive' }}</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Visibility Settings -->
+    <div class="form-section">
+      <h3 class="section-title">Visibility Settings</h3>
+      
+      <div class="checkbox-group">
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.visibleToDistributors"
+            name="visibleToDistributors"
+          >
+          <span class="checkbox-label">Visible to Distributors</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.visibleToStockists"
+            name="visibleToStockists"
+          >
+          <span class="checkbox-label">Visible to Super Stockists</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.allowOnlineOrders"
+            name="allowOnlineOrders"
+          >
+          <span class="checkbox-label">Allow Online Orders</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Minimum Order Quantity</label>
+        <input 
+          type="number" 
+          class="form-input" 
+          placeholder="e.g., 100"
+          [(ngModel)]="formData.minimumOrderQuantity"
+          name="minimumOrderQuantity"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Manufacturing Country</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.manufacturingCountry"
+          name="manufacturingCountry"
+        >
+          @for (country of countryOptions; track country) {
+            <option [value]="country">{{ country }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Certifications -->
+    <div class="form-row full-width">
+      <div class="form-group">
+        <label class="form-label">Certifications</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., ISO 9001, GMP, FDA Approved"
+          [(ngModel)]="formData.certifications"
+          name="certifications"
+        >
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="form-row full-width">
+      <div class="form-group">
+        <label class="form-label">Tags</label>
+        <div class="tag-input-container">
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="Add a tag and press Enter"
+            [(ngModel)]="tagInput"
+            name="tagInput"
+            (keyup.enter)="addTag()"
+          >
+          <button 
+            type="button" 
+            class="add-tag-btn"
+            (click)="addTag()"
+          >
+            Add Tag
+          </button>
+        </div>
+        
+        @if (formData.tags.length > 0) {
+          <div class="tags-list">
+            @for (tag of formData.tags; track tag) {
+              <span class="tag-item">
+                {{ tag }}
+                <button 
+                  type="button" 
+                  class="remove-tag-btn"
+                  (click)="removeTag(tag)"
+                >
+                  ×
+                </button>
+              </span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-row full-width">
+      <div class="form-group">
+        <label class="form-label">Additional Notes</label>
+        <textarea 
+          class="form-textarea" 
+          placeholder="Enter any additional notes..."
+          [(ngModel)]="formData.notes"
+          name="notes"
+          rows="4"
+        ></textarea>
+      </div>
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-previous"
+      (click)="onPrevious()"
+    >
+      ‹ Previous
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSaveAndFinish()"
+    >
+      Save & Finish
+    </button>
+  </div>
+</div>
+

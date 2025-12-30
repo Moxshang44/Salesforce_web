@@ -28,7 +28,7 @@ export const routes: Routes = [
   },
   {
     path: 'products/brand',
-    loadComponent: () => import('./features/product-master/product-master.component').then(m => m.ProductMasterComponent),
+    loadComponent: () => import('./features/brand/brand.component').then(m => m.BrandComponent),
     canActivate: [authGuard]
   },
   {
@@ -48,7 +48,17 @@ export const routes: Routes = [
   },
   {
     path: 'routes',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/routes/routes.component').then(m => m.RoutesComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'routes/add',
+    loadComponent: () => import('./features/routes/components/add-routes/add-routes.component').then(m => m.AddRoutesComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'routes/assign',
+    loadComponent: () => import('./features/routes/components/assign-routes/assign-routes.component').then(m => m.AssignRoutesComponent),
     canActivate: [authGuard]
   },
   {

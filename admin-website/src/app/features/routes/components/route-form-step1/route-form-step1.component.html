@@ -1,0 +1,266 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 1 of 3</span>
+    <button type="button" class="close-btn" (click)="onCancel()">×</button>
+  </div>
+
+  <form class="route-form">
+    <!-- Route Name -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Route Name</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="Kasthuri-East"
+          [(ngModel)]="formData.routeName"
+          name="routeName"
+          (blur)="generateRouteCode()"
+          required
+        >
+      </div>
+
+      <!-- Route Code -->
+      <div class="form-group">
+        <label class="form-label">
+          Route Code <span class="auto-badge">Auto</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="RT-BORA-KT"
+          [(ngModel)]="formData.routeCode"
+          name="routeCode"
+          required
+        >
+      </div>
+    </div>
+
+    <!-- Geographic Mapping Section -->
+    <div class="form-section">
+      <h3 class="section-title">Geographic Mapping</h3>
+      <p class="section-subtitle">Select existing values or add new ones if missing</p>
+
+      <!-- Select Country and Type New Country -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Select Country</label>
+          <select 
+            class="form-select" 
+            [(ngModel)]="formData.selectedCountry"
+            name="selectedCountry"
+          >
+            @for (country of countryOptions; track country) {
+              <option [value]="country">{{ country }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Type New Country</label>
+          <div class="input-with-button">
+            <input 
+              type="text" 
+              class="form-input" 
+              placeholder="Type New Country"
+              [(ngModel)]="formData.newCountry"
+              name="newCountry"
+            >
+            <button 
+              type="button" 
+              class="add-btn"
+              (click)="addCountry()"
+            >
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Select Zone and Type New Zone -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Select Zone</label>
+          <select 
+            class="form-select" 
+            [(ngModel)]="formData.selectedZone"
+            name="selectedZone"
+          >
+            @for (zone of zoneOptions; track zone) {
+              <option [value]="zone">{{ zone }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Type New Zone</label>
+          <div class="input-with-button">
+            <input 
+              type="text" 
+              class="form-input" 
+              placeholder="Type New Zone"
+              [(ngModel)]="formData.newZone"
+              name="newZone"
+            >
+            <button 
+              type="button" 
+              class="add-btn"
+              (click)="addZone()"
+            >
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Select Region and Type New Region -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Select Region</label>
+          <select 
+            class="form-select" 
+            [(ngModel)]="formData.selectedRegion"
+            name="selectedRegion"
+          >
+            <option value="">+ Add New Region</option>
+            @for (region of regionOptions; track region) {
+              <option [value]="region">{{ region }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Type New Region</label>
+          <div class="input-with-button">
+            <input 
+              type="text" 
+              class="form-input" 
+              placeholder="Type New Region"
+              [(ngModel)]="formData.newRegion"
+              name="newRegion"
+            >
+            <button 
+              type="button" 
+              class="add-btn"
+              (click)="addRegion()"
+            >
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Select Area and Type New Area -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Select Area</label>
+          <select 
+            class="form-select" 
+            [(ngModel)]="formData.selectedArea"
+            name="selectedArea"
+          >
+            <option value="">+ Add New Area</option>
+            @for (area of areaOptions; track area) {
+              <option [value]="area">{{ area }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Type New Area</label>
+          <div class="input-with-button">
+            <input 
+              type="text" 
+              class="form-input" 
+              placeholder="Type New Area"
+              [(ngModel)]="formData.newArea"
+              name="newArea"
+            >
+            <button 
+              type="button" 
+              class="add-btn"
+              (click)="addArea()"
+            >
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Select Distributor -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Select Distributor</label>
+          <select 
+            class="form-select" 
+            [(ngModel)]="formData.selectedDistributor"
+            name="selectedDistributor"
+          >
+            <option value="">Select</option>
+            @for (distributor of distributorOptions; track distributor) {
+              <option [value]="distributor">{{ distributor }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group"></div>
+      </div>
+    </div>
+
+    <!-- Channel Type -->
+    <div class="form-section">
+      <label class="section-label">Channel Type</label>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input 
+            type="radio" 
+            name="channelType" 
+            value="General Trade"
+            [(ngModel)]="formData.channelType"
+            class="radio-input"
+          >
+          <span class="radio-label">General Trade</span>
+        </label>
+
+        <label class="radio-option">
+          <input 
+            type="radio" 
+            name="channelType" 
+            value="Modern Trade"
+            [(ngModel)]="formData.channelType"
+            class="radio-input"
+          >
+          <span class="radio-label">Modern Trade</span>
+        </label>
+
+        <label class="radio-option">
+          <input 
+            type="radio" 
+            name="channelType" 
+            value="HoReCa Trade"
+            [(ngModel)]="formData.channelType"
+            class="radio-input"
+          >
+          <span class="radio-label">HoReCa Trade</span>
+        </label>
+      </div>
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSaveAndNext()"
+    >
+      Save & Next
+    </button>
+  </div>
+</div>
