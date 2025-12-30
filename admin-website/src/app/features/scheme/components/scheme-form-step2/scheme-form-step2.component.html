@@ -1,0 +1,160 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 2 of 2</span>
+  </div>
+
+  <form class="scheme-form">
+    <!-- Row 1: Label, Country, Zone -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Label</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., North India Visible"
+          [(ngModel)]="formData.label"
+          name="label"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Country</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectCountry"
+          name="selectCountry"
+        >
+          <option value="1 Selected">1 Selected</option>
+          <option value="2 Selected">2 Selected</option>
+          <option value="All">All Selected</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Zone</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectZone"
+          name="selectZone"
+        >
+          <option value="All Selected">All Selected</option>
+          <option value="North">North</option>
+          <option value="South">South</option>
+          <option value="East">East</option>
+          <option value="West">West</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Row 2: Regions and Areas -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Select Regions</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectRegions"
+          name="selectRegions"
+        >
+          <option value="Select Regions">Select Regions</option>
+          <option value="Region 1">Region 1</option>
+          <option value="Region 2">Region 2</option>
+          <option value="All">All Regions</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Areas</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectAreas"
+          name="selectAreas"
+        >
+          <option value="All Selected">All Selected</option>
+          <option value="Area 1">Area 1</option>
+          <option value="Area 2">Area 2</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Row 3: Dates and Total Days -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Start Date</label>
+        <input 
+          type="date" 
+          class="form-input date-input" 
+          [(ngModel)]="formData.startDate"
+          name="startDate"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">End Date</label>
+        <input 
+          type="date" 
+          class="form-input date-input" 
+          [(ngModel)]="formData.endDate"
+          name="endDate"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Total Days</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="57"
+          [(ngModel)]="formData.totalDays"
+          name="totalDays"
+        >
+      </div>
+    </div>
+
+    <!-- Row 4: Claim Type and Lead -->
+    <div class="form-row form-row-2">
+      <div class="form-group">
+        <label class="form-label">Select Claim Type</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectClaimType"
+          name="selectClaimType"
+        >
+          <option value="Select">Select</option>
+          <option value="Type 1">Type 1</option>
+          <option value="Type 2">Type 2</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Lead</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectLead"
+          name="selectLead"
+        >
+          <option value="Retailer">Retailer</option>
+          <option value="Distributor">Distributor</option>
+          <option value="Wholesaler">Wholesaler</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onPrevious()"
+    >
+      Cancel
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSaveAndNext()"
+    >
+      Save & Next
+    </button>
+  </div>
+</div>

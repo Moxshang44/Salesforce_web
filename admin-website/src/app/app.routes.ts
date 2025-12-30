@@ -27,6 +27,26 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'products/brand',
+    loadComponent: () => import('./features/product-master/product-master.component').then(m => m.ProductMasterComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'products/category',
+    loadComponent: () => import('./features/product-master/product-master.component').then(m => m.ProductMasterComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'products/scheme',
+    loadComponent: () => import('./features/scheme/scheme.component').then(m => m.SchemeComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'products/pricelist',
+    loadComponent: () => import('./features/product-master/product-master.component').then(m => m.ProductMasterComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'routes',
     loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
