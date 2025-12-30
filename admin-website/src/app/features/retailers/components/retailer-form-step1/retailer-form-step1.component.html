@@ -1,0 +1,294 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 1 of 2</span>
+    <button type="button" class="close-btn" (click)="onCancel()">×</button>
+  </div>
+
+  <form class="retailer-form">
+    <!-- Row 1: Store Name, Retailer ID, Contact Person -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">Retailer Store Name</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., Sharma General Store"
+          [(ngModel)]="formData.storeName"
+          name="storeName"
+          (blur)="generateRetailerId()"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Retailer ID <span class="auto-badge">Auto</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="SR-EMP-001"
+          [(ngModel)]="formData.retailerId"
+          name="retailerId"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contact Person name</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., Manoj Badayani"
+          [(ngModel)]="formData.contactPersonName"
+          name="contactPersonName"
+          required
+        >
+      </div>
+    </div>
+
+    <!-- Row 2: Mobile Number, Email, License Number -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">Mobile Number</label>
+        <div class="input-with-select">
+          <select 
+            class="country-code-select" 
+            [(ngModel)]="formData.countryCode"
+            name="countryCode"
+          >
+            @for (code of countryCodeOptions; track code) {
+              <option [value]="code">{{ code }}</option>
+            }
+          </select>
+          <input 
+            type="text" 
+            class="phone-input" 
+            placeholder="eg. 9449910-00090"
+            [(ngModel)]="formData.mobileNumber"
+            name="mobileNumber"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Email <span class="optional-text">(Optional)</span>
+        </label>
+        <input 
+          type="email" 
+          class="form-input" 
+          placeholder="abc@companyname.com"
+          [(ngModel)]="formData.email"
+          name="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">License Number</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="eg. 9190093303"
+          [(ngModel)]="formData.licenseNumber"
+          name="licenseNumber"
+        >
+      </div>
+    </div>
+
+    <!-- Row 3: GST Number, PAN Card Number, Pin code -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">GST Number</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="0000 XXXXXXXXX"
+          [(ngModel)]="formData.gstNumber"
+          name="gstNumber"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">PAN Card Number</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="DAU USDZNC"
+          [(ngModel)]="formData.panCardNumber"
+          name="panCardNumber"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pin code</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="388126"
+          [(ngModel)]="formData.pinCode"
+          name="pinCode"
+        >
+      </div>
+    </div>
+
+    <!-- Row 4: Full Address -->
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label class="form-label">Full Address</label>
+        <textarea 
+          class="form-textarea" 
+          placeholder="Enter full address..."
+          [(ngModel)]="formData.fullAddress"
+          name="fullAddress"
+          rows="3"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Row 5: Add Map Link -->
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label class="form-label">Add Map Link</label>
+        <input 
+          type="url" 
+          class="form-input" 
+          placeholder="e.g., https://maps.app.goo.gl.../#m88977,sd=sbc"
+          [(ngModel)]="formData.mapLink"
+          name="mapLink"
+        >
+      </div>
+    </div>
+
+    <!-- Upload Documents Section -->
+    <div class="upload-section">
+      <label class="section-label">Upload Document</label>
+      
+      @if (documentPreviews.length === 0) {
+        <div 
+          class="file-upload-area"
+          [class.dragging]="isDraggingDocs"
+          (dragover)="onDocumentDragOver($event)"
+          (dragleave)="onDocumentDragLeave($event)"
+          (drop)="onDocumentDrop($event)"
+        >
+          <div class="upload-icon">📁</div>
+          <p class="upload-text">Drag & drop image here or click to browse</p>
+          <p class="upload-hint">PNG, JPG (max up to 5MB)</p>
+          <input 
+            type="file" 
+            accept="image/*,.pdf,.doc,.docx"
+            multiple
+            (change)="onDocumentFileSelected($event)"
+            class="file-input"
+            #docFileInput
+          >
+        </div>
+      } @else {
+        <div class="file-previews">
+          @for (doc of documentPreviews; track $index; let i = $index) {
+            <div class="file-preview-item">
+              <img [src]="doc.preview" alt="Document preview" class="preview-thumbnail">
+              <button 
+                type="button" 
+                class="remove-file-btn"
+                (click)="removeDocument(i)"
+              >
+                ×
+              </button>
+            </div>
+          }
+          <div 
+            class="add-more-btn"
+            (click)="docFileInput.click()"
+          >
+            <span class="add-icon">+</span>
+          </div>
+          <input 
+            type="file" 
+            accept="image/*,.pdf,.doc,.docx"
+            multiple
+            (change)="onDocumentFileSelected($event)"
+            class="file-input"
+            #docFileInput
+          >
+        </div>
+      }
+    </div>
+
+    <!-- Store Image Section -->
+    <div class="upload-section">
+      <label class="section-label">Store Image</label>
+      
+      @if (imagePreviews.length === 0) {
+        <div 
+          class="file-upload-area"
+          [class.dragging]="isDraggingImages"
+          (dragover)="onImageDragOver($event)"
+          (dragleave)="onImageDragLeave($event)"
+          (drop)="onImageDrop($event)"
+        >
+          <div class="upload-icon">📁</div>
+          <p class="upload-text">Drag & drop image here or click to browse</p>
+          <p class="upload-hint">PNG, JPG (max up to 5MB)</p>
+          <input 
+            type="file" 
+            accept="image/*"
+            multiple
+            (change)="onImageFileSelected($event)"
+            class="file-input"
+            #imageFileInput
+          >
+        </div>
+      } @else {
+        <div class="file-previews">
+          @for (image of imagePreviews; track $index; let i = $index) {
+            <div class="file-preview-item">
+              <img [src]="image.preview" alt="Store image preview" class="preview-thumbnail">
+              <button 
+                type="button" 
+                class="remove-file-btn"
+                (click)="removeImage(i)"
+              >
+                ×
+              </button>
+            </div>
+          }
+          <div 
+            class="add-more-btn"
+            (click)="imageFileInput.click()"
+          >
+            <span class="add-icon">+</span>
+          </div>
+          <input 
+            type="file" 
+            accept="image/*"
+            multiple
+            (change)="onImageFileSelected($event)"
+            class="file-input"
+            #imageFileInput
+          >
+        </div>
+      }
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSaveAndNext()"
+    >
+      Save & Next
+    </button>
+  </div>
+</div>

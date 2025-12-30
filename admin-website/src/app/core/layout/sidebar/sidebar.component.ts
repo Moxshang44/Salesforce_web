@@ -53,16 +53,9 @@ export class SidebarComponent {
     },
     { label: 'Distributors', route: '/distributors', iconImage: 'assets/images/Distributor.png' },
     { label: 'Super Stockist', route: '/super-stockist', iconImage: 'assets/images/superstockist.png' },
-    { 
-      label: 'Retailer', 
-      route: '/retailer', 
-      iconImage: 'assets/images/finance.png',
-      isExpanded: false,
-      subItems: [
-        { label: 'Finance', route: '/finance' },
-        { label: 'Marketing', route: '/marketing' }
-      ]
-    },
+    { label: 'Retailer', route: '/retailer', iconImage: 'assets/images/finance.png' },
+    { label: 'Finance', route: '/finance', iconImage: 'assets/images/finance.png' },
+    { label: 'Marketing', route: '/marketing', iconImage: 'assets/images/marketing.png' },
     { label: 'Assign Task', route: '/tasks', iconImage: 'assets/images/assigntask.png' },
     { label: 'Employees', route: '/employees', iconImage: 'assets/images/employees.png' },
     { label: 'AI chat bot', route: '/ai-chat', iconImage: 'assets/images/aichatbot.png' },
