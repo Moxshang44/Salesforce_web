@@ -1,0 +1,265 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 1 of 2</span>
+    <button type="button" class="close-btn" (click)="onCancel()">×</button>
+  </div>
+
+  <form class="brand-form">
+    <!-- Brand Name -->
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label class="form-label">Brand Name</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., Maude Hlaze"
+          [(ngModel)]="formData.brandName"
+          name="brandName"
+          (blur)="generateBrandCode()"
+          required
+        >
+      </div>
+    </div>
+
+    <!-- Brand Code -->
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label class="form-label">
+          Brand Code <span class="auto-badge">Auto</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., BCAT1001"
+          [(ngModel)]="formData.brandCode"
+          name="brandCode"
+          required
+        >
+      </div>
+    </div>
+
+    <!-- Brand Visibility Control -->
+    <div class="form-section">
+      <label class="section-label">Brand Visibility Control</label>
+      <div class="checkbox-row">
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.availableInAllRegions"
+            name="availableInAllRegions"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">Available in all regions</span>
+        </label>
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.limitedLaunch"
+            name="limitedLaunch"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">Limited launch</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Select Country -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Select Country</label>
+        <div class="custom-dropdown">
+          <button type="button" class="dropdown-toggle">
+            {{ getSelectedCountriesText() }}
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="dropdown-menu">
+            @for (country of countryOptions; track country) {
+              <label class="dropdown-item">
+                <input 
+                  type="checkbox" 
+                  [checked]="isCountrySelected(country)"
+                  (change)="toggleCountry(country)"
+                  class="dropdown-checkbox"
+                >
+                <span>{{ country }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Select Regions -->
+      <div class="form-group">
+        <label class="form-label">Select Regions</label>
+        <div class="custom-dropdown">
+          <button type="button" class="dropdown-toggle">
+            {{ getSelectedRegionsText() }}
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="dropdown-menu">
+            @for (region of regionOptions; track region) {
+              <label class="dropdown-item">
+                <input 
+                  type="checkbox" 
+                  [checked]="isRegionSelected(region)"
+                  (change)="toggleRegion(region)"
+                  class="dropdown-checkbox"
+                >
+                <span>{{ region }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Select Zone -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Select Zone</label>
+        <div class="custom-dropdown">
+          <button type="button" class="dropdown-toggle">
+            {{ getSelectedZonesText() }}
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="dropdown-menu">
+            @for (zone of zoneOptions; track zone) {
+              <label class="dropdown-item">
+                <input 
+                  type="checkbox" 
+                  [checked]="isZoneSelected(zone)"
+                  (change)="toggleZone(zone)"
+                  class="dropdown-checkbox"
+                >
+                <span>{{ zone }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Select Areas -->
+      <div class="form-group">
+        <label class="form-label">Select Areas</label>
+        <div class="custom-dropdown">
+          <button type="button" class="dropdown-toggle">
+            {{ getSelectedAreasText() }}
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="dropdown-menu">
+            @for (area of areaOptions; track area) {
+              <label class="dropdown-item">
+                <input 
+                  type="checkbox" 
+                  [checked]="isAreaSelected(area)"
+                  (change)="toggleArea(area)"
+                  class="dropdown-checkbox"
+                >
+                <span>{{ area }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Channel Visibility (Optional) -->
+    <div class="form-section">
+      <label class="section-label">Channel Visibility <span class="optional-text">(Optional)</span></label>
+      <div class="checkbox-row">
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.channelVisibility.generalTrade"
+            name="generalTrade"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">General Trade</span>
+        </label>
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.channelVisibility.modernTrade"
+            name="modernTrade"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">Modern Trade</span>
+        </label>
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.channelVisibility.horecaTrade"
+            name="horecaTrade"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">HoReCa Trade</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Brand Logo Upload -->
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label class="form-label">Brand Logo</label>
+        
+        @if (!formData.brandLogoPreview) {
+          <div 
+            class="file-upload-area"
+            [class.dragging]="isDragging"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+          >
+            <div class="upload-icon">📁</div>
+            <p class="upload-text">Drag & drop image here or click to browse</p>
+            <p class="upload-hint">PNG, JPG, JPEG up to 5MB</p>
+            <input 
+              type="file" 
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              class="file-input"
+              #fileInput
+            >
+            <button 
+              type="button" 
+              class="browse-btn"
+              (click)="fileInput.click()"
+            >
+              Browse Files
+            </button>
+          </div>
+        } @else {
+          <div class="logo-preview">
+            <img [src]="formData.brandLogoPreview" alt="Brand Logo Preview" class="preview-image">
+            <button 
+              type="button" 
+              class="remove-logo-btn"
+              (click)="removeLogo()"
+            >
+              Remove Logo
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSaveAndNext()"
+    >
+      Save & Next
+    </button>
+  </div>
+</div>
+

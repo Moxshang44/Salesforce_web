@@ -41,7 +41,16 @@ export class SidebarComponent {
         { label: 'Pricelist', route: '/products/pricelist' }
       ]
     },
-    { label: 'Routes', route: '/routes', iconImage: 'assets/images/routes.png' },
+    { 
+      label: 'Routes Master', 
+      route: '/routes', 
+      iconImage: 'assets/images/routes.png',
+      isExpanded: false,
+      subItems: [
+        { label: 'Add Routes', route: '/routes' },
+        { label: 'Assign Routes', route: '/routes/assign' }
+      ]
+    },
     { label: 'Distributors', route: '/distributors', iconImage: 'assets/images/Distributor.png' },
     { label: 'Super Stockist', route: '/super-stockist', iconImage: 'assets/images/superstockist.png' },
     { 

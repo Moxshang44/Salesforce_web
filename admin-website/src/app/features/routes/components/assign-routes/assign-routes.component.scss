@@ -1,0 +1,45 @@
+@import '../../../../../styles/variables';
+
+.page-container {
+  display: flex;
+  min-height: 100vh;
+  background: #F5F5F5;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 255px;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-area {
+  flex: 1;
+  margin-top: 56px;
+  padding: 24px 32px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.placeholder-content {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  
+  p {
+    font-size: 16px;
+    color: #666;
+  }
+}
+
