@@ -1,0 +1,177 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 1 of 2</span>
+  </div>
+
+  <form class="scheme-form">
+    <!-- Scheme Based On -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Scheme Based On:</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.schemeBasedOn"
+          name="schemeBasedOn"
+        >
+          @for (option of schemeBasedOptions; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Scheme Name</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., Monsoon Special Scheme"
+          [(ngModel)]="formData.schemeName"
+          name="schemeName"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Scheme Code</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="#1031"
+          [(ngModel)]="formData.schemeCode"
+          name="schemeCode"
+        >
+      </div>
+    </div>
+
+    <!-- Select One -->
+    <div class="form-section">
+      <label class="section-label">Select One</label>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input 
+            type="radio" 
+            name="selectOne" 
+            value="buy-x-get-y-free"
+            [(ngModel)]="formData.selectOne"
+          >
+          <span class="radio-label">Buy X — Get Y Free</span>
+        </label>
+        <label class="radio-option">
+          <input 
+            type="radio" 
+            name="selectOne" 
+            value="buy-x-discount"
+            [(ngModel)]="formData.selectOne"
+          >
+          <span class="radio-label">Buy X — Discount %</span>
+        </label>
+        <label class="radio-option">
+          <input 
+            type="radio" 
+            name="selectOne" 
+            value="buy-x-get-off"
+            [(ngModel)]="formData.selectOne"
+          >
+          <span class="radio-label">Buy X — ₹Y Get Off</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Buy Units -->
+    <div class="form-row units-row">
+      <div class="form-group">
+        <label class="form-label">Buy Units</label>
+        <div class="input-with-select">
+          <select 
+            class="unit-select" 
+            [(ngModel)]="formData.buyUnits"
+            name="buyUnits"
+          >
+            @for (unit of unitOptions; track unit) {
+              <option [value]="unit">{{ unit }}</option>
+            }
+          </select>
+          <input 
+            type="text" 
+            class="unit-input" 
+            placeholder="e.g., 1000"
+            [(ngModel)]="formData.buyUnitsValue"
+            name="buyUnitsValue"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Get free Units</label>
+        <div class="input-with-select">
+          <select 
+            class="unit-select" 
+            [(ngModel)]="formData.getFreeUnits"
+            name="getFreeUnits"
+          >
+            @for (unit of unitOptions; track unit) {
+              <option [value]="unit">{{ unit }}</option>
+            }
+          </select>
+          <input 
+            type="text" 
+            class="unit-input" 
+            placeholder="10"
+            [(ngModel)]="formData.getFreeUnitsValue"
+            name="getFreeUnitsValue"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Max Free Units <span class="optional">(Optional)</span>
+        </label>
+        <div class="input-with-remove">
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="10"
+            [(ngModel)]="formData.maxFreeUnits"
+            name="maxFreeUnits"
+          >
+          <button 
+            type="button" 
+            class="remove-btn"
+            (click)="onRemove()"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Scheme Rule Button -->
+    <div class="add-rule-section">
+      <button 
+        type="button" 
+        class="add-rule-btn"
+        (click)="onAddSchemeRule()"
+      >
+        ➕ Add Scheme Rule
+      </button>
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSaveAndNext()"
+    >
+      Save & Next
+    </button>
+  </div>
+</div>
