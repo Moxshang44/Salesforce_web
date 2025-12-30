@@ -1,0 +1,20 @@
+<div class="stats-card">
+  <div class="stats-icon">{{ icon }}</div>
+  
+  <div class="stats-content">
+    <h3 class="stats-title">{{ title }}</h3>
+    <div class="stats-value">{{ value }}</div>
+    
+    @if (trend) {
+      <div class="stats-trend" [class.positive]="trend.isPositive" [class.negative]="!trend.isPositive">
+        <span class="trend-arrow">{{ trend.isPositive ? '↗' : '↘' }}</span>
+        <span class="trend-value">{{ trend.value }}</span>
+      </div>
+    }
+    
+    @if (subtitle) {
+      <div class="stats-subtitle">{{ subtitle }}</div>
+    }
+  </div>
+</div>
+

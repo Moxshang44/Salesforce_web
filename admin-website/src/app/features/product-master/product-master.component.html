@@ -1,0 +1,130 @@
+<div class="product-master-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <app-header></app-header>
+
+    <div class="product-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Products List</h1>
+        
+        <div class="header-actions">
+          <app-button variant="primary" size="sm" (click)="onBulkUpload()">
+            📤 Bulk Upload
+          </app-button>
+          <app-button variant="outline" size="sm" (click)="onExport()">
+            📊 Excel
+          </app-button>
+          <app-button variant="primary" size="sm" (click)="onAdd()">
+            ➕ Add
+          </app-button>
+        </div>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card">
+        <!-- Table Controls -->
+        <div class="table-controls">
+          <div class="pagination-controls">
+            <button class="page-nav" (click)="previousPage()" [disabled]="currentPage === 1">
+              ‹‹
+            </button>
+            <button 
+              class="page-number" 
+              [class.active]="currentPage === 1"
+              (click)="goToPage(1)"
+            >
+              1
+            </button>
+            <button 
+              class="page-number"
+              [class.active]="currentPage === 2"
+              (click)="goToPage(2)"
+            >
+              2
+            </button>
+            <button class="page-nav" (click)="nextPage()" [disabled]="currentPage === totalPages">
+              ››
+            </button>
+          </div>
+
+          <div class="search-filter">
+            <button class="filter-btn" (click)="onFilter()">
+              🔽 Filter
+            </button>
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                class="search-input"
+                (input)="onSearch($event)"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-wrapper">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th class="col-action">Action</th>
+                <th class="col-active">Active</th>
+                <th class="col-brand">Brand/Type-Code</th>
+                <th class="col-name">Name/size/Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of products; track product.id) {
+                <tr>
+                  <td class="col-action">
+                    <div class="action-buttons">
+                      <button class="action-btn edit" (click)="onEdit(product)" title="Edit">
+                        ✏️
+                      </button>
+                      <button class="action-btn view" (click)="onEdit(product)" title="View">
+                        👁️
+                      </button>
+                      <button class="action-btn delete" (click)="onDelete(product)" title="Delete">
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                  <td class="col-active">
+                    <span 
+                      class="status-badge" 
+                      [class.active]="product.active"
+                      [class.inactive]="!product.active"
+                    >
+                      {{ product.active ? 'Yes' : 'No' }}
+                    </span>
+                  </td>
+                  <td class="col-brand">
+                    <div class="brand-info">
+                      <div class="brand-name">{{ product.brand }}</div>
+                      <div class="type-code">{{ product.typeCode }}</div>
+                    </div>
+                  </td>
+                  <td class="col-name">
+                    <div class="product-info">
+                      <div class="product-name">{{ product.name }}</div>
+                      <div class="product-category">{{ product.category }}</div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer -->
+        <div class="table-footer">
+          <p>Showing 1 to 10 of 15 entries</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

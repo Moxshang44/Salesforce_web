@@ -1,0 +1,54 @@
+<div class="ai-assistant">
+  <!-- Floating button -->
+  <button class="ai-button" (click)="toggleAssistant()" [class.active]="isOpen">
+    <span class="ai-icon">🤖</span>
+    @if (!isOpen) {
+      <span class="ai-label">Talk to AI</span>
+    }
+  </button>
+
+  <!-- AI Assistant Modal -->
+  @if (isOpen) {
+    <div class="ai-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="ai-icon-large">🤖</span>
+          <div>
+            <h4>AI Assistant</h4>
+            @if (isConnecting) {
+              <p class="status connecting">Calling assistant...</p>
+            } @else {
+              <p class="status connected">Connected</p>
+            }
+          </div>
+        </div>
+        <button class="close-button" (click)="closeAssistant()">✕</button>
+      </div>
+      
+      <div class="modal-content">
+        @if (isConnecting) {
+          <div class="loading-state">
+            <div class="loader"></div>
+            <p>Waiting for response...</p>
+          </div>
+        } @else {
+          <div class="chat-area">
+            <div class="message ai-message">
+              <p>Hello! I'm your AI assistant. How can I help you today?</p>
+            </div>
+          </div>
+          
+          <div class="input-area">
+            <input 
+              type="text" 
+              placeholder="Type your message..." 
+              class="chat-input"
+            />
+            <button class="send-button">Send</button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+

@@ -1,0 +1,27 @@
+/* Global SCSS Variables */
+
+// Layout
+$container-max-width: 1440px;
+$sidebar-width: 280px;
+$header-height: 64px;
+
+// Z-index layers
+$z-index-dropdown: 1000;
+$z-index-modal: 2000;
+$z-index-tooltip: 3000;
+
+// Transitions
+$transition-speed-fast: 150ms;
+$transition-speed-normal: 300ms;
+$transition-speed-slow: 500ms;
+
+// Breakpoints
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-wide: 1440px;
+
+// Grid
+$grid-columns: 12;
+$grid-gutter: 24px;
+

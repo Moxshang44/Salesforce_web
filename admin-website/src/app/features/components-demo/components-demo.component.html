@@ -1,0 +1,111 @@
+<div class="demo-container">
+  <header class="demo-header">
+    <h1>Component Library Demo</h1>
+    <p>Pixel-perfect components inspired by Figma designs</p>
+  </header>
+
+  <div class="demo-grid">
+    <!-- Buttons Section -->
+    <app-card title="Buttons" subtitle="Various button styles and sizes">
+      <div class="component-showcase">
+        <div class="showcase-row">
+          <app-button variant="primary">Primary Button</app-button>
+          <app-button variant="secondary">Secondary Button</app-button>
+          <app-button variant="outline">Outline Button</app-button>
+          <app-button variant="ghost">Ghost Button</app-button>
+          <app-button variant="danger">Danger Button</app-button>
+        </div>
+        
+        <div class="showcase-row">
+          <app-button variant="primary" size="sm">Small</app-button>
+          <app-button variant="primary" size="md">Medium</app-button>
+          <app-button variant="primary" size="lg">Large</app-button>
+        </div>
+        
+        <div class="showcase-row">
+          <app-button variant="primary" [disabled]="true">Disabled</app-button>
+          <app-button variant="primary" [loading]="true">Loading</app-button>
+        </div>
+      </div>
+    </app-card>
+
+    <!-- Inputs Section -->
+    <app-card title="Input Fields" subtitle="Form input components">
+      <div class="component-showcase">
+        <app-input
+          label="Email Address"
+          type="email"
+          placeholder="Enter your email"
+          hint="We'll never share your email"
+          [(value)]="email"
+        ></app-input>
+        
+        <app-input
+          label="Password"
+          type="password"
+          placeholder="Enter your password"
+          [required]="true"
+          [(value)]="password"
+        ></app-input>
+        
+        <app-input
+          label="Disabled Input"
+          placeholder="This field is disabled"
+          [disabled]="true"
+        ></app-input>
+        
+        <app-input
+          label="Input with Error"
+          placeholder="This has an error"
+          error="This field is required"
+        ></app-input>
+      </div>
+    </app-card>
+
+    <!-- Cards Section -->
+    <app-card title="Card Components" subtitle="Container components with various states">
+      <div class="component-showcase">
+        <div class="cards-grid">
+          <app-card title="Basic Card" [elevated]="false">
+            <p>This is a basic card without elevation.</p>
+          </app-card>
+          
+          <app-card title="Elevated Card" [elevated]="true">
+            <p>This card has a shadow effect.</p>
+          </app-card>
+          
+          <app-card title="Hoverable Card" [hoverable]="true">
+            <p>Hover over this card to see the effect.</p>
+          </app-card>
+        </div>
+      </div>
+    </app-card>
+
+    <!-- Integration Example -->
+    <app-card title="Form Example" subtitle="Combining components together">
+      <form class="demo-form" (submit)="onSubmit()">
+        <app-input
+          label="Email"
+          type="email"
+          placeholder="you@example.com"
+          [required]="true"
+          [(value)]="email"
+        ></app-input>
+        
+        <app-input
+          label="Password"
+          type="password"
+          placeholder="••••••••"
+          [required]="true"
+          [(value)]="password"
+        ></app-input>
+        
+        <div class="form-actions">
+          <app-button variant="outline" type="button">Cancel</app-button>
+          <app-button variant="primary" type="submit">Sign In</app-button>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>
+
