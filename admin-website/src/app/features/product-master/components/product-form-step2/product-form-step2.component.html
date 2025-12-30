@@ -1,0 +1,202 @@
+<form class="product-form-step2">
+  <!-- Step Header -->
+  <div class="step-header">
+    <div class="step-indicator">
+      <span class="step-dot active"></span>
+      <span class="step-label">Step 2 of 3</span>
+    </div>
+    <div class="step-title">Physical & Technical Details</div>
+  </div>
+
+  <!-- Form Grid -->
+  <div class="form-grid">
+    <!-- Packaging Type -->
+    <div class="form-group">
+      <label class="form-label">Packaging Type</label>
+      <select class="form-select" [(ngModel)]="formData.packagingType" name="packagingType">
+        @for (type of packagingTypes; track type) {
+          <option [value]="type">{{ type }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Measure Type -->
+    <div class="form-group">
+      <label class="form-label">Measure Type</label>
+      <select class="form-select" [(ngModel)]="formData.measureType" name="measureType">
+        @for (type of measureTypes; track type) {
+          <option [value]="type">{{ type }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Shelf Life / Expiry Duration -->
+    <div class="form-group">
+      <label class="form-label">Shelf Life / Expiry Duration</label>
+      <div class="input-group">
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="formData.shelfLife" 
+          name="shelfLife"
+          placeholder="Select Units"
+        />
+        <select class="form-select-addon" [(ngModel)]="formData.shelfLifeUnit" name="shelfLifeUnit">
+          @for (unit of shelfLifeUnits; track unit) {
+            <option [value]="unit">{{ unit }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Net Weight -->
+    <div class="form-group">
+      <label class="form-label">Net Weight</label>
+      <div class="input-group">
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="formData.netWeight" 
+          name="netWeight"
+        />
+        <select class="form-select-addon" [(ngModel)]="formData.weightUnit" name="weightUnit">
+          @for (unit of weightUnits; track unit) {
+            <option [value]="unit">{{ unit }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Gross Weight -->
+    <div class="form-group">
+      <label class="form-label">Gross Weight</label>
+      <div class="input-group">
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="formData.grossWeight" 
+          name="grossWeight"
+        />
+        <select class="form-select-addon" [(ngModel)]="formData.grossWeightUnit" name="grossWeightUnit">
+          @for (unit of weightUnits; track unit) {
+            <option [value]="unit">{{ unit }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- UDM Section -->
+  <div class="udm-section">
+    <div class="udm-header">
+      <h3 class="udm-title">UDM Section</h3>
+    </div>
+
+    <!-- UDM Add Row -->
+    <div class="udm-add-row">
+      <div class="udm-add-grid">
+        <div class="form-group">
+          <label class="form-label">Select Parent UOM</label>
+          <select class="form-select" [(ngModel)]="formData.selectParentUOM" name="selectParentUOM">
+            @for (type of packagingTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">UOM Name</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            [(ngModel)]="formData.uomName" 
+            name="uomName"
+            placeholder="Box"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            [(ngModel)]="formData.quantity" 
+            name="quantity"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Price</label>
+          <div class="price-input">
+            <span class="currency">₹</span>
+            <input 
+              type="text" 
+              class="form-input" 
+              [(ngModel)]="formData.price" 
+              name="price"
+            />
+          </div>
+        </div>
+      </div>
+      <button type="button" class="add-udm-btn" (click)="addUDMItem()">
+        + Add UDM
+      </button>
+    </div>
+
+    <!-- UDM Table -->
+    <div class="udm-table-wrapper">
+      <table class="udm-table">
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>UOM Name</th>
+            <th>Contains</th>
+            <th>Total Base Unit</th>
+            <th>Default</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of formData.udmItems; track $index) {
+            <tr>
+              <td>{{ item.level }}</td>
+              <td>{{ item.parentUOM }}</td>
+              <td>{{ item.contains || '-' }}</td>
+              <td>{{ item.totalBaseUnit }}</td>
+              <td>
+                <input 
+                  type="checkbox" 
+                  class="checkbox" 
+                  [(ngModel)]="item.default"
+                  [name]="'default-' + $index"
+                />
+              </td>
+              <td>
+                <div class="action-icons">
+                  <button type="button" class="icon-btn edit" title="Edit">✏️</button>
+                  <button type="button" class="icon-btn delete" (click)="removeUDMItem($index)" title="Delete">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="form-actions">
+    <app-button 
+      variant="outline" 
+      type="button"
+      (click)="onPrevious()"
+    >
+      Previous
+    </app-button>
+    <app-button 
+      variant="primary" 
+      type="button"
+      (click)="onSaveAndNext()"
+    >
+      Save & Next
+    </app-button>
+  </div>
+</form>
+

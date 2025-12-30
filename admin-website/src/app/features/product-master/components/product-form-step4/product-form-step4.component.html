@@ -1,0 +1,139 @@
+<form class="product-form-step4">
+  <!-- Step Header -->
+  <div class="step-header">
+    <div class="step-indicator">
+      <span class="step-dot active"></span>
+      <span class="step-label">Step 4 of 6</span>
+    </div>
+    <div class="step-title">Visibility & Access Controls</div>
+  </div>
+
+  <!-- Territory Selection -->
+  <div class="territory-section">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Select Country</label>
+        <select class="form-select" name="selectCountry">
+          <option value="">2 Selected</option>
+          @for (country of countries; track country) {
+            <option [value]="country">{{ country }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Select Zone</label>
+        <select class="form-select" name="selectZone">
+          <option value="">All Selected</option>
+          @for (zone of zones; track zone) {
+            <option [value]="zone">{{ zone }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Select Areas</label>
+        <select class="form-select" name="selectAreas">
+          <option value="">Select Areas</option>
+          @for (area of areas; track area) {
+            <option [value]="area">{{ area }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Select Regions</label>
+        <select class="form-select" name="selectRegions">
+          <option value="">Select Regions</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Channel Visibility -->
+  <div class="visibility-section">
+    <h3 class="section-title">Channel Visibility</h3>
+    <div class="checkbox-grid">
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          class="checkbox" 
+          [(ngModel)]="formData.channelVisibility.generalTrade" 
+          name="generalTrade"
+        />
+        <span>General Trade</span>
+      </label>
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          class="checkbox" 
+          [(ngModel)]="formData.channelVisibility.modernTrade" 
+          name="modernTrade"
+        />
+        <span>Modern Trade</span>
+      </label>
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          class="checkbox" 
+          [(ngModel)]="formData.channelVisibility.horeca" 
+          name="horeca"
+        />
+        <span>HORECA Trade</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Retailer Type Visibility -->
+  <div class="visibility-section">
+    <h3 class="section-title">Retailer Type Visibility</h3>
+    <div class="checkbox-grid">
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          class="checkbox" 
+          [(ngModel)]="formData.channelVisibility.typeA" 
+          name="typeA"
+        />
+        <span>Type A</span>
+      </label>
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          class="checkbox" 
+          [(ngModel)]="formData.channelVisibility.typeB" 
+          name="typeB"
+        />
+        <span>Type B</span>
+      </label>
+      <label class="checkbox-label">
+        <input 
+          type="checkbox" 
+          class="checkbox" 
+          [(ngModel)]="formData.channelVisibility.typeC" 
+          name="typeC"
+        />
+        <span>Type C</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="form-actions">
+    <app-button 
+      variant="outline" 
+      type="button"
+      (click)="onPrevious()"
+    >
+      Previous
+    </app-button>
+    <app-button 
+      variant="primary" 
+      type="button"
+      (click)="onSave()"
+    >
+      Save & Next
+    </app-button>
+  </div>
+</form>
+

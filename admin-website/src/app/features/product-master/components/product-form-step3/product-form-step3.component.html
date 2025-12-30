@@ -1,0 +1,255 @@
+<form class="product-form-step3">
+  <!-- Step Header -->
+  <div class="step-header">
+    <div class="step-indicator">
+      <span class="step-dot active"></span>
+      <span class="step-label">Step 3 of 3</span>
+    </div>
+    <div class="step-title">Channel Pricing & Territory Control</div>
+  </div>
+
+  <!-- Top Section: MRP, GST, GST Category -->
+  <div class="top-section">
+    <div class="form-group">
+      <label class="form-label">MRP</label>
+      <div class="currency-input">
+        <span class="currency">₹</span>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="formData.mrp" 
+          name="mrp"
+        />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">GST %</label>
+      <select class="form-select" [(ngModel)]="formData.gstPercent" name="gstPercent">
+        @for (gst of gstPercentages; track gst) {
+          <option [value]="gst">{{ gst }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">GST Category</label>
+      <select class="form-select" [(ngModel)]="formData.gstCategory" name="gstCategory">
+        @for (category of gstCategories; track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Pricing Levels Table -->
+  <div class="pricing-table-section">
+    <table class="pricing-table">
+      <thead>
+        <tr>
+          <th>Level</th>
+          <th>Margin %</th>
+          <th>Purchase Price</th>
+          <th>Selling Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (level of formData.pricingLevels; track $index) {
+          <tr>
+            <td>
+              <div class="level-cell">
+                <span class="level-name">{{ level.level }}</span>
+                <select 
+                  class="level-type" 
+                  [(ngModel)]="level.priceType" 
+                  [name]="'priceType-' + $index"
+                >
+                  @for (type of priceTypes; track type) {
+                    <option [value]="type">{{ type }}</option>
+                  }
+                </select>
+              </div>
+            </td>
+            <td>
+              <input 
+                type="text" 
+                class="form-input-small" 
+                [(ngModel)]="level.margin" 
+                [name]="'margin-' + $index"
+              />
+            </td>
+            <td>
+              <div class="currency-input-small">
+                <span class="currency">₹</span>
+                <input 
+                  type="text" 
+                  class="form-input-small" 
+                  [(ngModel)]="level.purchasePrice" 
+                  [name]="'purchasePrice-' + $index"
+                />
+              </div>
+            </td>
+            <td>
+              <div class="currency-input-small">
+                <span class="currency">₹</span>
+                <input 
+                  type="text" 
+                  class="form-input-small" 
+                  [(ngModel)]="level.sellingPrice" 
+                  [name]="'sellingPrice-' + $index"
+                />
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Minimum Order Quantity Section -->
+  <div class="moq-section">
+    <h3 class="moq-title">Minimum Order Quantity <span class="optional">(Optional)</span></h3>
+    <div class="moq-grid">
+      <div class="form-group">
+        <label class="form-label">Super Stockiest MOQ</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="formData.superStockistMOQ" 
+          name="superStockistMOQ"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Distributor MOQ</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="formData.distributorMOQ" 
+          name="distributorMOQ"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Retailer MOQ</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="formData.retailerMOQ" 
+          name="retailerMOQ"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Enable Region-Based Pricing -->
+  <div class="region-pricing-toggle">
+    <label class="checkbox-label">
+      <input 
+        type="checkbox" 
+        class="checkbox" 
+        [(ngModel)]="formData.enableRegionPricing" 
+        name="enableRegionPricing"
+      />
+      <span>Enable Region-Based Pricing/Margin</span>
+    </label>
+    <button type="button" class="add-btn" (click)="addRegionPricing()">+ Add</button>
+  </div>
+
+  <!-- Region Pricing Table -->
+  @if (formData.enableRegionPricing && formData.regionPricings.length > 0) {
+    <div class="region-table-section">
+      <table class="region-table">
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>Label Rule Name</th>
+            <th>MRP</th>
+            <th>Stockist %</th>
+            <th>Distributor %</th>
+            <th>Retailer %</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (region of formData.regionPricings; track region.id) {
+            <tr>
+              <td>
+                <div class="action-icons">
+                  <button type="button" class="icon-btn edit" title="Edit">✏️</button>
+                  <button type="button" class="icon-btn copy" title="Copy">📋</button>
+                  <button type="button" class="icon-btn delete" (click)="removeRegionPricing($index)" title="Delete">🗑️</button>
+                </div>
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-input-table" 
+                  [(ngModel)]="region.labelRuleName" 
+                  [name]="'labelRuleName-' + region.id"
+                  placeholder="North Zone Pricing"
+                />
+              </td>
+              <td>
+                <div class="currency-input-table">
+                  <span class="currency">₹</span>
+                  <input 
+                    type="text" 
+                    class="form-input-table" 
+                    [(ngModel)]="region.mrp" 
+                    [name]="'mrp-' + region.id"
+                  />
+                </div>
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-input-table percent-input" 
+                  [(ngModel)]="region.stockistPercent" 
+                  [name]="'stockistPercent-' + region.id"
+                  placeholder="8%"
+                />
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-input-table percent-input" 
+                  [(ngModel)]="region.distributorPercent" 
+                  [name]="'distributorPercent-' + region.id"
+                  placeholder="12%"
+                />
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-input-table percent-input" 
+                  [(ngModel)]="region.retailerPercent" 
+                  [name]="'retailerPercent-' + region.id"
+                  placeholder="16%"
+                />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <div class="table-footer-actions">
+        <button type="button" class="btn-secondary">Previous</button>
+        <button type="button" class="btn-primary">Save & Next</button>
+      </div>
+    </div>
+  }
+
+  <!-- Form Actions -->
+  <div class="form-actions">
+    <app-button 
+      variant="outline" 
+      type="button"
+      (click)="onPrevious()"
+    >
+      Previous
+    </app-button>
+    <app-button 
+      variant="primary" 
+      type="button"
+      (click)="onSave()"
+    >
+      Save & Next
+    </app-button>
+  </div>
+</form>
+
