@@ -63,7 +63,12 @@ export const routes: Routes = [
   },
   {
     path: 'distributors',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/distributors/distributors.component').then(m => m.DistributorsComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'distributors/:id/stock',
+    loadComponent: () => import('./features/distributors/distributor-stock/distributor-stock.component').then(m => m.DistributorStockComponent),
     canActivate: [authGuard]
   },
   {

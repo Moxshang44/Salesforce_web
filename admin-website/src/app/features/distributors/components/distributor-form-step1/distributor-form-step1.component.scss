@@ -1,0 +1,382 @@
+.form-container {
+  padding: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.form-step-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.step-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #664423;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #666;
+  }
+}
+
+.distributor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  &.three-col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auto-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.optional-text {
+  color: #999;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.form-input,
+.form-select {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
+
+  &::placeholder {
+    color: #999;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #664423;
+    box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+}
+
+.form-textarea {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s ease;
+  background: white;
+
+  &::placeholder {
+    color: #999;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #664423;
+    box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+}
+
+// Mobile Number with Country Code
+.input-with-select {
+  display: flex;
+  gap: 8px;
+}
+
+.country-code-select {
+  flex: 0 0 80px;
+  padding: 10px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+
+  &:focus {
+    outline: none;
+    border-color: #664423;
+    box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+}
+
+.phone-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+
+  &::placeholder {
+    color: #999;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #664423;
+    box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+}
+
+// Upload Sections
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.file-upload-area {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  background: #fafafa;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #664423;
+    background: #f5f5f5;
+  }
+
+  &.dragging {
+    border-color: #664423;
+    background: #fff9f0;
+  }
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+}
+
+.file-input {
+  display: none;
+}
+
+// File Previews
+.file-previews {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.file-preview-item {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e0e0e0;
+  background: white;
+}
+
+.preview-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-file-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(200, 35, 51, 1);
+    transform: scale(1.1);
+  }
+}
+
+.add-more-btn {
+  width: 100px;
+  height: 100px;
+  border: 2px dashed #664423;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #fff9f0;
+    border-color: #4a3119;
+  }
+}
+
+.add-icon {
+  font-size: 36px;
+  color: #664423;
+}
+
+// Action Buttons
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  position: sticky;
+  bottom: 0;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-cancel {
+  background: white;
+  color: #666;
+  border: 1px solid #ddd;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #999;
+  }
+}
+
+.btn-save {
+  background: #664423;
+  color: white;
+
+  &:hover {
+    background: #4a3119;
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .form-row.three-col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-row,
+  .form-row.three-col {
+    grid-template-columns: 1fr;
+  }
+
+  .form-container {
+    max-height: 60vh;
+  }
+
+  .file-preview-item,
+  .add-more-btn {
+    width: 80px;
+    height: 80px;
+  }
+}
+

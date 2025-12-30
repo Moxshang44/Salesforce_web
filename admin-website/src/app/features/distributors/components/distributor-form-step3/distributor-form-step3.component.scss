@@ -1,0 +1,341 @@
+.form-container {
+  padding: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.form-step-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.step-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #664423;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #666;
+  }
+}
+
+.routes-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+// Filter Rows
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.filter-select {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #664423;
+    box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+}
+
+// Routes Section
+.routes-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.routes-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.column-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.routes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.header-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.routes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 280px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.route-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.route-name {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.btn-assigned,
+.btn-assign {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.btn-assigned {
+  background: #664423;
+  color: white;
+
+  &:hover {
+    background: #4a3119;
+  }
+}
+
+.btn-assign {
+  background: #664423;
+  color: white;
+
+  &:hover {
+    background: #4a3119;
+  }
+}
+
+.btn-icon {
+  font-size: 14px;
+}
+
+// Pagination
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.pagination-text {
+  font-size: 12px;
+  color: #666;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.page-btn {
+  padding: 4px 10px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #999;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.page-number {
+  padding: 4px 10px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  min-width: 32px;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #999;
+  }
+
+  &.active {
+    background: #664423;
+    color: white;
+    border-color: #664423;
+  }
+}
+
+// Action Buttons
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  position: sticky;
+  bottom: 0;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-cancel {
+  background: white;
+  color: #666;
+  border: 1px solid #ddd;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #999;
+  }
+}
+
+.btn-save {
+  background: #664423;
+  color: white;
+
+  &:hover {
+    background: #4a3119;
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .routes-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-container {
+    max-height: 60vh;
+  }
+
+  .routes-list {
+    min-height: 200px;
+    max-height: 200px;
+  }
+}
+
