@@ -3,6 +3,12 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
+import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { ProductFormComponent } from './components/product-form/product-form.component';
+import { ProductFormStep2Component } from './components/product-form-step2/product-form-step2.component';
+import { ProductFormStep3Component } from './components/product-form-step3/product-form-step3.component';
+import { ProductFormStep3_2Component } from './components/product-form-step3-2/product-form-step3-2.component';
+import { ProductFormStep4Component } from './components/product-form-step4/product-form-step4.component';
 
 interface Product {
   id: string;
@@ -17,13 +23,15 @@ interface Product {
 @Component({
   selector: 'app-product-master',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent, ButtonComponent],
+  imports: [CommonModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, ProductFormComponent, ProductFormStep2Component, ProductFormStep3Component, ProductFormStep3_2Component, ProductFormStep4Component],
   templateUrl: './product-master.component.html',
   styleUrl: './product-master.component.scss'
 })
 export class ProductMasterComponent {
   currentPage = 1;
   totalPages = 2;
+  isAddModalOpen = false;
+  currentStep: number = 1;
   
   products: Product[] = [
     {
@@ -139,7 +147,73 @@ export class ProductMasterComponent {
   }
 
   onAdd() {
-    console.log('Add new product');
+    this.currentStep = 1;
+    this.isAddModalOpen = true;
+  }
+
+  closeAddModal() {
+    this.isAddModalOpen = false;
+    this.currentStep = 1;
+  }
+
+  onSaveStep1(productData: any) {
+    console.log('Save step 1:', productData);
+    // Move to step 2
+    this.currentStep = 2;
+  }
+
+  onSaveStep2(productData: any) {
+    console.log('Save step 2:', productData);
+    // Move to step 3
+    this.currentStep = 3;
+  }
+
+  onSaveStep3(productData: any) {
+    console.log('Save step 3:', productData);
+    // Move to step 3.2
+    this.currentStep = 3.2;
+  }
+
+  onSaveStep3_2(productData: any) {
+    console.log('Save step 3.2:', productData);
+    // Move to step 4
+    this.currentStep = 4;
+  }
+
+  onSaveStep4(productData: any) {
+    console.log('Save step 4:', productData);
+    // Here you would typically save all data to backend
+    // For now, just close the modal and show success
+    console.log('Product creation completed!');
+    this.isAddModalOpen = false;
+    this.currentStep = 1;
+  }
+
+  onPreviousStep() {
+    if (this.currentStep === 4) {
+      this.currentStep = 3.2;
+    } else if (this.currentStep === 3.2) {
+      this.currentStep = 3;
+    } else if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  getModalTitle(): string {
+    switch(this.currentStep) {
+      case 1:
+        return 'Add Product — Step 1: Basic Product Information';
+      case 2:
+        return 'Add Product — Step 2: Physical & Technical Details';
+      case 3:
+        return 'Add Product — Step 3: Channel Pricing & Territory Control';
+      case 3.2:
+        return 'Add Product — Step 3: Channel Pricing & Territory Control';
+      case 4:
+        return 'Add Product — Step 4: Visibility & Access Controls';
+      default:
+        return 'Add Product';
+    }
   }
 
   onFilter() {

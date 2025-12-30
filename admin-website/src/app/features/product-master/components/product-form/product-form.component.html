@@ -1,0 +1,231 @@
+<form class="product-form">
+  <!-- Step Header -->
+  <div class="step-header">
+    <div class="step-indicator">
+      <span class="step-dot active"></span>
+      <span class="step-label">Step 1 of 3</span>
+    </div>
+    <div class="step-title">Basic Product Information</div>
+  </div>
+
+  <!-- Form Grid -->
+  <div class="form-grid">
+    <!-- Brand -->
+    <div class="form-group">
+      <label class="form-label">
+        Brand
+        <span class="required">*</span>
+      </label>
+      <select 
+        class="form-select" 
+        [(ngModel)]="formData.brand" 
+        name="brand"
+      >
+        <option value="">Select Brand</option>
+        @for (brand of brands; track brand) {
+          <option [value]="brand">{{ brand }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Category -->
+    <div class="form-group">
+      <label class="form-label">
+        Category
+        <span class="required">*</span>
+      </label>
+      <select 
+        class="form-select" 
+        [(ngModel)]="formData.category" 
+        name="category"
+      >
+        <option value="">Select Category</option>
+        @for (category of categories; track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Subcategory -->
+    <div class="form-group">
+      <label class="form-label">
+        Subcategory <span class="optional">(Optional)</span>
+      </label>
+      <select 
+        class="form-select" 
+        [(ngModel)]="formData.subcategory" 
+        name="subcategory"
+      >
+        <option value="">Select Subcategory</option>
+        @for (subcategory of subcategories; track subcategory) {
+          <option [value]="subcategory">{{ subcategory }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- SKU Code -->
+    <div class="form-group">
+      <label class="form-label">
+        SKU Code
+        <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        class="form-input" 
+        [(ngModel)]="formData.skuCode" 
+        name="skuCode"
+        placeholder="Enter SKU code"
+      />
+    </div>
+
+    <!-- Product Name (Full Width) -->
+    <div class="form-group full-width">
+      <label class="form-label">
+        PRD Name / Product as New
+        <span class="required">*</span>
+      </label>
+      <input 
+        type="text" 
+        class="form-input" 
+        [(ngModel)]="formData.productName" 
+        name="productName"
+        placeholder="Enter product name"
+      />
+    </div>
+
+    <!-- Organic Whole Grain Energy Bar (Static Text) -->
+    <div class="form-group full-width">
+      <input 
+        type="text" 
+        class="form-input" 
+        value="Organic Whole Grain Energy Bar" 
+        readonly
+      />
+    </div>
+
+    <!-- Short Description (Full Width) -->
+    <div class="form-group full-width">
+      <label class="form-label">
+        Short Description
+        <span class="required">*</span>
+      </label>
+      <textarea 
+        class="form-textarea" 
+        [(ngModel)]="formData.shortDescription" 
+        name="shortDescription"
+        placeholder="A delicious and wholesome organic energy bar, packed with whole grains, nuts, and dried fruits for sustained energy, perfect for on the go activities."
+        rows="3"
+      ></textarea>
+    </div>
+
+    <!-- Product Images (Full Width) -->
+    <div class="form-group full-width">
+      <label class="form-label">Product Images</label>
+      <div class="image-upload-section">
+        <div class="upload-area" (click)="fileInput.click()">
+          <div class="upload-icon">📁</div>
+          <div class="upload-text">Drop a file image here or click to browse</div>
+          <div class="upload-hint">PNG, JPG or GIF (max. 800x400px)</div>
+          <input 
+            #fileInput
+            type="file" 
+            accept="image/*" 
+            multiple
+            (change)="onImageSelect($event)"
+            style="display: none"
+          />
+        </div>
+
+        @if (imagePreviews.length > 0) {
+          <div class="image-preview-grid">
+            @for (preview of imagePreviews; track $index) {
+              <div class="image-preview-item">
+                <img [src]="preview" alt="Product image" />
+                <button 
+                  type="button" 
+                  class="remove-image-btn" 
+                  (click)="removeImage($index)"
+                >
+                  ✕
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Ingredients & Compliance (Full Width) -->
+    <div class="form-group full-width">
+      <label class="form-label">Ingredients & Compliance (Optional)</label>
+      <textarea 
+        class="form-textarea" 
+        [(ngModel)]="formData.ingredientsCompliance" 
+        name="ingredientsCompliance"
+        placeholder="The product bag contains a protein based (30%) consisting of premium concentrate, organic isolate, premier, grass fed BCI, allergen soy milk, essential, organic vitamins and minerals, and well as acids."
+        rows="3"
+      ></textarea>
+    </div>
+
+    <!-- Height & Width -->
+    <div class="form-group">
+      <label class="form-label">
+        Height & Width <span class="optional">(Optional)</span>
+      </label>
+      <div class="dimension-inputs">
+        <input 
+          type="number" 
+          class="form-input" 
+          [(ngModel)]="formData.height" 
+          name="height"
+          placeholder="45"
+        />
+        <span class="dimension-separator">x</span>
+        <input 
+          type="number" 
+          class="form-input" 
+          [(ngModel)]="formData.width" 
+          name="width"
+          placeholder="45"
+        />
+        <span class="dimension-unit">CM</span>
+      </div>
+    </div>
+
+    <!-- HSN Code -->
+    <div class="form-group">
+      <label class="form-label">
+        HSN Code (Optional)
+      </label>
+      <select 
+        class="form-select" 
+        [(ngModel)]="formData.hsnCode" 
+        name="hsnCode"
+      >
+        <option value="">Select HSN Code</option>
+        <option value="HSN001">HSN001</option>
+        <option value="HSN002">HSN002</option>
+        <option value="HSN003">HSN003</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="form-actions">
+    <app-button 
+      variant="outline" 
+      type="button"
+      (click)="onCancel()"
+    >
+      Cancel
+    </app-button>
+    <app-button 
+      variant="primary" 
+      type="button"
+      (click)="onSave()"
+    >
+      Save & Next
+    </app-button>
+  </div>
+</form>
+

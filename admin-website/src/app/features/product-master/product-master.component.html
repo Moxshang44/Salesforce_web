@@ -126,5 +126,44 @@
       </div>
     </div>
   </div>
+
+  <!-- Add Product Modal -->
+  <app-modal 
+    [isOpen]="isAddModalOpen" 
+    [title]="getModalTitle()"
+    width="900px"
+    (close)="closeAddModal()"
+  >
+    @if (currentStep === 1) {
+      <app-product-form 
+        (save)="onSaveStep1($event)"
+        (cancel)="closeAddModal()"
+      ></app-product-form>
+    }
+    @if (currentStep === 2) {
+      <app-product-form-step2 
+        (save)="onSaveStep2($event)"
+        (previous)="onPreviousStep()"
+      ></app-product-form-step2>
+    }
+    @if (currentStep === 3) {
+      <app-product-form-step3 
+        (save)="onSaveStep3($event)"
+        (previous)="onPreviousStep()"
+      ></app-product-form-step3>
+    }
+    @if (currentStep === 3.2) {
+      <app-product-form-step3-2 
+        (save)="onSaveStep3_2($event)"
+        (previous)="onPreviousStep()"
+      ></app-product-form-step3-2>
+    }
+    @if (currentStep === 4) {
+      <app-product-form-step4 
+        (save)="onSaveStep4($event)"
+        (previous)="onPreviousStep()"
+      ></app-product-form-step4>
+    }
+  </app-modal>
 </div>
 

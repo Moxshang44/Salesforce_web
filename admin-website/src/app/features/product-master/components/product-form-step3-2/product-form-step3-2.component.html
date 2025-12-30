@@ -1,0 +1,259 @@
+<form class="product-form-step3-2">
+  <!-- Step Header -->
+  <div class="step-header">
+    <div class="step-indicator">
+      <span class="step-dot active"></span>
+      <span class="step-label">Step 3 of 3</span>
+    </div>
+    <div class="step-title">Channel Pricing & Territory Control</div>
+  </div>
+
+  <!-- Territory Pricing Cards -->
+  @for (territory of formData.territoryPricings; track territory.id) {
+    <div class="territory-card">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="form-group-inline">
+          <label class="form-label">Label</label>
+          <input 
+            type="text" 
+            class="form-input-inline" 
+            [(ngModel)]="territory.label" 
+            [name]="'label-' + territory.id"
+            placeholder="e.g. North Zone Pricing"
+          />
+        </div>
+        <button 
+          type="button" 
+          class="remove-btn" 
+          (click)="removeTerritoryPricing($index)"
+          *ngIf="formData.territoryPricings.length > 1"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Territory Selection Row -->
+      <div class="territory-selection">
+        <div class="form-group">
+          <label class="form-label">Select Country</label>
+          <select class="form-select" [name]="'country-' + territory.id">
+            <option value="">2 Selected</option>
+            @for (country of countries; track country) {
+              <option [value]="country">{{ country }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Select Zone</label>
+          <select class="form-select" [name]="'zone-' + territory.id">
+            <option value="">All Selected</option>
+            @for (zone of zones; track zone) {
+              <option [value]="zone">{{ zone }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Regions and MRP Row -->
+      <div class="territory-selection">
+        <div class="form-group">
+          <label class="form-label">Select Regions</label>
+          <select class="form-select" [name]="'regions-' + territory.id">
+            <option value="">All Selected</option>
+            @for (region of regions; track region) {
+              <option [value]="region">{{ region }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">MRP</label>
+          <div class="currency-input">
+            <span class="currency">₹</span>
+            <input 
+              type="text" 
+              class="form-input" 
+              [(ngModel)]="territory.mrp" 
+              [name]="'mrp-' + territory.id"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Levels Table -->
+      <div class="pricing-section">
+        <table class="pricing-table-compact">
+          <thead>
+            <tr>
+              <th>Level</th>
+              <th>Margin %</th>
+              <th>Purchase Price</th>
+              <th>Selling Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Super Stockist -->
+            <tr>
+              <td>
+                <div class="level-cell">
+                  <span class="level-name">Super Stockist</span>
+                  <select class="level-type-small" [name]="'ss-type-' + territory.id">
+                    @for (type of priceTypes; track type) {
+                      <option [value]="type">{{ type }}</option>
+                    }
+                  </select>
+                </div>
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-input-table" 
+                  [(ngModel)]="territory.levels.superStockist.margin" 
+                  [name]="'ss-margin-' + territory.id"
+                />
+              </td>
+              <td>
+                <div class="currency-input-table">
+                  <span class="currency">₹</span>
+                  <input 
+                    type="text" 
+                    class="form-input-table" 
+                    [(ngModel)]="territory.levels.superStockist.purchasePrice" 
+                    [name]="'ss-purchase-' + territory.id"
+                  />
+                </div>
+              </td>
+              <td>
+                <div class="currency-input-table">
+                  <span class="currency">₹</span>
+                  <input 
+                    type="text" 
+                    class="form-input-table" 
+                    [(ngModel)]="territory.levels.superStockist.sellingPrice" 
+                    [name]="'ss-selling-' + territory.id"
+                  />
+                </div>
+              </td>
+            </tr>
+            <!-- Distributor -->
+            <tr>
+              <td>
+                <div class="level-cell">
+                  <span class="level-name">Distributor</span>
+                  <select class="level-type-small" [name]="'dist-type-' + territory.id">
+                    @for (type of priceTypes; track type) {
+                      <option [value]="type">{{ type }}</option>
+                    }
+                  </select>
+                </div>
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-input-table" 
+                  [(ngModel)]="territory.levels.distributor.margin" 
+                  [name]="'dist-margin-' + territory.id"
+                />
+              </td>
+              <td>
+                <div class="currency-input-table">
+                  <span class="currency">₹</span>
+                  <input 
+                    type="text" 
+                    class="form-input-table" 
+                    [(ngModel)]="territory.levels.distributor.purchasePrice" 
+                    [name]="'dist-purchase-' + territory.id"
+                  />
+                </div>
+              </td>
+              <td>
+                <div class="currency-input-table">
+                  <span class="currency">₹</span>
+                  <input 
+                    type="text" 
+                    class="form-input-table" 
+                    [(ngModel)]="territory.levels.distributor.sellingPrice" 
+                    [name]="'dist-selling-' + territory.id"
+                  />
+                </div>
+              </td>
+            </tr>
+            <!-- Retailer -->
+            <tr>
+              <td>
+                <div class="level-cell">
+                  <span class="level-name">Retailer</span>
+                  <select class="level-type-small" [name]="'ret-type-' + territory.id">
+                    @for (type of priceTypes; track type) {
+                      <option [value]="type">{{ type }}</option>
+                    }
+                  </select>
+                </div>
+              </td>
+              <td>
+                <input 
+                  type="text" 
+                  class="form-input-table" 
+                  [(ngModel)]="territory.levels.retailer.margin" 
+                  [name]="'ret-margin-' + territory.id"
+                />
+              </td>
+              <td>
+                <div class="currency-input-table">
+                  <span class="currency">₹</span>
+                  <input 
+                    type="text" 
+                    class="form-input-table" 
+                    [(ngModel)]="territory.levels.retailer.purchasePrice" 
+                    [name]="'ret-purchase-' + territory.id"
+                  />
+                </div>
+              </td>
+              <td>
+                <div class="currency-input-table">
+                  <span class="currency">₹</span>
+                  <input 
+                    type="text" 
+                    class="form-input-table" 
+                    [(ngModel)]="territory.levels.retailer.sellingPrice" 
+                    [name]="'ret-selling-' + territory.id"
+                  />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Card Footer Actions -->
+      <div class="card-footer">
+        <button type="button" class="btn-secondary">Cancel</button>
+        <button type="button" class="btn-primary">Save</button>
+      </div>
+    </div>
+  }
+
+  <!-- Add Territory Button -->
+  <button type="button" class="add-territory-btn" (click)="addTerritoryPricing()">
+    + Add Another Territory Pricing
+  </button>
+
+  <!-- Form Actions -->
+  <div class="form-actions">
+    <app-button 
+      variant="outline" 
+      type="button"
+      (click)="onPrevious()"
+    >
+      Previous
+    </app-button>
+    <app-button 
+      variant="primary" 
+      type="button"
+      (click)="onSave()"
+    >
+      Save & Complete
+    </app-button>
+  </div>
+</form>
+
