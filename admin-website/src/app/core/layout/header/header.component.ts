@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -12,6 +13,9 @@ export class HeaderComponent {
   companyName = 'Gaatha Global Marketing';
   hasNotifications = true;
   searchQuery = '';
+  showProfileMenu = false;
+
+  constructor(private authService: AuthService) {}
 
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -28,6 +32,11 @@ export class HeaderComponent {
   }
 
   onProfileClick() {
-    console.log('Profile clicked');
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  onLogout() {
+    this.showProfileMenu = false;
+    this.authService.logout();
   }
 }

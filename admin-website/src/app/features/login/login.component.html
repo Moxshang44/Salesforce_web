@@ -1,0 +1,87 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">
+        <div class="logo-icon">🏢</div>
+      </div>
+      <h1 class="login-title">Company Name</h1>
+      <p class="login-subtitle">Admin Portal</p>
+    </div>
+
+    <form class="login-form" (ngSubmit)="onSubmit()">
+      @if (errorMessage) {
+        <div class="error-message">
+          <span class="error-icon">⚠️</span>
+          {{ errorMessage }}
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="username" class="form-label">
+          <span class="label-icon">👤</span>
+          Username
+        </label>
+        <input
+          type="text"
+          id="username"
+          class="form-input"
+          [(ngModel)]="username"
+          name="username"
+          placeholder="Enter your username"
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">
+          <span class="label-icon">🔒</span>
+          Password
+        </label>
+        <div class="password-input-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            class="form-input"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+            tabindex="-1"
+          >
+            {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <label class="remember-me">
+          <input type="checkbox" class="checkbox" />
+          <span>Remember me</span>
+        </label>
+        <a href="#" class="forgot-password">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="login-button">
+        <span class="button-text">Sign In</span>
+        <span class="button-icon">→</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p class="footer-text">
+        Demo Credentials: <strong>testadmin / 111111</strong>
+      </p>
+    </div>
+  </div>
+
+  <div class="login-background">
+    <div class="background-shape shape-1"></div>
+    <div class="background-shape shape-2"></div>
+    <div class="background-shape shape-3"></div>
+  </div>
+</div>

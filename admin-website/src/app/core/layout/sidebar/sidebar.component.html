@@ -4,17 +4,51 @@
   </div>
 
   <nav class="sidebar-nav">
-    @for (item of navItems; track item.route) {
-      <a 
-        [routerLink]="item.route" 
-        routerLinkActive="active"
-        class="nav-item"
-      >
-        @if (item.iconImage) {
-          <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
+    @for (item of navItems; track item.label) {
+      <div class="nav-item-wrapper">
+        @if (item.subItems && item.subItems.length > 0) {
+          <!-- Nav item with sub-menu -->
+          <div 
+            class="nav-item"
+            [class.active]="item.isExpanded"
+            [class.has-submenu]="true"
+            (click)="toggleSubMenu(item)"
+          >
+            @if (item.iconImage) {
+              <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
+            }
+            <span class="nav-label">{{ item.label }}</span>
+            <span class="expand-icon" [class.expanded]="item.isExpanded">▸</span>
+          </div>
+          
+          <!-- Sub-menu items -->
+          @if (item.isExpanded) {
+            <div class="sub-menu">
+              @for (subItem of item.subItems; track subItem.route) {
+                <a 
+                  [routerLink]="subItem.route" 
+                  routerLinkActive="active"
+                  class="sub-nav-item"
+                >
+                  <span class="sub-nav-label">{{ subItem.label }}</span>
+                </a>
+              }
+            </div>
+          }
+        } @else {
+          <!-- Regular nav item without sub-menu -->
+          <a 
+            [routerLink]="item.route" 
+            routerLinkActive="active"
+            class="nav-item"
+          >
+            @if (item.iconImage) {
+              <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
+            }
+            <span class="nav-label">{{ item.label }}</span>
+          </a>
         }
-        <span class="nav-label">{{ item.label }}</span>
-      </a>
+      </div>
     }
   </nav>
 </aside>
