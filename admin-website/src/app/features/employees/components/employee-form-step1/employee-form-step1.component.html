@@ -1,0 +1,329 @@
+<div class="form-container">
+  <div class="form-step-indicator">
+    <span class="step-text">Step 1 of 2</span>
+    <button type="button" class="close-btn" (click)="onCancel()">×</button>
+  </div>
+
+  <form class="employee-form">
+    <!-- Row 1: Employee Name, Employee ID, Mobile Number -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">Employee Name</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="e.g., Manoj Badayani"
+          [(ngModel)]="formData.employeeName"
+          name="employeeName"
+          (blur)="generateEmployeeId()"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Employee ID</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="SR-EMP-001"
+          [(ngModel)]="formData.employeeId"
+          name="employeeId"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Mobile Number</label>
+        <div class="input-with-select">
+          <select 
+            class="country-code-select" 
+            [(ngModel)]="formData.countryCode"
+            name="countryCode"
+          >
+            @for (code of countryCodeOptions; track code) {
+              <option [value]="code">{{ code }}</option>
+            }
+          </select>
+          <input 
+            type="text" 
+            class="phone-input" 
+            placeholder="eg. 9449910-00090"
+            [(ngModel)]="formData.mobileNumber"
+            name="mobileNumber"
+            required
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Aadhaar Number, Role, Reporting Manager -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">Aadhaar Number</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          placeholder="0000 0000 0000"
+          [(ngModel)]="formData.aadhaarNumber"
+          name="aadhaarNumber"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.role"
+          name="role"
+        >
+          @for (role of roleOptions; track role) {
+            <option [value]="role">{{ role }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Reporting Manager</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.reportingManager"
+          name="reportingManager"
+        >
+          <option value="">Nehls Singh (SO)</option>
+          @for (manager of reportingManagerOptions; track manager) {
+            <option [value]="manager">{{ manager }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Row 3: Select Country, Select Zone, Select Region -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">Select Country</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectedCountry"
+          name="selectedCountry"
+        >
+          @for (country of countryOptions; track country) {
+            <option [value]="country">{{ country }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Zone</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectedZone"
+          name="selectedZone"
+        >
+          @for (zone of zoneOptions; track zone) {
+            <option [value]="zone">{{ zone }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Region</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectedRegion"
+          name="selectedRegion"
+        >
+          @for (region of regionOptions; track region) {
+            <option [value]="region">{{ region }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Row 4: Select Area, Employee Route, Select Start and End Dates -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">Select Area</label>
+        <select 
+          class="form-select" 
+          [(ngModel)]="formData.selectedArea"
+          name="selectedArea"
+        >
+          @for (area of areaOptions; track area) {
+            <option [value]="area">{{ area }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Employee Route</label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input 
+              type="radio" 
+              name="employeeRoute" 
+              value="Permanent"
+              [(ngModel)]="formData.employeeRoute"
+              class="radio-input"
+            >
+            <span class="radio-label">Permanent</span>
+          </label>
+
+          <label class="radio-item">
+            <input 
+              type="radio" 
+              name="employeeRoute" 
+              value="Temporary"
+              [(ngModel)]="formData.employeeRoute"
+              class="radio-input"
+            >
+            <span class="radio-label">Temporary</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Start and End Dates</label>
+        <div class="date-range">
+          <input 
+            type="date" 
+            class="date-input" 
+            [(ngModel)]="formData.startDate"
+            name="startDate"
+            placeholder="9-Sep-2025"
+          >
+          <span class="date-separator">to</span>
+          <input 
+            type="date" 
+            class="date-input" 
+            [(ngModel)]="formData.endDate"
+            name="endDate"
+            placeholder="13-Sep-2025"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Week Schedule Section -->
+    <div class="schedule-section">
+      <div class="schedule-header">
+        <h3 class="schedule-title">Days</h3>
+        <h3 class="schedule-title">Route</h3>
+        <h3 class="schedule-title">Days</h3>
+        <h3 class="schedule-title">Route</h3>
+      </div>
+
+      <div class="schedule-grid">
+        <!-- Monday & Thursday -->
+        <div class="schedule-row">
+          <div class="day-label">{{ weekSchedule[0].day }}</div>
+          <div class="route-select-wrapper">
+            <select 
+              class="route-select" 
+              [(ngModel)]="weekSchedule[0].route"
+              [name]="'route-' + weekSchedule[0].day"
+            >
+              <option value="">Disable</option>
+              @for (route of routeOptions; track route) {
+                <option [value]="route">{{ route }}</option>
+              }
+            </select>
+          </div>
+          
+          <div class="day-label">{{ weekSchedule[3].day }}</div>
+          <div class="route-select-wrapper">
+            <select 
+              class="route-select" 
+              [(ngModel)]="weekSchedule[3].route"
+              [name]="'route-' + weekSchedule[3].day"
+            >
+              <option value="">Route 3 Name</option>
+              @for (route of routeOptions; track route) {
+                <option [value]="route">{{ route }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Tuesday & Friday -->
+        <div class="schedule-row">
+          <div class="day-label">{{ weekSchedule[1].day }}</div>
+          <div class="route-select-wrapper">
+            <select 
+              class="route-select" 
+              [(ngModel)]="weekSchedule[1].route"
+              [name]="'route-' + weekSchedule[1].day"
+            >
+              <option value="">Route 1 Name</option>
+              @for (route of routeOptions; track route) {
+                <option [value]="route">{{ route }}</option>
+              }
+            </select>
+          </div>
+          
+          <div class="day-label">{{ weekSchedule[4].day }}</div>
+          <div class="route-select-wrapper">
+            <select 
+              class="route-select" 
+              [(ngModel)]="weekSchedule[4].route"
+              [name]="'route-' + weekSchedule[4].day"
+            >
+              <option value="">Route 4 Name</option>
+              @for (route of routeOptions; track route) {
+                <option [value]="route">{{ route }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Wednesday & Saturday -->
+        <div class="schedule-row">
+          <div class="day-label">{{ weekSchedule[2].day }}</div>
+          <div class="route-select-wrapper">
+            <select 
+              class="route-select" 
+              [(ngModel)]="weekSchedule[2].route"
+              [name]="'route-' + weekSchedule[2].day"
+            >
+              <option value="">Route 2 Name</option>
+              @for (route of routeOptions; track route) {
+                <option [value]="route">{{ route }}</option>
+              }
+            </select>
+          </div>
+          
+          <div class="day-label">{{ weekSchedule[5].day }}</div>
+          <div class="route-select-wrapper">
+            <select 
+              class="route-select" 
+              [(ngModel)]="weekSchedule[5].route"
+              [name]="'route-' + weekSchedule[5].day"
+            >
+              <option value="">Route 5 Name</option>
+              @for (route of routeOptions; track route) {
+                <option [value]="route">{{ route }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button 
+      type="button" 
+      class="btn-save"
+      (click)="onSaveAndNext()"
+    >
+      Save & Next
+    </button>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<div class="page-container">
+  <app-sidebar></app-sidebar>
+  
+  <div class="main-content">
+    <app-header></app-header>
+    
+    <div class="content-area">
+      <div class="page-header">
+        <h1 class="page-title">Employee List</h1>
+        <div class="header-actions">
+          <button class="action-btn bulk-upload-btn" (click)="onBulkUpload()">
+            <span class="btn-icon">📤</span>
+            Bulk Upload
+          </button>
+          <button class="action-btn excel-btn" (click)="onExcel()">
+            <span class="btn-icon">📊</span>
+            Excel
+          </button>
+          <button class="action-btn add-btn" (click)="onAdd()">
+            <span class="btn-icon">➕</span>
+            Add
+          </button>
+        </div>
+      </div>
+
+      <div class="table-controls">
+        <div class="pagination-controls">
+          <button class="page-btn" [disabled]="currentPage === 1">‹</button>
+          <button class="page-number active">1</button>
+          <button class="page-number">2</button>
+          <button class="page-btn" [disabled]="currentPage === totalPages">›</button>
+        </div>
+        
+        <div class="right-controls">
+          <button class="filter-btn" (click)="onFilter()">
+            <span class="filter-icon">▼</span>
+            Filter
+          </button>
+          <div class="search-box">
+            <input type="text" placeholder="Search..." class="search-input">
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="col-action">Action</th>
+              <th class="col-active">Active</th>
+              <th class="col-employee">Employee Name / Code</th>
+              <th class="col-role">Role / Reporting To</th>
+              <th class="col-area">Assigned Area</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (employee of employees; track employee.id) {
+              <tr class="table-row">
+                <td class="col-action">
+                  <div class="action-buttons">
+                    <button class="action-icon edit-icon" (click)="onEdit(employee)" title="Edit">✏️</button>
+                    <button class="action-icon view-icon" (click)="onView(employee)" title="View">👁️</button>
+                    <button class="action-icon delete-icon" (click)="onDelete(employee)" title="Delete">🗑️</button>
+                  </div>
+                </td>
+                <td class="col-active">
+                  <button 
+                    class="active-toggle"
+                    [class.active]="employee.isActive"
+                    (click)="toggleActive(employee)"
+                  >
+                    Yes
+                  </button>
+                </td>
+                <td class="col-employee">
+                  <div class="employee-info">
+                    <div class="employee-name">{{ employee.name }}</div>
+                    <div class="employee-code">{{ employee.code }}</div>
+                  </div>
+                </td>
+                <td class="col-role">
+                  <div class="role-info">
+                    <div class="role-title">{{ employee.role }}</div>
+                    <div class="reporting-to">Reporting to {{ employee.reportingTo }}</div>
+                  </div>
+                </td>
+                <td class="col-area">
+                  <div class="area-text">{{ employee.assignedArea }}</div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <div class="footer-left">
+          <span class="footer-text">Copyright © 2025, All rights reserved by <a href="#" class="footer-link">Gaatha Global Marketing Pvt. Ltd.</a></span>
+        </div>
+        <div class="footer-right">
+          <span class="footer-text">Design by Fverds Staff | Version 1.0</span>
+        </div>
+      </div>
+
+      <div class="pagination-bottom">
+        <span class="pagination-text">Showing 1 to 10 of 15 entries</span>
+      </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <app-modal
+      [isOpen]="isAddModalOpen"
+      [title]="getModalTitle()"
+      width="1000px"
+      (close)="closeAddModal()"
+    >
+      @if (currentStep === 1) {
+        <app-employee-form-step1
+          (save)="onSaveStep1($event)"
+          (cancel)="closeAddModal()"
+        ></app-employee-form-step1>
+      }
+    </app-modal>
+  </div>
+</div>
