@@ -33,7 +33,7 @@ export const routes: Routes = [
   },
   {
     path: 'products/category',
-    loadComponent: () => import('./features/product-master/product-master.component').then(m => m.ProductMasterComponent),
+    loadComponent: () => import('./features/category/category.component').then(m => m.CategoryComponent),
     canActivate: [authGuard]
   },
   {

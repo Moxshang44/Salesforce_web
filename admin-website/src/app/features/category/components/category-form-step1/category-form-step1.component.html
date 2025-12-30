@@ -1,0 +1,187 @@
+<div class="category-form-step1">
+  <div class="step-indicator">Step 1 of 2</div>
+
+  <div class="form-row">
+    <div class="form-group full-width">
+      <label for="categoryName">Category Name</label>
+      <input
+        type="text"
+        id="categoryName"
+        [(ngModel)]="categoryData.categoryName"
+        placeholder="e.g., North India Visible"
+        class="form-input"
+      />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="subCategoryName">Sub Category Name (Optional)</label>
+      <div class="sub-category-input-group">
+        <input
+          type="text"
+          id="subCategoryName"
+          [(ngModel)]="newSubCategory"
+          placeholder="e.g., North India Visible"
+          class="form-input"
+          (keyup.enter)="addSubCategory()"
+        />
+        <button type="button" class="add-sub-btn" (click)="addSubCategory()">
+          +
+        </button>
+      </div>
+      @if (categoryData.subCategoryNames.length > 0) {
+        <div class="sub-category-list">
+          @for (subCat of categoryData.subCategoryNames; track $index) {
+            <div class="sub-category-tag">
+              <span>{{ subCat }}</span>
+              <button type="button" class="remove-btn" (click)="removeSubCategory($index)">
+                ×
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <div class="form-group">
+      <label for="categoryCode">Category Code (Auto)</label>
+      <input
+        type="text"
+        id="categoryCode"
+        [(ngModel)]="categoryData.categoryCode"
+        placeholder="#CAT1000"
+        class="form-input"
+      />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="selectBrand">Select Brand</label>
+      <select
+        id="selectBrand"
+        [(ngModel)]="categoryData.selectedBrand"
+        class="form-select"
+      >
+        <option value="">Select</option>
+        <option value="brand1">Brand 1</option>
+        <option value="brand2">Brand 2</option>
+        <option value="brand3">Brand 3</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectCountry">Select Country</label>
+      <select
+        id="selectCountry"
+        [(ngModel)]="categoryData.selectedCountry"
+        class="form-select"
+      >
+        <option value="1 Selected">1 Selected</option>
+        <option value="2 Selected">2 Selected</option>
+        <option value="All Selected">All Selected</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectZone">Select Zone</label>
+      <select
+        id="selectZone"
+        [(ngModel)]="categoryData.selectedZone"
+        class="form-select"
+      >
+        <option value="All Selected">All Selected</option>
+        <option value="North">North</option>
+        <option value="South">South</option>
+        <option value="East">East</option>
+        <option value="West">West</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="selectRegions">Select Regions</label>
+      <select
+        id="selectRegions"
+        [(ngModel)]="categoryData.selectedRegions"
+        class="form-select"
+      >
+        <option value="Select Regions">Select Regions</option>
+        <option value="Region 1">Region 1</option>
+        <option value="Region 2">Region 2</option>
+        <option value="All Regions">All Regions</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectAreas">Select Areas</label>
+      <select
+        id="selectAreas"
+        [(ngModel)]="categoryData.selectedAreas"
+        class="form-select"
+      >
+        <option value="All Selected">All Selected</option>
+        <option value="Area 1">Area 1</option>
+        <option value="Area 2">Area 2</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <label class="section-label">Channel Visibility</label>
+    <div class="checkbox-group">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [(ngModel)]="categoryData.channelVisibility.generalTrade"
+        />
+        <span>General Trade</span>
+      </label>
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [(ngModel)]="categoryData.channelVisibility.modernTrade"
+        />
+        <span>Modern Trade</span>
+      </label>
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [(ngModel)]="categoryData.channelVisibility.horecaTrade"
+        />
+        <span>HoReCa Trade</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <label class="section-label">Category Image</label>
+    <div
+      class="upload-area"
+      [class.drag-over]="dragOver"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()"
+    >
+      <div class="upload-icon">📁</div>
+      <div class="upload-text">
+        <strong>Drag & drop images here or click to browse</strong>
+      </div>
+      <div class="upload-subtext">(PNG, JPG, GIF (max 5x 10 MB))</div>
+      @if (categoryData.categoryImage) {
+        <div class="file-name">{{ categoryData.categoryImage.name }}</div>
+      }
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        (change)="onFileSelected($event)"
+        style="display: none;"
+      />
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <app-button variant="secondary" (click)="onCancel()">Cancel</app-button>
+    <app-button variant="primary" (click)="onSave()">Save & Next</app-button>
+  </div>
+</div>
