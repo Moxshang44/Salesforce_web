@@ -1,0 +1,15 @@
+<div class="action-item">
+  <div class="action-content">
+    <p class="action-message">{{ action.message }}</p>
+  </div>
+  <div class="action-button">
+    <app-button 
+      [variant]="action.variant || 'primary'" 
+      size="sm"
+      (click)="onActionClick()"
+    >
+      {{ action.actionLabel }}
+    </app-button>
+  </div>
+</div>
+

@@ -1,0 +1,43 @@
+<div class="sales-chart-container">
+  <div class="chart-header">
+    <h3 class="chart-title">Sales vs Targets</h3>
+  </div>
+  
+  <div class="filter-row">
+    <span class="filter-label">Select type</span>
+    
+    <div class="time-range-selector">
+      <button 
+        class="range-button" 
+        [class.active]="selectedRange === 'daily'"
+        (click)="selectRange('daily')"
+      >
+        Daily
+      </button>
+      <button 
+        class="range-button" 
+        [class.active]="selectedRange === 'weekly'"
+        (click)="selectRange('weekly')"
+      >
+        Weekly
+      </button>
+      <button 
+        class="range-button" 
+        [class.active]="selectedRange === 'monthly'"
+        (click)="selectRange('monthly')"
+      >
+        Monthly
+      </button>
+    </div>
+  </div>
+
+  <div class="chart-content">
+    <div class="chart-placeholder">
+      <div class="placeholder-text">
+        <p>Chart visualization will appear here</p>
+        <small>Integrate with Chart.js or similar library</small>
+      </div>
+    </div>
+  </div>
+</div>
+

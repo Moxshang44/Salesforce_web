@@ -1,0 +1,50 @@
+<div class="dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+      <!-- Page Title -->
+      <h1 class="page-title">Dashboard</h1>
+
+      <!-- Stats Cards Row -->
+      <section class="stats-section">
+        @for (stat of stats; track stat.title) {
+          <app-stats-card
+            [title]="stat.title"
+            [value]="stat.value"
+            [subtitle]="stat.subtitle ?? ''"
+            [trend]="stat.trend"
+          ></app-stats-card>
+        }
+      </section>
+
+      <!-- Content Grid -->
+      <div class="content-grid">
+        <!-- Sales Chart Section -->
+        <section class="chart-section">
+          <app-sales-chart></app-sales-chart>
+        </section>
+
+        <!-- Actions Required Section -->
+        <section class="actions-section">
+          <h2 class="section-title">Actions Required</h2>
+          <div class="actions-list">
+            @for (action of actions; track action.id) {
+              <app-action-item
+                [action]="action"
+                (actionClick)="onActionClick($event)"
+              ></app-action-item>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+

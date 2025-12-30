@@ -1,0 +1,21 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1 class="company-name">{{ companyName }}</h1>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of navItems; track item.route) {
+      <a 
+        [routerLink]="item.route" 
+        routerLinkActive="active"
+        class="nav-item"
+      >
+        @if (item.iconImage) {
+          <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
+        }
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</aside>
+
