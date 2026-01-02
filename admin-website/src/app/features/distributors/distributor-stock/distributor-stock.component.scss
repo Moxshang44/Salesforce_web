@@ -62,6 +62,12 @@
   background: #664423;
   color: white;
 
+  .filter-icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+
   &:hover {
     background: #4a3119;
   }

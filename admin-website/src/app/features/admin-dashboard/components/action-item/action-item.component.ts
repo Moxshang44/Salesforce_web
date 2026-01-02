@@ -20,6 +20,16 @@ export class ActionItemComponent {
   @Input() action!: ActionItem;
   @Output() actionClick = new EventEmitter<string>();
 
+  get isUrgent(): boolean {
+    return this.action.message.includes("Diwali Dhamaka") || 
+           this.action.message.includes("Elite Widgets");
+  }
+
+  get isButtonRed(): boolean {
+    return this.action.actionLabel === 'Extend' || 
+           this.action.actionLabel === 'Order New';
+  }
+
   onActionClick() {
     this.actionClick.emit(this.action.id);
   }

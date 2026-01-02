@@ -30,10 +30,27 @@
   color: #333333;
   line-height: 1.5;
   font-weight: 400;
+  
+  &.urgent {
+    color: #DC3545;
+  }
 }
 
 .action-button {
   flex-shrink: 0;
+  
+  ::ng-deep app-button.red-button {
+    button {
+      color: #DC3545 !important;
+      border-color: #DC3545 !important;
+      
+      &:hover {
+        background-color: #fff5f5 !important;
+        border-color: #DC3545 !important;
+        color: #DC3545 !important;
+      }
+    }
+  }
 }
 
 @media (max-width: $breakpoint-tablet) {

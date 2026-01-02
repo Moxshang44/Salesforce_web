@@ -4,6 +4,7 @@ import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { RouteFormStep1Component } from './components/route-form-step1/route-form-step1.component';
+import { ButtonComponent } from '../../shared/components/button/button.component';
 
 interface Route {
   id: number;
@@ -18,7 +19,7 @@ interface Route {
 @Component({
   selector: 'app-routes',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent, ModalComponent, RouteFormStep1Component],
+  imports: [CommonModule, SidebarComponent, HeaderComponent, ModalComponent, RouteFormStep1Component, ButtonComponent],
   templateUrl: './routes.component.html',
   styleUrl: './routes.component.scss'
 })

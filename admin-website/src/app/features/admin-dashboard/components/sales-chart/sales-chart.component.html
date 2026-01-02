@@ -32,10 +32,79 @@
   </div>
 
   <div class="chart-content">
-    <div class="chart-placeholder">
-      <div class="placeholder-text">
-        <p>Chart visualization will appear here</p>
-        <small>Integrate with Chart.js or similar library</small>
+    <div class="chart-wrapper">
+      <div class="chart-legend">
+        <div class="legend-item">
+          <span class="legend-color sales"></span>
+          <span class="legend-label">Sales</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color target"></span>
+          <span class="legend-label">Target</span>
+        </div>
+      </div>
+      
+      <div class="chart-area">
+        <svg class="chart-svg" [attr.viewBox]="'0 0 ' + chartWidth + ' 280'" preserveAspectRatio="xMidYMid meet">
+          <!-- Y-axis grid lines -->
+          @for (i of [0, 1, 2, 3, 4]; track i) {
+            <line 
+              [attr.x1]="50" 
+              [attr.y1]="30 + (i * 50)" 
+              [attr.x2]="chartEndX" 
+              [attr.y2]="30 + (i * 50)" 
+              class="grid-line"
+            />
+            <text 
+              [attr.x]="45" 
+              [attr.y]="35 + (i * 50)" 
+              class="axis-label"
+              text-anchor="end"
+            >
+              {{ formatValue(maxValue - (maxValue * i / 4)) }}
+            </text>
+          }
+          
+          <!-- Chart bars -->
+          @for (data of chartData; track data.label; let i = $index) {
+            <g class="bar-group">
+              <!-- Target bar -->
+              <rect
+                [attr.x]="60 + (i * 70)"
+                [attr.y]="30 + (200 - getBarHeight(data.target))"
+                [attr.width]="25"
+                [attr.height]="getBarHeight(data.target)"
+                class="bar target-bar"
+                rx="2"
+              />
+              
+              <!-- Sales bar -->
+              <rect
+                [attr.x]="60 + (i * 70) + 30"
+                [attr.y]="30 + (200 - getBarHeight(data.sales))"
+                [attr.width]="25"
+                [attr.height]="getBarHeight(data.sales)"
+                class="bar sales-bar"
+                rx="2"
+              />
+              
+              <!-- Label -->
+              <text
+                [attr.x]="60 + (i * 70) + 37.5"
+                [attr.y]="245"
+                class="bar-label"
+                text-anchor="middle"
+              >
+                {{ data.label }}
+              </text>
+            </g>
+          }
+          
+          <!-- X-axis line -->
+          <line [attr.x1]="50" y1="230" [attr.x2]="chartEndX" y2="230" class="axis-line" />
+          <!-- Y-axis line -->
+          <line x1="50" y1="30" x2="50" y2="230" class="axis-line" />
+        </svg>
       </div>
     </div>
   </div>

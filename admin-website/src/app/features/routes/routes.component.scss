@@ -3,7 +3,7 @@
 .page-container {
   display: flex;
   min-height: 100vh;
-  background: #F5F5F5;
+  background: #f8f9fa;
 }
 
 .main-content {
@@ -15,9 +15,8 @@
 
 .content-area {
   flex: 1;
-  margin-top: 56px;
-  padding: 24px 32px;
-  max-width: 100%;
+  padding: var(--spacing-sm) 32px 24px;
+  margin-top: 64px;
 }
 
 // Page Header
@@ -29,122 +28,89 @@
 }
 
 .page-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #2c3e50;
   margin: 0;
 }
 
 .header-actions {
   display: flex;
-  gap: 12px;
-}
-
-.action-btn {
-  display: flex;
+  gap: var(--spacing-md);
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  ::ng-deep app-button {
+    .btn-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .button-icon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      display: inline-block;
+    }
   }
-}
-
-.bulk-upload-btn {
-  background: #664423;
-  color: white;
-
-  &:hover {
-    background: #4a3119;
-  }
-}
-
-.excel-btn {
-  background: #28a745;
-  color: white;
-
-  &:hover {
-    background: #218838;
-  }
-}
-
-.add-btn {
-  background: #664423;
-  color: white;
-
-  &:hover {
-    background: #4a3119;
-  }
-}
-
-.btn-icon {
-  font-size: 16px;
 }
 
 // Table Controls
 .table-controls {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
-  padding: 16px 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .pagination-controls {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 8px;
 }
 
 .page-btn {
-  padding: 6px 12px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #ddd;
   background: white;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
+  color: #666;
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    background: #f8f9fa;
-    border-color: #999;
+    background: #f5f5f5;
+    border-color: #664423;
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
   }
 }
 
 .page-number {
-  padding: 6px 12px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #ddd;
   background: white;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  min-width: 36px;
+  font-weight: 500;
+  color: #666;
   transition: all 0.2s ease;
-
-  &:hover {
-    background: #f8f9fa;
-    border-color: #999;
-  }
 
   &.active {
     background: #664423;
     color: white;
+    border-color: #664423;
+  }
+
+  &:hover:not(.active) {
+    background: #f5f5f5;
     border-color: #664423;
   }
 }
@@ -169,13 +135,15 @@
   cursor: pointer;
   transition: all 0.2s ease;
 
+  .filter-icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+
   &:hover {
     background: #4a3119;
   }
-}
-
-.filter-icon {
-  font-size: 10px;
 }
 
 .search-box {
@@ -183,30 +151,30 @@
 }
 
 .search-input {
+  width: 250px;
   padding: 8px 16px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
-  width: 200px;
   transition: all 0.2s ease;
+
+  &::placeholder {
+    color: #999;
+  }
 
   &:focus {
     outline: none;
     border-color: #664423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
-
-  &::placeholder {
-    color: #999;
-  }
 }
 
 // Table Container
 .table-container {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: 20px;
 }
 
@@ -216,14 +184,14 @@
 
   thead {
     background: #f8f9fa;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 2px solid #e9ecef;
 
     th {
-      padding: 14px 16px;
+      padding: 16px;
       text-align: left;
       font-size: 13px;
       font-weight: 700;
-      color: #333;
+      color: #495057;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -232,10 +200,10 @@
   tbody {
     tr {
       border-bottom: 1px solid #f0f0f0;
-      transition: background 0.2s ease;
+      transition: background-color 0.2s ease;
 
       &:hover {
-        background: #fafafa;
+        background: #f8f9fa;
       }
 
       &:last-child {
@@ -244,9 +212,10 @@
     }
 
     td {
-      padding: 14px 16px;
+      padding: 16px;
       font-size: 14px;
-      color: #555;
+      color: #495057;
+      vertical-align: middle;
     }
   }
 }
@@ -279,15 +248,48 @@
 }
 
 .action-icon {
-  background: none;
+  width: 32px;
+  height: 32px;
   border: none;
-  font-size: 18px;
+  background: #f5f5f5;
+  border-radius: 6px;
   cursor: pointer;
-  padding: 4px;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 
   &:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
+  }
+
+  &.edit-icon {
+    color: #4caf50;
+
+    &:hover {
+      background: #e8f5e9;
+    }
+  }
+
+  &.view-icon {
+    color: #2196f3;
+
+    &:hover {
+      background: #e3f2fd;
+    }
+  }
+
+  &.delete-icon {
+    color: #f44336;
+
+    &:hover {
+      background: #ffebee;
+    }
   }
 }
 
@@ -348,12 +350,12 @@
 .route-name {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #2c3e50;
 }
 
 .route-code {
   font-size: 13px;
-  color: #999;
+  color: #7f8c8d;
 }
 
 // Channel Badge
@@ -370,7 +372,7 @@
 // Assigned Text
 .assigned-text {
   font-size: 14px;
-  color: #555;
+  color: #495057;
 }
 
 // Footer

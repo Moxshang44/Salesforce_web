@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 interface SubMenuItem {
   label: string;
@@ -25,6 +26,7 @@ interface NavItem {
 })
 export class SidebarComponent {
   companyName = 'Company Name';
+  currentRoute = '';
   
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', iconImage: 'assets/images/dashboard.png' },
@@ -62,6 +64,31 @@ export class SidebarComponent {
     { label: 'Assets', route: '/assets', iconImage: 'assets/images/assets.png' },
     { label: 'Settings', route: '/settings', iconImage: 'assets/images/settings.png' },
   ];
+
+  constructor(private router: Router) {
+    this.currentRoute = this.router.url;
+    
+    // Listen to route changes
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.currentRoute = event.url;
+        // Auto-expand parent items if their sub-route is active
+        this.navItems.forEach(item => {
+          if (item.subItems && this.isParentRouteActive(item)) {
+            item.isExpanded = true;
+          }
+        });
+      });
+  }
+
+  isParentRouteActive(item: NavItem): boolean {
+    if (!item.route || !item.subItems) return false;
+    
+    // Check if current route matches parent route or any sub-route
+    return this.currentRoute === item.route || 
+           item.subItems.some(subItem => this.currentRoute.startsWith(subItem.route));
+  }
 
   toggleSubMenu(item: NavItem): void {
     if (item.subItems) {
