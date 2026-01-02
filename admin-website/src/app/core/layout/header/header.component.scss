@@ -47,7 +47,7 @@
 .search-input {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid #664423;
   border-radius: var(--radius-lg);
   font-size: var(--font-size-sm);
   outline: none;
@@ -59,7 +59,7 @@
   }
   
   &:focus {
-    border-color: var(--color-primary);
+    border-color: #664423;
     background: var(--color-background);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
@@ -117,6 +117,9 @@
     width: 20px;
     height: 20px;
     color: #333333;
+    stroke: #D0D0D0;
+    stroke-width: 1.5;
+    fill: none;
   }
   
   .notification-badge {

@@ -41,13 +41,18 @@
 
 .content-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-2xl);
+  grid-template-columns: auto 1fr;
+  gap: var(--spacing-lg);
   margin-bottom: var(--spacing-2xl);
   
   @media (max-width: $breakpoint-desktop) {
     grid-template-columns: 1fr;
   }
+}
+
+.chart-section {
+  max-width: 600px;
+  width: 100%;
 }
 
 .section-title {

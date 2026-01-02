@@ -15,7 +15,7 @@
 
 .content-area {
   flex: 1;
-  padding: 24px 32px;
+  padding: var(--spacing-sm) 32px 24px;
   margin-top: 64px;
 }
 
@@ -35,55 +35,22 @@
 
 .header-actions {
   display: flex;
-  gap: 12px;
-}
-
-.action-btn {
-  display: flex;
+  gap: var(--spacing-md);
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  .btn-icon {
-    font-size: 16px;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.bulk-upload-btn {
-  background: #664423;
-  color: white;
-
-  &:hover {
-    background: #4a3119;
-  }
-}
-
-.excel-btn {
-  background: #664423;
-  color: white;
-
-  &:hover {
-    background: #4a3119;
-  }
-}
-
-.add-btn {
-  background: #664423;
-  color: white;
-
-  &:hover {
-    background: #4a3119;
+  
+  ::ng-deep app-button {
+    .btn-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .button-icon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      display: inline-block;
+    }
   }
 }
 
@@ -157,7 +124,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: #ff9800;
+  background: #664423;
   color: white;
   border: none;
   border-radius: 6px;
@@ -166,12 +133,14 @@
   cursor: pointer;
   transition: all 0.2s ease;
 
-  .filter-icon {
-    font-size: 12px;
+  .filter-icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
   }
 
   &:hover {
-    background: #f57c00;
+    background: #5a3a1f;
   }
 }
 
@@ -280,71 +249,63 @@
   background: #f5f5f5;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
   &:hover {
     transform: scale(1.1);
   }
 
-  &.edit-icon:hover {
-    background: #e3f2fd;
+  &.edit-icon {
+    color: #4caf50;
+
+    &:hover {
+      background: #e8f5e9;
+    }
   }
 
-  &.view-icon:hover {
-    background: #f3e5f5;
+  &.view-icon {
+    color: #2196f3;
+
+    &:hover {
+      background: #e3f2fd;
+    }
   }
 
-  &.delete-icon:hover {
-    background: #ffebee;
-  }
-}
+  &.delete-icon {
+    color: #f44336;
 
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-
-  input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-
-    &:checked + .toggle-slider {
-      background: #4caf50;
-
-      &:before {
-        transform: translateX(20px);
-      }
+    &:hover {
+      background: #ffebee;
     }
   }
 }
 
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #ccc;
-  border-radius: 24px;
-  transition: 0.3s;
-
-  &:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: white;
+  
+  &.active {
     background: white;
-    border-radius: 50%;
-    transition: 0.3s;
+    color: #4ade80;
+    border: 2px solid #4ade80;
+  }
+  
+  &.inactive {
+    background: white;
+    color: #f87171;
+    border: 2px solid #f87171;
   }
 }
 

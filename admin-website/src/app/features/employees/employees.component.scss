@@ -169,13 +169,15 @@
   cursor: pointer;
   transition: all 0.2s ease;
 
+  .filter-icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+
   &:hover {
     background: #4a3119;
   }
-}
-
-.filter-icon {
-  font-size: 10px;
 }
 
 .search-box {

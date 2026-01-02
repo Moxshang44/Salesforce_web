@@ -10,7 +10,7 @@
           <!-- Nav item with sub-menu -->
           <div 
             class="nav-item"
-            [class.active]="item.isExpanded"
+            [class.active]="isParentRouteActive(item) || item.isExpanded"
             [class.has-submenu]="true"
             (click)="toggleSubMenu(item)"
           >
