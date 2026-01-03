@@ -13,7 +13,8 @@ interface Route {
   routeName: string;
   routeCode: string;
   channel: string;
-  assignedTo: string;
+  area: string;
+  region: string;
 }
 
 @Component({
@@ -37,7 +38,8 @@ export class RoutesComponent {
       routeName: 'Kasthuri West Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'General Trade',
-      assignedTo: 'Kasthuri West'
+      area: 'Andheri West',
+      region: 'Mumbai'
     },
     {
       id: 2,
@@ -46,7 +48,8 @@ export class RoutesComponent {
       routeName: 'Kasthuri West Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'General Trade',
-      assignedTo: 'Kasthuri West'
+      area: 'Andheri West',
+      region: 'Mumbai'
     },
     {
       id: 3,
@@ -55,7 +58,8 @@ export class RoutesComponent {
       routeName: 'Kasthuri West Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'Modern Trade',
-      assignedTo: 'Kasthuri East'
+      area: 'Andheri East',
+      region: 'Mumbai'
     },
     {
       id: 4,
@@ -64,7 +68,8 @@ export class RoutesComponent {
       routeName: 'Chennai Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'General Trade',
-      assignedTo: 'Normal'
+      area: 'Normal',
+      region: 'Chennai'
     },
     {
       id: 5,
@@ -73,7 +78,8 @@ export class RoutesComponent {
       routeName: 'Dadar West Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'Modern Trade',
-      assignedTo: 'Dadar West'
+      area: 'Dadar West',
+      region: 'Mumbai'
     },
     {
       id: 6,
@@ -82,7 +88,8 @@ export class RoutesComponent {
       routeName: 'Dadar Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'Horeca Trade',
-      assignedTo: 'Dadar'
+      area: 'Dadar',
+      region: 'Mumbai'
     },
     {
       id: 7,
@@ -91,7 +98,8 @@ export class RoutesComponent {
       routeName: 'Kasthuri West Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'General Trade',
-      assignedTo: 'Kasthuri West'
+      area: 'Andheri West',
+      region: 'Mumbai'
     },
     {
       id: 8,
@@ -100,7 +108,8 @@ export class RoutesComponent {
       routeName: 'Kurla Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'General Trade',
-      assignedTo: 'Kurla'
+      area: 'Kurla',
+      region: 'Mumbai'
     },
     {
       id: 9,
@@ -109,7 +118,8 @@ export class RoutesComponent {
       routeName: 'Kasthuri West Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'Modern Trade',
-      assignedTo: 'Malad West'
+      area: 'Malad West',
+      region: 'Mumbai'
     },
     {
       id: 10,
@@ -118,7 +128,8 @@ export class RoutesComponent {
       routeName: 'Kurla Route',
       routeCode: '#01 MUM-ICIC',
       channel: 'Horeca Trade',
-      assignedTo: 'Kurla'
+      area: 'Kurla',
+      region: 'Mumbai'
     }
   ];
 
@@ -175,6 +186,10 @@ export class RoutesComponent {
 
   onView(route: Route): void {
     console.log('View route:', route);
+  }
+
+  onViewDetails(route: Route): void {
+    console.log('View details:', route);
   }
 
   toggleActive(route: Route): void {

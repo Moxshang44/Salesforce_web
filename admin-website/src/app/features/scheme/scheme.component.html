@@ -25,10 +25,10 @@
 
       <div class="table-controls">
         <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1">‹</button>
+          <button class="page-btn" [disabled]="currentPage === 1"><<</button>
           <button class="page-number active">1</button>
           <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">›</button>
+          <button class="page-btn" [disabled]="currentPage === totalPages">>></button>
         </div>
         
         <div class="right-controls">
@@ -37,6 +37,9 @@
             Filter
           </button>
           <div class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             <input type="text" placeholder="Search..." class="search-input">
           </div>
         </div>
@@ -50,7 +53,7 @@
               <th class="col-active">Active</th>
               <th class="col-product">Product | SKU</th>
               <th class="col-schemes">Schemes</th>
-              <th class="col-date">Date/Options</th>
+              <th class="col-zone">Zone/Regions</th>
             </tr>
           </thead>
           <tbody>
@@ -91,13 +94,6 @@
                 </td>
                 <td class="col-product">
                   <div class="product-info">
-                    @if (scheme.tags.length > 0) {
-                      <div class="product-tags">
-                        @for (tag of scheme.tags; track tag) {
-                          <span class="tag-dot">{{ tag }}</span>
-                        }
-                      </div>
-                    }
                     <div class="product-details">
                       <div class="product-name">{{ scheme.productName }}</div>
                       <div class="product-sku">{{ scheme.skuCode }}</div>
@@ -106,20 +102,13 @@
                 </td>
                 <td class="col-schemes">
                   <div class="scheme-info">
-                    <span 
-                      class="scheme-badge"
-                      [class.active-scheme]="scheme.schemeType === 'Active'"
-                      [class.inactive-scheme]="scheme.schemeType === 'Inactive'"
-                    >
-                      {{ scheme.schemeType === 'Active' ? 'Yes' : 'No' }}
-                    </span>
                     <div class="scheme-name">{{ scheme.scheme }}</div>
                   </div>
                 </td>
-                <td class="col-date">
-                  <div class="date-info">
-                    <div class="date-range">{{ scheme.dateRange }}</div>
-                    <div class="options-text">{{ scheme.options }}</div>
+                <td class="col-zone">
+                  <div class="zone-info">
+                    <div class="zone-name">{{ scheme.zone }}</div>
+                    <div class="regions-text">{{ scheme.regions }}</div>
                   </div>
                 </td>
               </tr>

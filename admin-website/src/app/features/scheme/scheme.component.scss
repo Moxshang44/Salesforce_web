@@ -35,7 +35,7 @@
 
 .header-actions {
   display: flex;
-  gap: var(--spacing-md);
+  gap: 8px;
   align-items: center;
   
   ::ng-deep app-button {
@@ -70,17 +70,17 @@
 .page-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid #ddd;
+  border: none;
   background: white;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  color: #666;
+  font-weight: 700;
+  color: #664423;
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
     background: #f5f5f5;
-    border-color: #664423;
   }
 
   &:disabled {
@@ -92,7 +92,7 @@
 .page-number {
   width: 32px;
   height: 32px;
-  border: 1px solid #ddd;
+  border: none;
   background: white;
   border-radius: 6px;
   cursor: pointer;
@@ -104,12 +104,10 @@
   &.active {
     background: #664423;
     color: white;
-    border-color: #664423;
   }
 
   &:hover:not(.active) {
     background: #f5f5f5;
-    border-color: #664423;
   }
 }
 
@@ -146,11 +144,21 @@
 
 .search-box {
   position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #999;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .search-input {
   width: 250px;
-  padding: 8px 16px;
+  padding: 8px 16px 8px 36px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
@@ -180,16 +188,15 @@
   border-collapse: collapse;
 
   thead {
-    background: #f8f9fa;
+    background: #f5f0e8;
     border-bottom: 2px solid #e9ecef;
 
     th {
       padding: 16px;
-      text-align: left;
-      font-size: 13px;
+      text-align: center;
+      font-size: 15px;
       font-weight: 700;
-      color: #495057;
-      text-transform: uppercase;
+      color: #000000;
       letter-spacing: 0.5px;
     }
   }
@@ -213,6 +220,7 @@
       font-size: 14px;
       color: #495057;
       vertical-align: middle;
+      text-align: center;
     }
   }
 }
@@ -233,20 +241,21 @@
   width: 25%;
 }
 
-.col-date {
+.col-zone {
   width: 25%;
 }
 
 .action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 4px;
+  justify-content: center;
 }
 
 .action-icon {
   width: 32px;
   height: 32px;
   border: none;
-  background: #f5f5f5;
+  background: transparent;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -261,51 +270,43 @@
 
   &:hover {
     transform: scale(1.1);
+    opacity: 0.7;
   }
 
   &.edit-icon {
     color: #4caf50;
-
-    &:hover {
-      background: #e8f5e9;
-    }
   }
 
   &.view-icon {
     color: #2196f3;
-
-    &:hover {
-      background: #e3f2fd;
-    }
   }
 
   &.delete-icon {
     color: #f44336;
-
-    &:hover {
-      background: #ffebee;
-    }
   }
 }
 
 .status-badge {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 4px 16px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   background: white;
+  min-width: 60px;
+  text-align: center;
   
   &.active {
     background: white;
-    color: #4ade80;
-    border: 2px solid #4ade80;
+    color: #22CC22;
+    border: 2px solid #22CC22;
   }
   
   &.inactive {
     background: white;
     color: #f87171;
     border: 2px solid #f87171;
+    border-radius: 6px;
   }
 }
 
@@ -331,7 +332,7 @@
 .product-name {
   font-size: 14px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #000000;
   margin-bottom: 4px;
 }
 
@@ -346,43 +347,25 @@
   gap: 12px;
 }
 
-.scheme-badge {
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-
-  &.active-scheme {
-    background: #d4edda;
-    color: #155724;
-  }
-
-  &.inactive-scheme {
-    background: #f8d7da;
-    color: #721c24;
-  }
-}
-
 .scheme-name {
   font-size: 14px;
-  color: #495057;
+  color: #000000;
   font-weight: 500;
 }
 
-.date-info {
+.zone-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.date-range {
+.zone-name {
   font-size: 14px;
-  color: #495057;
+  color: #000000;
   font-weight: 500;
 }
 
-.options-text {
+.regions-text {
   font-size: 13px;
   color: #7f8c8d;
 }

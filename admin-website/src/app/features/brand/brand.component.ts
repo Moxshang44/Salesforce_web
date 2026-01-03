@@ -11,10 +11,10 @@ interface Brand {
   id: number;
   brandName: string;
   brandCode: string;
-  category: string;
-  status: 'Active' | 'Inactive';
+  categoriesCount: number;
   productsCount: number;
   createdDate: string;
+  createdAgo: string;
   description: string;
   isActive: boolean;
 }
@@ -37,10 +37,10 @@ export class BrandComponent {
       id: 1,
       brandName: 'Himalaya Wellness',
       brandCode: 'HW-001',
-      category: 'Ayurveda, Wellness',
-      status: 'Active',
-      productsCount: 45,
+      categoriesCount: 6,
+      productsCount: 42,
       createdDate: '15 Jan 2024',
+      createdAgo: '6 months',
       description: 'Leading wellness brand',
       isActive: true
     },
@@ -48,10 +48,10 @@ export class BrandComponent {
       id: 2,
       brandName: 'Cipla',
       brandCode: 'CPL-002',
-      category: 'Pharmaceutical',
-      status: 'Active',
+      categoriesCount: 8,
       productsCount: 120,
       createdDate: '10 Feb 2024',
+      createdAgo: '5 months',
       description: 'Trusted pharma brand',
       isActive: true
     },
@@ -59,10 +59,10 @@ export class BrandComponent {
       id: 3,
       brandName: 'Sun Pharma',
       brandCode: 'SP-003',
-      category: 'Healthcare',
-      status: 'Active',
+      categoriesCount: 7,
       productsCount: 89,
       createdDate: '22 Feb 2024',
+      createdAgo: '5 months',
       description: 'Quality healthcare products',
       isActive: true
     },
@@ -70,10 +70,10 @@ export class BrandComponent {
       id: 4,
       brandName: 'Abbott',
       brandCode: 'ABT-004',
-      category: 'Nutrition',
-      status: 'Active',
+      categoriesCount: 5,
       productsCount: 56,
       createdDate: '05 Mar 2024',
+      createdAgo: '4 months',
       description: 'Nutrition experts',
       isActive: true
     },
@@ -81,10 +81,10 @@ export class BrandComponent {
       id: 5,
       brandName: 'Dr. Reddy\'s',
       brandCode: 'DRL-005',
-      category: 'Pharmaceutical',
-      status: 'Inactive',
+      categoriesCount: 4,
       productsCount: 34,
       createdDate: '18 Mar 2024',
+      createdAgo: '4 months',
       description: 'Healthcare solutions',
       isActive: false
     },
@@ -92,10 +92,10 @@ export class BrandComponent {
       id: 6,
       brandName: 'Mankind',
       brandCode: 'MK-006',
-      category: 'Healthcare',
-      status: 'Active',
+      categoriesCount: 6,
       productsCount: 67,
       createdDate: '25 Mar 2024',
+      createdAgo: '4 months',
       description: 'Affordable healthcare',
       isActive: true
     },
@@ -103,10 +103,10 @@ export class BrandComponent {
       id: 7,
       brandName: 'Zydus Healthcare',
       brandCode: 'ZH-007',
-      category: 'Wellness',
-      status: 'Active',
+      categoriesCount: 5,
       productsCount: 42,
       createdDate: '10 Apr 2024',
+      createdAgo: '3 months',
       description: 'Complete wellness solutions',
       isActive: true
     },
@@ -114,10 +114,10 @@ export class BrandComponent {
       id: 8,
       brandName: 'Glenmark',
       brandCode: 'GLN-008',
-      category: 'Pharmaceutical',
-      status: 'Active',
+      categoriesCount: 7,
       productsCount: 78,
       createdDate: '15 Apr 2024',
+      createdAgo: '3 months',
       description: 'Innovative medicines',
       isActive: true
     },
@@ -125,10 +125,10 @@ export class BrandComponent {
       id: 9,
       brandName: 'Alembic',
       brandCode: 'ALM-009',
-      category: 'Nutrition',
-      status: 'Active',
+      categoriesCount: 4,
       productsCount: 23,
       createdDate: '20 May 2024',
+      createdAgo: '2 months',
       description: 'Nutritional supplements',
       isActive: true
     },
@@ -136,10 +136,10 @@ export class BrandComponent {
       id: 10,
       brandName: 'Torrent Pharma',
       brandCode: 'TOR-010',
-      category: 'Healthcare',
-      status: 'Inactive',
+      categoriesCount: 5,
       productsCount: 38,
       createdDate: '30 May 2024',
+      createdAgo: '2 months',
       description: 'Comprehensive care',
       isActive: false
     }
