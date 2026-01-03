@@ -11,6 +11,23 @@
   overflow: hidden;
 }
 
+.demo-credentials {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+}
+
+.credentials-text {
+  font-size: 11px;
+  color: #666;
+  
+  strong {
+    color: #664423;
+    font-weight: 600;
+  }
+}
+
 .login-card {
   position: relative;
   z-index: 1;
@@ -39,29 +56,33 @@
   margin-bottom: 40px;
 }
 
-.logo {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
+.welcome-text {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 12px 0;
+  font-weight: 400;
 }
 
-.logo-icon {
+.header-top {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
-  background: #664423;
-  border-radius: 20px;
-  font-size: 40px;
-  box-shadow: 0 8px 24px rgba(102, 68, 35, 0.3);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.company-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .login-title {
   font-size: 28px;
   font-weight: 700;
   color: #1a1a1a;
-  margin: 0 0 8px 0;
+  margin: 0;
 }
 
 .login-subtitle {
@@ -108,14 +129,9 @@
 .form-label {
   display: flex;
   align-items: center;
-  gap: 8px;
   font-size: 14px;
   font-weight: 600;
   color: #333;
-}
-
-.label-icon {
-  font-size: 16px;
 }
 
 .form-input {
@@ -156,12 +172,14 @@
   right: 16px;
   background: none;
   border: none;
-  font-size: 20px;
   cursor: pointer;
   opacity: 0.6;
   transition: opacity 0.2s ease;
   padding: 0;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     opacity: 1;
@@ -171,6 +189,13 @@
     outline: none;
     opacity: 1;
   }
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  color: #666;
+  stroke: currentColor;
 }
 
 .form-footer {
@@ -212,7 +237,8 @@
 }
 
 .login-button {
-  width: 100%;
+  width: 200px;
+  margin: 8px auto 0;
   padding: 16px 24px;
   font-size: 16px;
   font-weight: 600;
@@ -226,7 +252,6 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-top: 8px;
 
   &:hover {
     background: #4a3119;
@@ -259,23 +284,6 @@
   transform: translateX(4px);
 }
 
-.login-footer {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #e0e0e0;
-  text-align: center;
-}
-
-.footer-text {
-  font-size: 13px;
-  color: #666;
-  margin: 0;
-
-  strong {
-    color: #664423;
-    font-weight: 600;
-  }
-}
 
 .login-background {
   position: absolute;
