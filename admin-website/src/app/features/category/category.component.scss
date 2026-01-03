@@ -36,7 +36,7 @@
 
 .header-actions {
   display: flex;
-  gap: var(--spacing-md);
+  gap: 8px;
   align-items: center;
   
   ::ng-deep app-button {
@@ -70,17 +70,17 @@
 .page-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid #ddd;
+  border: none;
   background: white;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  color: #666;
+  font-weight: 700;
+  color: #664423;
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
     background: #f5f5f5;
-    border-color: #664423;
   }
 
   &:disabled {
@@ -92,7 +92,7 @@
 .page-number {
   width: 32px;
   height: 32px;
-  border: 1px solid #ddd;
+  border: none;
   background: white;
   border-radius: 6px;
   cursor: pointer;
@@ -104,12 +104,10 @@
   &.active {
     background: #664423;
     color: white;
-    border-color: #664423;
   }
 
   &:hover:not(.active) {
     background: #f5f5f5;
-    border-color: #664423;
   }
 }
 
@@ -146,11 +144,21 @@
 
 .search-box {
   position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #999;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .search-input {
   width: 250px;
-  padding: 8px 16px;
+  padding: 8px 16px 8px 36px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
@@ -163,6 +171,7 @@
   &:focus {
     outline: none;
     border-color: #664423;
+    box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
 
@@ -179,17 +188,16 @@
   border-collapse: collapse;
 
   thead {
-    background-color: #f8f9fa;
+    background-color: #f5f0e8;
     border-bottom: 2px solid #e0e0e0;
 
     tr {
       th {
         padding: 16px;
-        text-align: left;
-        font-size: 14px;
-        font-weight: 600;
-        color: #2c3e50;
-        text-transform: uppercase;
+        text-align: center;
+        font-size: 15px;
+        font-weight: 700;
+        color: #000000;
         letter-spacing: 0.5px;
       }
     }
@@ -213,6 +221,7 @@
         font-size: 14px;
         color: #6c757d;
         vertical-align: middle;
+        text-align: center;
       }
     }
   }
@@ -227,35 +236,28 @@
 }
 
 .col-name {
-  width: 200px;
-}
-
-.col-code {
-  width: 140px;
-}
-
-.col-description {
-  width: auto;
+  width: 25%;
 }
 
 .col-count {
-  width: 120px;
+  width: 150px;
 }
 
-.col-status {
-  width: 100px;
+.col-created {
+  width: 150px;
 }
 
 .action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 4px;
+  justify-content: center;
 }
 
 .action-icon {
   width: 32px;
   height: 32px;
   border: none;
-  background: #f5f5f5;
+  background: transparent;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -270,100 +272,84 @@
 
   &:hover {
     transform: scale(1.1);
+    opacity: 0.7;
   }
 
   &.edit-icon {
     color: #4caf50;
-
-    &:hover {
-      background: #e8f5e9;
-    }
   }
 
   &.view-icon {
     color: #2196f3;
-
-    &:hover {
-      background: #e3f2fd;
-    }
   }
 
   &.delete-icon {
     color: #f44336;
-
-    &:hover {
-      background: #ffebee;
-    }
   }
 }
 
 .status-badge {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 4px 16px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   background: white;
+  min-width: 60px;
+  text-align: center;
   
   &.active {
     background: white;
-    color: #4ade80;
-    border: 2px solid #4ade80;
+    color: #22CC22;
+    border: 2px solid #22CC22;
   }
   
   &.inactive {
     background: white;
     color: #f87171;
     border: 2px solid #f87171;
+    border-radius: 6px;
   }
+}
+
+.category-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .category-name {
   font-weight: 600;
-  color: #2c3e50;
-  font-size: 15px;
+  color: #000000;
+  font-size: 14px;
 }
 
 .category-code {
-  font-family: 'Courier New', monospace;
-  color: #6c757d;
+  color: #7f8c8d;
   font-size: 13px;
-  background-color: #f5f5f5;
-  padding: 4px 8px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
-.description-text {
-  color: #6c757d;
-  font-size: 13px;
-  line-height: 1.4;
 }
 
 .product-count {
   font-weight: 500;
-  color: #664423;
+  color: #000000;
   font-size: 14px;
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.created-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-  &.active-status {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-  }
+.created-date {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 500;
+}
 
-  &.inactive-status {
-    background-color: #ffebee;
-    color: #c62828;
-  }
+.created-ago {
+  font-size: 13px;
+  color: #7f8c8d;
 }
 
 .table-footer {

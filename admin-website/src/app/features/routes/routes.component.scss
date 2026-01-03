@@ -36,7 +36,7 @@
 
 .header-actions {
   display: flex;
-  gap: var(--spacing-md);
+  gap: 8px;
   align-items: center;
   
   ::ng-deep app-button {
@@ -72,17 +72,17 @@
 .page-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid #ddd;
+  border: none;
   background: white;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
-  color: #666;
+  font-size: 16px;
+  font-weight: 700;
+  color: #664423;
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
     background: #f5f5f5;
-    border-color: #664423;
   }
 
   &:disabled {
@@ -94,7 +94,7 @@
 .page-number {
   width: 32px;
   height: 32px;
-  border: 1px solid #ddd;
+  border: none;
   background: white;
   border-radius: 6px;
   cursor: pointer;
@@ -106,12 +106,10 @@
   &.active {
     background: #664423;
     color: white;
-    border-color: #664423;
   }
 
   &:hover:not(.active) {
     background: #f5f5f5;
-    border-color: #664423;
   }
 }
 
@@ -148,11 +146,21 @@
 
 .search-box {
   position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #999;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .search-input {
   width: 250px;
-  padding: 8px 16px;
+  padding: 8px 16px 8px 36px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
@@ -183,16 +191,15 @@
   border-collapse: collapse;
 
   thead {
-    background: #f8f9fa;
+    background: #f5f0e8;
     border-bottom: 2px solid #e9ecef;
 
     th {
       padding: 16px;
-      text-align: left;
-      font-size: 13px;
+      text-align: center;
+      font-size: 15px;
       font-weight: 700;
-      color: #495057;
-      text-transform: uppercase;
+      color: #000000;
       letter-spacing: 0.5px;
     }
   }
@@ -216,6 +223,7 @@
       font-size: 14px;
       color: #495057;
       vertical-align: middle;
+      text-align: center;
     }
   }
 }
@@ -225,8 +233,8 @@
   width: 120px;
 }
 
-.col-active {
-  width: 80px;
+.col-details {
+  width: 140px;
 }
 
 .col-route {
@@ -234,24 +242,25 @@
 }
 
 .col-channel {
-  width: 20%;
+  width: 18%;
 }
 
 .col-assigned {
-  width: 20%;
+  width: 18%;
 }
 
 // Action Buttons
 .action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 4px;
+  justify-content: center;
 }
 
 .action-icon {
   width: 32px;
   height: 32px;
   border: none;
-  background: #f5f5f5;
+  background: transparent;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -266,30 +275,19 @@
 
   &:hover {
     transform: scale(1.1);
+    opacity: 0.7;
   }
 
   &.edit-icon {
     color: #4caf50;
-
-    &:hover {
-      background: #e8f5e9;
-    }
   }
 
   &.view-icon {
     color: #2196f3;
-
-    &:hover {
-      background: #e3f2fd;
-    }
   }
 
   &.delete-icon {
     color: #f44336;
-
-    &:hover {
-      background: #ffebee;
-    }
   }
 }
 
@@ -350,7 +348,7 @@
 .route-name {
   font-size: 14px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #000000;
 }
 
 .route-code {
@@ -358,21 +356,51 @@
   color: #7f8c8d;
 }
 
-// Channel Badge
-.channel-badge {
-  display: inline-block;
-  padding: 6px 12px;
+// Details Button
+.details-btn {
+  padding: 6px 16px;
   background: #664423;
   color: white;
-  border-radius: 4px;
-  font-size: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #5a3a1f;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-// Assigned Text
-.assigned-text {
+// Channel Text
+.channel-text {
   font-size: 14px;
-  color: #495057;
+  color: #000000;
+  font-weight: 400;
+}
+
+// Area / Region Info
+.area-region-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.area-text {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 500;
+}
+
+.region-text {
+  font-size: 13px;
+  color: #7f8c8d;
 }
 
 // Footer

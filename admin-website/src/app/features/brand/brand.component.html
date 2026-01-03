@@ -6,7 +6,7 @@
     
     <div class="content-area">
       <div class="page-header">
-        <h1 class="page-title">Brand List</h1>
+        <h1 class="page-title">Products list</h1>
         <div class="header-actions">
           <app-button variant="primary" size="sm" (click)="onBulkUpload()">
             <img src="assets/images/bulkupload.png" alt="Bulk Upload" class="button-icon">
@@ -25,10 +25,10 @@
 
       <div class="table-controls">
         <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1">‹</button>
+          <button class="page-btn" [disabled]="currentPage === 1"><<</button>
           <button class="page-number active">1</button>
           <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">›</button>
+          <button class="page-btn" [disabled]="currentPage === totalPages">>></button>
         </div>
         
         <div class="right-controls">
@@ -37,6 +37,9 @@
             Filter
           </button>
           <div class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             <input type="text" placeholder="Search..." class="search-input">
           </div>
         </div>
@@ -48,10 +51,9 @@
             <tr>
               <th class="col-actions">Actions</th>
               <th class="col-active">Active</th>
-              <th class="col-brand">Brand Name | Code</th>
-              <th class="col-category">Category</th>
-              <th class="col-status">Status | Products</th>
-              <th class="col-date">Created Date</th>
+              <th class="col-brand">Brand | code</th>
+              <th class="col-category">Category | products</th>
+              <th class="col-date">Created on</th>
             </tr>
           </thead>
           <tbody>
@@ -97,22 +99,16 @@
                   </div>
                 </td>
                 <td class="col-category">
-                  <div class="category-text">{{ brand.category }}</div>
-                </td>
-                <td class="col-status">
-                  <div class="status-info">
-                    <span 
-                      class="status-badge"
-                      [class.active-status]="brand.status === 'Active'"
-                      [class.inactive-status]="brand.status === 'Inactive'"
-                    >
-                      {{ brand.status }}
-                    </span>
+                  <div class="category-products-info">
+                    <div class="categories-count">{{ brand.categoriesCount }} Categories</div>
                     <div class="products-count">{{ brand.productsCount }} Products</div>
                   </div>
                 </td>
                 <td class="col-date">
-                  <div class="date-text">{{ brand.createdDate }}</div>
+                  <div class="created-info">
+                    <div class="created-date">{{ brand.createdDate }}</div>
+                    <div class="created-ago">{{ brand.createdAgo }}</div>
+                  </div>
                 </td>
               </tr>
             }

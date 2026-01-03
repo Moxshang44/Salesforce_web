@@ -28,9 +28,9 @@
   --color-border: #e5e7eb;
   --color-border-light: #f3f4f6;
   
-  /* Typography - Placeholder values */
-  --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-heading: inherit;
+  /* Typography */
+  --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-heading: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-family-mono: 'Monaco', 'Courier New', monospace;
   
   --font-size-xs: 0.75rem;    /* 12px */

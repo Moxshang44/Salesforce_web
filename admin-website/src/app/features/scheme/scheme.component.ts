@@ -16,6 +16,7 @@ interface Scheme {
   dateRange: string;
   options: string;
   zone: string;
+  regions: string;
   tags: string[];
   isActive: boolean;
 }
@@ -43,7 +44,8 @@ export class SchemeComponent {
       dateRange: '01 Nov 2024 to 15 Dec 2024',
       options: '2 extra options available',
       zone: 'East Zone',
-      tags: ['💙', '💚', '🧡'],
+      regions: 'Bihar, West Bengal, Odisha',
+      tags: [],
       isActive: true
     },
     {
@@ -55,6 +57,7 @@ export class SchemeComponent {
       dateRange: 'Valid till 31 Dec 2024',
       options: '+ 2 extra options',
       zone: 'North Zone',
+      regions: 'Delhi, Haryana, Punjab',
       tags: [],
       isActive: true
     },
@@ -67,6 +70,7 @@ export class SchemeComponent {
       dateRange: 'Dec 2024 to Feb 2025',
       options: '+ 4 extra options',
       zone: 'East Zone',
+      regions: 'Jharkhand, Assam',
       tags: [],
       isActive: false
     },
@@ -79,6 +83,7 @@ export class SchemeComponent {
       dateRange: 'Nov 1 to Dec 31',
       options: '+ 2 extra options',
       zone: 'East Zone',
+      regions: 'West Bengal, Tripura',
       tags: [],
       isActive: true
     },
@@ -90,7 +95,8 @@ export class SchemeComponent {
       schemeType: 'Active',
       dateRange: 'Valid till 31 Dec 2024',
       options: '1 extra option',
-      zone: 'East Zone',
+      zone: 'West Zone',
+      regions: 'Gujarat, Rajasthan',
       tags: [],
       isActive: true
     },
@@ -103,6 +109,7 @@ export class SchemeComponent {
       dateRange: 'Valid till 31 Dec 2024',
       options: '+ 5 extra options',
       zone: 'West Zone',
+      regions: 'Gujarat, Rajasthan',
       tags: [],
       isActive: true
     },
@@ -115,6 +122,7 @@ export class SchemeComponent {
       dateRange: 'Valid till 31 Dec 2024',
       options: '+ 3 extra options',
       zone: 'East Zone',
+      regions: 'Bihar, Odisha',
       tags: [],
       isActive: false
     },
@@ -127,6 +135,7 @@ export class SchemeComponent {
       dateRange: 'Valid till 31 Dec 2024',
       options: '+ 3 extra options',
       zone: 'West Zone',
+      regions: 'Gujarat, Rajasthan',
       tags: [],
       isActive: true
     },
@@ -139,6 +148,7 @@ export class SchemeComponent {
       dateRange: 'Valid till 31 Dec 2024',
       options: '+ 3 extra options',
       zone: 'North Zone',
+      regions: 'Uttar Pradesh, Uttarakhand',
       tags: [],
       isActive: true
     },
@@ -150,7 +160,8 @@ export class SchemeComponent {
       schemeType: 'Inactive',
       dateRange: 'Valid till 31 Dec 2024',
       options: '+ 1 extra options',
-      zone: 'Nasir',
+      zone: 'South Zone',
+      regions: 'Tamil Nadu, Karnataka',
       tags: [],
       isActive: true
     }

@@ -10,9 +10,9 @@ interface Category {
   id: number;
   categoryName: string;
   categoryCode: string;
-  description: string;
   productsCount: number;
-  status: 'Active' | 'Inactive';
+  createdDate: string;
+  createdAgo: string;
   isActive: boolean;
 }
 
@@ -34,90 +34,90 @@ export class CategoryComponent {
       id: 1,
       categoryName: 'Ayurvedic Medicine',
       categoryCode: 'CAT-001',
-      description: 'Traditional Ayurvedic products',
       productsCount: 45,
-      status: 'Active',
+      createdDate: '12 Nov 2024',
+      createdAgo: '6 months',
       isActive: true
     },
     {
       id: 2,
       categoryName: 'Health Supplements',
       categoryCode: 'CAT-002',
-      description: 'Vitamins and health supplements',
       productsCount: 32,
-      status: 'Active',
+      createdDate: '15 Oct 2024',
+      createdAgo: '7 months',
       isActive: true
     },
     {
       id: 3,
       categoryName: 'Personal Care',
       categoryCode: 'CAT-003',
-      description: 'Personal hygiene and care products',
       productsCount: 28,
-      status: 'Inactive',
+      createdDate: '20 Sep 2024',
+      createdAgo: '8 months',
       isActive: false
     },
     {
       id: 4,
       categoryName: 'Beauty Products',
       categoryCode: 'CAT-004',
-      description: 'Skincare and beauty items',
       productsCount: 56,
-      status: 'Active',
+      createdDate: '05 Aug 2024',
+      createdAgo: '9 months',
       isActive: true
     },
     {
       id: 5,
       categoryName: 'Home & Living',
       categoryCode: 'CAT-005',
-      description: 'Home essentials and living products',
       productsCount: 23,
-      status: 'Active',
+      createdDate: '18 Jul 2024',
+      createdAgo: '10 months',
       isActive: true
     },
     {
       id: 6,
       categoryName: 'Food & Beverages',
       categoryCode: 'CAT-006',
-      description: 'Organic food and beverages',
       productsCount: 67,
-      status: 'Active',
+      createdDate: '22 Jun 2024',
+      createdAgo: '11 months',
       isActive: true
     },
     {
       id: 7,
       categoryName: 'Baby Care',
       categoryCode: 'CAT-007',
-      description: 'Baby products and care items',
       productsCount: 19,
-      status: 'Inactive',
+      createdDate: '10 May 2024',
+      createdAgo: '1 year',
       isActive: false
     },
     {
       id: 8,
       categoryName: 'Fitness & Sports',
       categoryCode: 'CAT-008',
-      description: 'Fitness equipment and sports items',
       productsCount: 41,
-      status: 'Active',
+      createdDate: '14 Apr 2024',
+      createdAgo: '1 year',
       isActive: true
     },
     {
       id: 9,
       categoryName: 'Electronics',
       categoryCode: 'CAT-009',
-      description: 'Electronic gadgets and accessories',
       productsCount: 34,
-      status: 'Active',
+      createdDate: '28 Mar 2024',
+      createdAgo: '1 year',
       isActive: true
     },
     {
       id: 10,
       categoryName: 'Office Supplies',
       categoryCode: 'CAT-010',
-      description: 'Office and stationery products',
       productsCount: 15,
-      status: 'Active',
+      createdDate: '03 Feb 2024',
+      createdAgo: '1 year',
       isActive: true
     }
   ];
@@ -169,6 +169,5 @@ export class CategoryComponent {
 
   toggleActive(category: Category): void {
     category.isActive = !category.isActive;
-    category.status = category.isActive ? 'Active' : 'Inactive';
   }
 }

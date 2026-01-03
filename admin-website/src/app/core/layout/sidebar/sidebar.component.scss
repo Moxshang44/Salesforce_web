@@ -140,13 +140,14 @@
 .sub-nav-item {
   display: flex;
   align-items: center;
-  padding: 10px var(--spacing-lg) 10px 56px;
+  padding: 10px var(--spacing-lg) 10px 40px;
   color: #4a3a2a;
   text-decoration: none;
   transition: all $transition-speed-fast ease;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   position: relative;
+  line-height: 1.3;
   
   &:hover {
     background: rgba(102, 68, 35, 0.08);
@@ -161,6 +162,23 @@
 
 .sub-nav-label {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.arrow-left,
+.arrow-right {
+  font-weight: 700;
+  color: #664423;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sub-nav-item.active .arrow-left,
+.sub-nav-item.active .arrow-right {
+  opacity: 1;
 }
 
 .nav-icon {

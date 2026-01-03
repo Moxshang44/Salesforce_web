@@ -6,7 +6,7 @@
     
     <div class="content-area">
       <div class="page-header">
-        <h1 class="page-title">Category List</h1>
+        <h1 class="page-title">Product List</h1>
         <div class="header-actions">
           <app-button variant="primary" size="sm" (click)="onBulkUpload()">
             <img src="assets/images/bulkupload.png" alt="Bulk Upload" class="button-icon">
@@ -25,10 +25,10 @@
 
       <div class="table-controls">
         <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1">‹</button>
+          <button class="page-btn" [disabled]="currentPage === 1"><<</button>
           <button class="page-number active">1</button>
           <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">›</button>
+          <button class="page-btn" [disabled]="currentPage === totalPages">>></button>
         </div>
         
         <div class="right-controls">
@@ -37,6 +37,9 @@
             Filter
           </button>
           <div class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             <input type="text" placeholder="Search..." class="search-input">
           </div>
         </div>
@@ -48,11 +51,9 @@
             <tr>
               <th class="col-actions">Actions</th>
               <th class="col-active">Active</th>
-              <th class="col-name">Category Name</th>
-              <th class="col-code">Category Code</th>
-              <th class="col-description">Description</th>
-              <th class="col-count">Products</th>
-              <th class="col-status">Status</th>
+              <th class="col-name">Category Name | Code</th>
+              <th class="col-count">Products Count</th>
+              <th class="col-created">Created On</th>
             </tr>
           </thead>
           <tbody>
@@ -92,25 +93,19 @@
                   </span>
                 </td>
                 <td class="col-name">
+                  <div class="category-info">
                   <div class="category-name">{{ category.categoryName }}</div>
-                </td>
-                <td class="col-code">
                   <div class="category-code">{{ category.categoryCode }}</div>
-                </td>
-                <td class="col-description">
-                  <div class="description-text">{{ category.description }}</div>
+                  </div>
                 </td>
                 <td class="col-count">
-                  <div class="product-count">{{ category.productsCount }} items</div>
+                  <div class="product-count">{{ category.productsCount }}</div>
                 </td>
-                <td class="col-status">
-                  <span 
-                    class="status-badge"
-                    [class.active-status]="category.status === 'Active'"
-                    [class.inactive-status]="category.status === 'Inactive'"
-                  >
-                    {{ category.status }}
-                  </span>
+                <td class="col-created">
+                  <div class="created-info">
+                    <div class="created-date">{{ category.createdDate }}</div>
+                    <div class="created-ago">{{ category.createdAgo }}</div>
+                  </div>
                 </td>
               </tr>
             }

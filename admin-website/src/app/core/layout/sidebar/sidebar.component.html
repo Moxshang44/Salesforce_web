@@ -30,7 +30,11 @@
                   routerLinkActive="active"
                   class="sub-nav-item"
                 >
-                  <span class="sub-nav-label">{{ subItem.label }}</span>
+                  <span class="sub-nav-label">
+                    <span class="arrow-left">>></span>
+                    {{ subItem.label }}
+                    <span class="arrow-right"><<</span>
+                  </span>
                 </a>
               }
             </div>

@@ -36,11 +36,12 @@ export class SidebarComponent {
       iconImage: 'assets/images/productmastericonadmin.png',
       isExpanded: false,
       subItems: [
-        { label: 'Brand', route: '/products/brand' },
-        { label: 'Category', route: '/products/category' },
+        { label: 'Brand', route: '/brand' },
+        { label: 'Category', route: '/category' },
         { label: 'Product', route: '/products' },
-        { label: 'Scheme', route: '/products/scheme' },
-        { label: 'Pricelist', route: '/products/pricelist' }
+        { label: 'Scheme', route: '/scheme' },
+        { label: 'Focus Product', route: '/focusproducts' },
+        { label: 'Incentives', route: '/incentives' }
       ]
     },
     { 
@@ -87,7 +88,7 @@ export class SidebarComponent {
     
     // Check if current route matches parent route or any sub-route
     return this.currentRoute === item.route || 
-           item.subItems.some(subItem => this.currentRoute.startsWith(subItem.route));
+           item.subItems.some(subItem => this.currentRoute === subItem.route || this.currentRoute.startsWith(subItem.route + '/'));
   }
 
   toggleSubMenu(item: NavItem): void {

@@ -25,10 +25,10 @@
 
       <div class="table-controls">
         <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1">‹</button>
+          <button class="page-btn" [disabled]="currentPage === 1"><<</button>
           <button class="page-number active">1</button>
           <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">›</button>
+          <button class="page-btn" [disabled]="currentPage === totalPages">>></button>
         </div>
         
         <div class="right-controls">
@@ -37,6 +37,9 @@
             Filter
           </button>
           <div class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             <input type="text" placeholder="Search..." class="search-input">
           </div>
         </div>
@@ -47,10 +50,10 @@
           <thead>
             <tr>
               <th class="col-actions">Actions</th>
-              <th class="col-active">Active</th>
-              <th class="col-route">Route Name | Code</th>
+              <th class="col-details">Details</th>
+              <th class="col-route">Route Name / Code</th>
               <th class="col-channel">Channel</th>
-              <th class="col-assigned">Assigned To</th>
+              <th class="col-assigned">Area / Region</th>
             </tr>
           </thead>
           <tbody>
@@ -80,15 +83,8 @@
                     </button>
                   </div>
                 </td>
-                <td class="col-active">
-                  <label class="toggle-switch">
-                    <input 
-                      type="checkbox" 
-                      [checked]="route.active"
-                      (change)="toggleActive(route)"
-                    >
-                    <span class="toggle-slider"></span>
-                  </label>
+                <td class="col-details">
+                  <button class="details-btn" (click)="onViewDetails(route)">View Details</button>
                 </td>
                 <td class="col-route">
                   <div class="route-info">
@@ -97,10 +93,13 @@
                   </div>
                 </td>
                 <td class="col-channel">
-                  <span class="channel-badge">{{ route.channel }}</span>
+                  <div class="channel-text">{{ route.channel }}</div>
                 </td>
                 <td class="col-assigned">
-                  <div class="assigned-text">{{ route.assignedTo }}</div>
+                  <div class="area-region-info">
+                    <div class="area-text">{{ route.area }}</div>
+                    <div class="region-text">{{ route.region }}</div>
+                  </div>
                 </td>
               </tr>
             }
