@@ -1,10 +1,14 @@
 <div class="login-container">
+  <div class="demo-credentials">
+    <span class="credentials-text">Demo: <strong>testadmin / 111111</strong></span>
+  </div>
   <div class="login-card">
     <div class="login-header">
-      <div class="logo">
-        <div class="logo-icon">🏢</div>
+      <p class="welcome-text">Welcome to</p>
+      <div class="header-top">
+        <img src="assets/images/company-logo.svg" alt="Company Logo" class="company-logo">
+        <h1 class="login-title">Salesforce</h1>
       </div>
-      <h1 class="login-title">Company Name</h1>
       <p class="login-subtitle">Admin Portal</p>
     </div>
 
@@ -18,7 +22,6 @@
 
       <div class="form-group">
         <label for="username" class="form-label">
-          <span class="label-icon">👤</span>
           Username
         </label>
         <input
@@ -34,7 +37,6 @@
 
       <div class="form-group">
         <label for="password" class="form-label">
-          <span class="label-icon">🔒</span>
           Password
         </label>
         <div class="password-input-wrapper">
@@ -53,7 +55,18 @@
             (click)="togglePasswordVisibility()"
             tabindex="-1"
           >
-            {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+            @if (showPassword) {
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            } @else {
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.94 17.94C16.2306 19.243 14.1491 19.9649 12 20C5 20 1 12 1 12C2.24389 9.68192 3.96914 7.65663 6.06 6.06L17.94 17.94Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M1 1L23 23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.06 6.06C4.757 7.76938 4.03509 9.85087 4 12C4 19 12 23 12 23C14.3181 21.7561 16.3434 20.0309 17.94 17.94" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            }
           </button>
         </div>
       </div>
@@ -72,11 +85,6 @@
       </button>
     </form>
 
-    <div class="login-footer">
-      <p class="footer-text">
-        Demo Credentials: <strong>testadmin / 111111</strong>
-      </p>
-    </div>
   </div>
 
   <div class="login-background">
