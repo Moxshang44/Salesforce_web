@@ -8,27 +8,27 @@
       <div class="page-header">
         <h1 class="page-title">Employee List</h1>
         <div class="header-actions">
-          <button class="action-btn bulk-upload-btn" (click)="onBulkUpload()">
-            <span class="btn-icon">📤</span>
+          <app-button variant="primary" size="sm" (click)="onBulkUpload()">
+            <img src="assets/images/bulkupload.png" alt="Bulk Upload" class="button-icon">
             Bulk Upload
-          </button>
-          <button class="action-btn excel-btn" (click)="onExcel()">
-            <span class="btn-icon">📊</span>
+          </app-button>
+          <app-button variant="primary" size="sm" (click)="onExcel()">
+            <img src="assets/images/export.png" alt="Export" class="button-icon">
             Excel
-          </button>
-          <button class="action-btn add-btn" (click)="onAdd()">
-            <span class="btn-icon">➕</span>
+          </app-button>
+          <app-button variant="primary" size="sm" (click)="onAdd()">
+            <img src="assets/images/add.png" alt="Add" class="button-icon">
             Add
-          </button>
+          </app-button>
         </div>
       </div>
 
       <div class="table-controls">
         <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1">‹</button>
+          <button class="page-btn" [disabled]="currentPage === 1"><<</button>
           <button class="page-number active">1</button>
           <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">›</button>
+          <button class="page-btn" [disabled]="currentPage === totalPages">>></button>
         </div>
         
         <div class="right-controls">
@@ -37,6 +37,9 @@
             Filter
           </button>
           <div class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             <input type="text" placeholder="Search..." class="search-input">
           </div>
         </div>
@@ -46,7 +49,7 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th class="col-action">Action</th>
+              <th class="col-actions">Action</th>
               <th class="col-active">Active</th>
               <th class="col-employee">Employee Name / Code</th>
               <th class="col-role">Role / Reporting To</th>
@@ -56,21 +59,38 @@
           <tbody>
             @for (employee of employees; track employee.id) {
               <tr class="table-row">
-                <td class="col-action">
+                <td class="col-actions">
                   <div class="action-buttons">
-                    <button class="action-icon edit-icon" (click)="onEdit(employee)" title="Edit">✏️</button>
-                    <button class="action-icon view-icon" (click)="onView(employee)" title="View">👁️</button>
-                    <button class="action-icon delete-icon" (click)="onDelete(employee)" title="Delete">🗑️</button>
+                    <button class="action-icon edit-icon" (click)="onEdit(employee)" title="Edit">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                    <button class="action-icon info-icon" (click)="onInfo(employee)" title="Info">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                    <button class="action-icon delete-icon" (click)="onDelete(employee)" title="Delete">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
                   </div>
                 </td>
                 <td class="col-active">
-                  <button 
-                    class="active-toggle"
+                  <span 
+                    class="status-badge" 
                     [class.active]="employee.isActive"
-                    (click)="toggleActive(employee)"
+                    [class.inactive]="!employee.isActive"
                   >
-                    Yes
-                  </button>
+                    {{ employee.isActive ? 'Yes' : 'No' }}
+                  </span>
                 </td>
                 <td class="col-employee">
                   <div class="employee-info">
@@ -81,11 +101,14 @@
                 <td class="col-role">
                   <div class="role-info">
                     <div class="role-title">{{ employee.role }}</div>
-                    <div class="reporting-to">Reporting to {{ employee.reportingTo }}</div>
+                    <div class="reporting-to">Reporting to: {{ employee.reportingTo }}</div>
                   </div>
                 </td>
                 <td class="col-area">
-                  <div class="area-text">{{ employee.assignedArea }}</div>
+                  <div class="area-info">
+                    <div class="area-text">{{ employee.assignedArea }}</div>
+                    <div class="routes-count">{{ employee.routesCount || 0 }} Routes</div>
+                  </div>
                 </td>
               </tr>
             }
@@ -98,7 +121,7 @@
           <span class="footer-text">Copyright © 2025, All rights reserved by <a href="#" class="footer-link">Gaatha Global Marketing Pvt. Ltd.</a></span>
         </div>
         <div class="footer-right">
-          <span class="footer-text">Design by Fverds Staff | Version 1.0</span>
+          <span class="footer-text">Design By Krutik Shah | Version: 1.0</span>
         </div>
       </div>
 

@@ -3,7 +3,7 @@
 .header {
   position: fixed;
   top: 0;
-  left: 255px;
+  left: var(--sidebar-width, 255px);
   right: 0;
   height: 56px;
   background: #F5F5F5;
@@ -15,6 +15,7 @@
   z-index: 90;
   box-sizing: border-box;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: left 0.3s ease;
 }
 
 .header-left {

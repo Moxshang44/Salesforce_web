@@ -27,6 +27,7 @@ interface NavItem {
 export class SidebarComponent {
   companyName = 'Company Name';
   currentRoute = '';
+  isCollapsed = false;
   
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', iconImage: 'assets/images/dashboard.png' },
@@ -45,7 +46,7 @@ export class SidebarComponent {
       ]
     },
     { 
-      label: 'Routes Master', 
+      label: 'Routes', 
       route: '/routes', 
       iconImage: 'assets/images/routes.png',
       isExpanded: false,
@@ -54,13 +55,13 @@ export class SidebarComponent {
         { label: 'Assign Routes', route: '/routes/assign' }
       ]
     },
-    { label: 'Distributors', route: '/distributors', iconImage: 'assets/images/Distributor.png' },
     { label: 'Super Stockist', route: '/super-stockist', iconImage: 'assets/images/superstockist.png' },
-    { label: 'Retailer', route: '/retailer', iconImage: 'assets/images/finance.png' },
+    { label: 'Distributors', route: '/distributors', iconImage: 'assets/images/Distributor.png' },
+    { label: 'Retailers', route: '/retailer', iconImage: 'assets/images/finance.png' },
+    { label: 'Employee Master', route: '/employees', iconImage: 'assets/images/employees.png' },
     { label: 'Finance', route: '/finance', iconImage: 'assets/images/finance.png' },
     { label: 'Marketing', route: '/marketing', iconImage: 'assets/images/marketing.png' },
     { label: 'Assign Task', route: '/tasks', iconImage: 'assets/images/assigntask.png' },
-    { label: 'Employees', route: '/employees', iconImage: 'assets/images/employees.png' },
     { label: 'AI chat bot', route: '/ai-chat', iconImage: 'assets/images/aichatbot.png' },
     { label: 'Assets', route: '/assets', iconImage: 'assets/images/assets.png' },
     { label: 'Settings', route: '/settings', iconImage: 'assets/images/settings.png' },
@@ -68,6 +69,8 @@ export class SidebarComponent {
 
   constructor(private router: Router) {
     this.currentRoute = this.router.url;
+    // Initialize CSS variable
+    document.documentElement.style.setProperty('--sidebar-width', '255px');
     
     // Listen to route changes
     this.router.events
@@ -92,9 +95,24 @@ export class SidebarComponent {
   }
 
   toggleSubMenu(item: NavItem): void {
-    if (item.subItems) {
+    if (item.subItems && !this.isCollapsed) {
       item.isExpanded = !item.isExpanded;
     }
   }
+
+  toggleSidebar(): void {
+    this.isCollapsed = !this.isCollapsed;
+    // Close all sub-menus when collapsing
+    if (this.isCollapsed) {
+      this.navItems.forEach(item => {
+        if (item.subItems) {
+          item.isExpanded = false;
+        }
+      });
+    }
+    // Update CSS variable for main content margin
+    document.documentElement.style.setProperty('--sidebar-width', this.isCollapsed ? '70px' : '255px');
+  }
 }
+
 

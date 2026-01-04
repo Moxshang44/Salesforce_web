@@ -1,24 +1,10 @@
-<div class="page-container">
+<div class="stock-layout" [class.blurred]="showViewOptionsModal">
   <app-sidebar></app-sidebar>
   
   <div class="main-content">
     <app-header></app-header>
     
-    <div class="content-area">
-      <div class="page-header">
-        <h1 class="page-title">Distributor's Stock</h1>
-        <div class="header-actions">
-          <button class="action-btn filter-btn" (click)="onFilter()">
-            <img src="assets/images/filter.png" alt="Filter" class="filter-icon-img">
-            Filter
-          </button>
-          <button class="action-btn excel-btn" (click)="onExcel()">
-            <span class="btn-icon">📊</span>
-            Excel
-          </button>
-        </div>
-      </div>
-
+    <div class="stock-content">
       <!-- Tabs Section -->
       <div class="tabs-section">
         <button 
@@ -44,66 +30,195 @@
         </button>
       </div>
 
-      <!-- Table Controls -->
-      <div class="table-controls">
-        <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1">‹</button>
-          <button class="page-number active">1</button>
-          <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">›</button>
-        </div>
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">
+          @if (activeTab === 'claims' && selectedReturnsType === 'All Claims Summary') {
+            Claims Summary
+          } @else if (activeTab === 'claims' && selectedReturnsType === 'Sample') {
+            Distributor's Sample List
+          } @else if (activeTab === 'claims' && selectedReturnsType === 'Schemes') {
+            Distributor's Scheme Claims
+          } @else if (activeTab === 'claims') {
+            Distributor's Returns
+          } @else if (activeTab === 'orders') {
+            Distributor's Orders / Bills List
+          } @else {
+            Distributor's Stock
+          }
+        </h1>
         
-        <div class="right-controls">
-          <div class="search-box">
-            <input type="text" placeholder="Search..." class="search-input">
-          </div>
+        <div class="header-actions">
+          @if (activeTab === 'claims') {
+            <select class="returns-dropdown" [(ngModel)]="selectedReturnsType">
+              <option value="All Claims Summary">All Claims Summary</option>
+              <option value="Returns">Returns</option>
+              <option value="Sample">Sample</option>
+              <option value="Schemes">Schemes</option>
+            </select>
+          }
+          <app-button variant="primary" size="sm" (click)="onFilter()">
+            <img src="assets/images/filter.png" alt="Filter" class="button-icon">
+            Filter
+          </app-button>
+          <app-button variant="primary" size="sm" (click)="onExcel()">
+            <img src="assets/images/export.png" alt="Export" class="button-icon">
+            Excel
+          </app-button>
         </div>
       </div>
 
-      <!-- Stock Table -->
-      <div class="table-container">
-        <table class="data-table">
+      <!-- Table Controls -->
+      @if (activeTab !== 'claims' || selectedReturnsType !== 'All Claims Summary') {
+      <div class="table-controls">
+        <div class="pagination-controls">
+            <button class="page-nav" (click)="previousPage()" [disabled]="currentPage === 1">
+              <<
+            </button>
+            <button 
+              class="page-number" 
+              [class.active]="currentPage === 1"
+              (click)="goToPage(1)"
+            >
+              1
+            </button>
+            <button 
+              class="page-number"
+              [class.active]="currentPage === 2"
+              (click)="goToPage(2)"
+            >
+              2
+            </button>
+            <button class="page-nav" (click)="nextPage()" [disabled]="currentPage === totalPages">
+              >>
+            </button>
+        </div>
+        
+          <div class="search-filter">
+          <div class="search-box">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                class="search-input"
+                (input)="onSearch($event)"
+              />
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'stocks') {
+        <!-- Stocks Table -->
+        <div class="table-card">
+          <!-- Data Table -->
+          <div class="table-wrapper">
+            <table class="stock-table">
           <thead>
             <tr>
-              <th class="col-sku">SKU (Product) Name</th>
-              <th class="col-quantity">Avl Quantity</th>
-              <th class="col-min-stock">Min Required Stock</th>
-              <th class="col-purchase">Last Purchase</th>
+                  <th class="col-sku">
+                    <div class="sortable-header">
+                      SKU (Product) Name
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-quantity">
+                    <div class="sortable-header">
+                      Avl Quantity
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-min-stock">
+                    <div class="sortable-header">
+                      Min Required Stock
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-purchase">
+                    <div class="sortable-header">
+                      Last Purchase
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
             </tr>
           </thead>
           <tbody>
             @for (item of stockItems; track item.id) {
-              <tr class="table-row" [class.low-stock]="item.availableQuantity <= item.minRequiredStock">
+                  <tr>
                 <td class="col-sku">
                   <div class="sku-info">
+                        <div class="product-name">{{ item.productName }}</div>
                     <div class="sku-code">{{ item.sku }}</div>
-                    <div class="product-name">{{ item.productName }}</div>
                   </div>
                 </td>
                 <td class="col-quantity">
                   <div class="quantity-info">
-                    <span class="quantity-value" [class.text-danger]="item.availableQuantity <= item.minRequiredStock">
-                      {{ item.availableQuantity }} {{ item.unit }}
-                    </span>
-                    @if (item.availableQuantity <= item.minRequiredStock) {
-                      <span class="warning-badge">⚠️ Low Stock</span>
-                    }
+                        <div class="quantity-value" [class.low-stock]="item.stockStatus === 'low'" [class.critical]="item.stockStatus === 'critical'">
+                          {{ item.availableQuantity | number }} {{ item.unit }}
+                        </div>
+                        <div class="stock-status" [class.status-low]="item.stockStatus === 'low'" [class.status-critical]="item.stockStatus === 'critical'">
+                          {{ item.statusText }}
+                        </div>
                   </div>
                 </td>
                 <td class="col-min-stock">
+                      @if (item.isEditing) {
+                        <div class="edit-controls">
+                          <input 
+                            type="number" 
+                            class="edit-input" 
+                            [(ngModel)]="item.editValue"
+                            (keyup.enter)="saveMinStock(item)"
+                            (keyup.escape)="cancelEdit(item)"
+                          />
+                          <button class="save-btn" (click)="saveMinStock(item)" title="Save">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                          <button class="cancel-btn" (click)="cancelEdit(item)" title="Cancel">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        </div>
+                      } @else {
                   <div class="stock-controls">
-                    <span class="stock-value">{{ item.minRequiredStock }} {{ item.unit }}</span>
-                    <div class="control-buttons">
-                      <button class="control-btn minus-btn" (click)="decrementStock(item)">−</button>
-                      <button class="control-btn plus-btn" (click)="incrementStock(item)">+</button>
-                      <button class="control-btn remove-btn" (click)="onDelete(item)">×</button>
+                          <div class="stock-value">{{ item.minRequiredStock | number }} {{ item.unit }}</div>
+                          <button class="edit-icon-btn" (click)="startEdit(item)" title="Edit">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
                     </div>
-                  </div>
+                      }
                 </td>
                 <td class="col-purchase">
                   <div class="purchase-info">
-                    <div class="purchase-qty">{{ item.lastPurchase }} {{ item.unit }}</div>
-                    <div class="purchase-date">{{ item.lastPurchaseDate }}</div>
+                        <div class="purchase-text">{{ item.lastPurchase | number }} {{ item.unit }} {{ item.lastPurchaseDate }}</div>
                   </div>
                 </td>
               </tr>
@@ -112,19 +227,691 @@
         </table>
       </div>
 
-      <!-- Footer -->
+          <!-- Table Footer for Stocks -->
+          <div class="table-footer">
+            <p>Showing 1 to 9 of 15 entries</p>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'claims' && selectedReturnsType === 'Returns') {
+        <!-- Claims Table -->
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th class="col-bill-no">
+                    <div class="sortable-header">
+                      Bill No.
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-return-date">
+                    <div class="sortable-header">
+                      Return Date
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-product-reason">
+                    <div class="sortable-header">
+                      Product / Reason
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-qty">
+                    <div class="sortable-header">
+                      Qty
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-total-amount">
+                    <div class="sortable-header">
+                      Total Amount
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-claim-amount">
+                    <div class="sortable-header">
+                      Claim Amount
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-claim-status">
+                    <div class="sortable-header">
+                      Claim Status
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (claim of claimItems; track claim.id) {
+                  <tr>
+                    <td class="col-bill-no">
+                      <div class="bill-no">{{ claim.billNo }}</div>
+                    </td>
+                    <td class="col-return-date">
+                      <div class="return-date">{{ claim.returnDate }}</div>
+                    </td>
+                    <td class="col-product-reason">
+                      <div class="product-reason-info">
+                        <div class="product-name">{{ claim.productName }}</div>
+                        <div class="reason-text">Reason: {{ claim.reason }}</div>
+                      </div>
+                    </td>
+                    <td class="col-qty">
+                      <div class="qty-info">{{ claim.quantity }} {{ claim.unit }}</div>
+                    </td>
+                    <td class="col-total-amount">
+                      <div class="amount-info">₹{{ claim.totalAmount | number }}</div>
+                    </td>
+                    <td class="col-claim-amount">
+                      <div class="amount-info">₹{{ claim.claimAmount | number }}</div>
+                    </td>
+                    <td class="col-claim-status">
+                      <span 
+                        class="status-badge"
+                        [class.pending]="claim.claimStatus === 'pending'"
+                        [class.approved]="claim.claimStatus === 'approved'"
+                        [class.rejected]="claim.claimStatus === 'rejected'"
+                      >
+                        {{ claim.claimStatus | titlecase }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Footer -->
+          <div class="table-footer">
+            <div class="footer-content">
+              <div class="footer-left">
+                <p>Showing 1 to 9 of 15 entries</p>
+              </div>
+              <div class="footer-right">
+                <span class="summary-text">Total Return Quantity: {{ totalReturnQuantity }}</span>
+                <span class="summary-text">To Be Claim Value: ₹{{ toBeClaimValue | number }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'claims' && selectedReturnsType === 'Sample') {
+        <!-- Sample Table -->
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th class="col-salesman">
+                    <div class="sortable-header">
+                      Salesman Name / Route
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-products">
+                    <div class="sortable-header">
+                      Products
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-amount">
+                    <div class="sortable-header">
+                      Amount
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-quantity">
+                    <div class="sortable-header">
+                      Quantity
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-date">
+                    <div class="sortable-header">
+                      Date
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (sample of sampleItems; track sample.id) {
+                  <tr>
+                    <td class="col-salesman">
+                      <div class="salesman-info">
+                        <div class="salesman-name">{{ sample.salesmanName }}</div>
+                        <div class="route-name">({{ sample.route }})</div>
+                      </div>
+                    </td>
+                    <td class="col-products">
+                      <div 
+                        class="products-cell"
+                        (mouseenter)="onMouseEnterSample($event, sample)"
+                        (mouseleave)="onMouseLeaveSample()"
+                        (mousemove)="onMouseMoveSample($event)"
+                      >
+                        <div class="products-preview">
+                          {{ sample.products[0] }}
+                          @if (sample.products.length > 1) {
+                            <span class="more-products"> (+ {{ sample.products.length - 1 }} more)</span>
+                          }
+                        </div>
+                      </div>
+                    </td>
+                    <td class="col-amount">
+                      <div class="amount-info">₹{{ sample.amount | number }}</div>
+                    </td>
+                    <td class="col-quantity">
+                      <div class="qty-info">{{ sample.quantity }}</div>
+                    </td>
+                    <td class="col-date">
+                      <div class="date-info">{{ sample.date }}</div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Products Hover Popup -->
+          @if (hoveredSampleItem) {
+            <div 
+              class="products-popup"
+              [style.left.px]="hoverPosition.x + 10"
+              [style.top.px]="hoverPosition.y + 10"
+            >
+              <div class="popup-header">Products</div>
+              <div class="popup-content">
+                @for (product of hoveredSampleItem.products; track product) {
+                  <div class="popup-product-item">{{ product }}</div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Table Footer -->
       <div class="table-footer">
+            <div class="footer-content">
         <div class="footer-left">
-          <span class="footer-text">Copyright © 2025, All rights reserved by <a href="#" class="footer-link">Gaatha Global Marketing Pvt. Ltd.</a></span>
+                <p>Showing 1 to 9 of 15 entries</p>
+              </div>
+              <div class="footer-right">
+                <span class="summary-text">Total Return Quantity: <span class="summary-value">{{ totalReturnQuantity }}</span></span>
+                <span class="summary-text">To Be Claim Value: <span class="summary-value">₹{{ toBeClaimValue | number }}</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'claims' && selectedReturnsType === 'All Claims Summary') {
+        <!-- Claims Summary View -->
+        <div class="claims-summary-container">
+          <!-- Summary Cards -->
+          <div class="summary-cards">
+            <div class="summary-card">
+              <div class="card-label">Total Claim Raised</div>
+              <div class="card-value">₹ {{ totalClaimRaised | number }}</div>
+            </div>
+            <div class="summary-card">
+              <div class="card-label">Pending Claims</div>
+              <div class="card-value">₹ {{ pendingClaims | number }}</div>
+            </div>
+            <div class="summary-card">
+              <div class="card-label">Cleared Claim</div>
+              <div class="card-value">₹ {{ clearedClaim | number }}</div>
+            </div>
+          </div>
+
+          <!-- Month wise Summary Table -->
+          <div class="table-card">
+            <div class="table-title">Month wise Summary</div>
+            <div class="table-wrapper">
+              <table class="stock-table month-summary-table">
+                <thead>
+                  <tr>
+                    <th class="col-month">
+                      <div class="sortable-header">
+                        Month
+                        <span class="sort-indicator">
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                            <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="col-return-claims">
+                      <div class="sortable-header">
+                        Return Claims (₹)
+                        <span class="sort-indicator">
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                            <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="col-scheme-claims">
+                      <div class="sortable-header">
+                        Scheme Claims (₹)
+                        <span class="sort-indicator">
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                            <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="col-sample-claims">
+                      <div class="sortable-header">
+                        Sample Claims (₹)
+                        <span class="sort-indicator">
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                            <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="col-total-claim">
+                      <div class="sortable-header">
+                        Total Claim (₹)
+                        <span class="sort-indicator">
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                            <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </th>
+                    <th class="col-cleared-date">
+                      <div class="sortable-header">
+                        Cleared Date
+                        <span class="sort-indicator">
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                            <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of monthWiseSummary; track item.id) {
+                    <tr>
+                      <td class="col-month">
+                        <div class="month-info">{{ item.month }}</div>
+                      </td>
+                      <td class="col-return-claims">
+                        <div class="claim-amount">
+                          @if (item.returnClaims !== null) {
+                            ₹{{ item.returnClaims | number }}
+                          } @else {
+                            -
+                          }
+                        </div>
+                      </td>
+                      <td class="col-scheme-claims">
+                        <div class="claim-amount">
+                          @if (item.schemeClaims !== null) {
+                            ₹{{ item.schemeClaims | number }}
+                          } @else {
+                            -
+                          }
+                        </div>
+                      </td>
+                      <td class="col-sample-claims">
+                        <div class="claim-amount">
+                          @if (item.sampleClaims !== null) {
+                            ₹{{ item.sampleClaims | number }}
+                          } @else {
+                            -
+                          }
+                        </div>
+                      </td>
+                      <td class="col-total-claim">
+                        <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
+                      </td>
+                      <td class="col-cleared-date">
+                        <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
+                          @if (item.clearedDate) {
+                            {{ item.clearedDate }}
+                          } @else {
+                            -
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'claims' && selectedReturnsType === 'Schemes') {
+        <!-- Scheme Claims Table -->
+        <div class="table-card">
+          <div class="table-wrapper">
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th class="col-scheme-bill-no">
+                    <div class="sortable-header">
+                      Bill No.
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-scheme-retailer">
+                    <div class="sortable-header">
+                      Retailer Name / Route
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-scheme-products">
+                    <div class="sortable-header">
+                      Products / Quantity
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-scheme-amount">
+                    <div class="sortable-header">
+                      Amount
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (scheme of schemeClaimItems; track scheme.id) {
+                  <tr>
+                    <td class="col-scheme-bill-no">
+                      <div class="bill-no">{{ scheme.billNo }}</div>
+                    </td>
+                    <td class="col-scheme-retailer">
+                      <div class="scheme-retailer-info">
+                        <div class="retailer-name">{{ scheme.retailerName }}</div>
+                        <div class="route-name">({{ scheme.route }})</div>
+                      </div>
+                    </td>
+                    <td class="col-scheme-products">
+                      <div class="scheme-products-info">
+                        <div class="product-name">{{ scheme.productName }}</div>
+                        <div class="product-quantity">({{ scheme.quantity }} {{ scheme.unit }})</div>
+                      </div>
+                    </td>
+                    <td class="col-scheme-amount">
+                      <div class="amount-info">₹{{ scheme.amount | number }}</div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Footer -->
+          <div class="table-footer">
+            <div class="footer-content">
+              <div class="footer-left">
+                <p>Showing 1 to 9 of 15 entries</p>
         </div>
         <div class="footer-right">
-          <span class="footer-text">Design by Fverds Staff | Version 1.0</span>
+                <span class="summary-text">Total Return Quantity: <span class="summary-value">{{ totalReturnQuantity }}</span></span>
+                <span class="summary-text">To Be Claim Value: <span class="summary-value-orange">₹{{ toBeClaimValue | number }}</span></span>
+              </div>
+            </div>
+          </div>
         </div>
+      }
+
+      @if (activeTab === 'orders') {
+        <!-- Orders/Bills Table -->
+        <div class="table-card">
+          <div class="table-wrapper orders-table-wrapper">
+            <table class="stock-table orders-table">
+              <thead>
+                <tr>
+                  <th class="col-order-id">
+                    <div class="sortable-header">
+                      Order ID
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-order-date">
+                    <div class="sortable-header">
+                      Order Date
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-retailer">
+                    <div class="sortable-header">
+                      Retailer Name / Placed By
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-total-value">
+                    <div class="sortable-header">
+                      Order Total Value
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-billed-amount">
+                    <div class="sortable-header">
+                      Billed Amount
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-pending-amount">
+                    <div class="sortable-header">
+                      Pending Amount
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-action">
+                    <div class="sortable-header">
+                      Action
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of orderItems; track order.id) {
+                  <tr>
+                    <td class="col-order-id">
+                      <div class="order-id">{{ order.orderId }}</div>
+                    </td>
+                    <td class="col-order-date">
+                      <div class="order-date">{{ order.orderDate }}</div>
+                    </td>
+                    <td class="col-retailer">
+                      <div class="retailer-info">
+                        <div class="retailer-name">{{ order.retailerName }}</div>
+                        <div class="placed-by">Placed by: {{ order.placedBy }}</div>
+                      </div>
+                    </td>
+                    <td class="col-total-value">
+                      <div class="amount-info">₹{{ order.orderTotalValue | number }}</div>
+                    </td>
+                    <td class="col-billed-amount">
+                      <div class="amount-info">₹{{ order.billedAmount | number }}</div>
+                    </td>
+                    <td class="col-pending-amount">
+                      <div class="pending-amount-info">
+                        <span class="amount-info">₹{{ order.pendingAmount | number }}</span>
+                        <span 
+                          class="order-status-badge"
+                          [class.pending]="order.orderStatus === 'pending'"
+                          [class.billed]="order.orderStatus === 'billed'"
+                          [class.partial]="order.orderStatus === 'partial'"
+                        >
+                          {{ order.orderStatus === 'billed' ? 'Bill' : (order.orderStatus | titlecase) }}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="col-action">
+                      <div class="action-buttons">
+                        <button class="view-btn" (click)="onViewOrder(order)" title="View">
+                          View
+                        </button>
+                        @if (order.orderStatus === 'pending' || order.orderStatus === 'partial') {
+                          <button class="cancel-btn" (click)="onCancelPending(order)" title="Cancel Pending">
+                            Cancel Pending
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
       </div>
 
-      <div class="pagination-bottom">
-        <span class="pagination-text">Showing 1 to 10 of 15 entries</span>
+          <!-- Table Footer -->
+          <div class="table-footer">
+            <p>Showing 1 to 9 of 15 entries</p>
+          </div>
       </div>
+      }
     </div>
   </div>
+
+  <!-- View Options Modal -->
+  @if (showViewOptionsModal) {
+    <div class="view-options-backdrop" (click)="closeViewOptionsModal()">
+      <div class="view-options-modal" (click)="$event.stopPropagation()">
+        <div class="view-options-header">
+          <h3 class="view-options-title">View Options</h3>
+          <button class="view-options-close" (click)="closeViewOptionsModal()">✕</button>
+        </div>
+        <div class="view-options-body">
+          <button class="view-option-btn" (click)="onViewBill()">View Bill</button>
+          <button class="view-option-btn" (click)="onViewPurchase()">View Purchase</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

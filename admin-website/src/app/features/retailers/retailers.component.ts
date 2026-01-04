@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
+import { ButtonComponent } from '../../shared/components/button/button.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { RetailerFormStep1Component } from './components/retailer-form-step1/retailer-form-step1.component';
 import { RetailerFormStep2Component } from './components/retailer-form-step2/retailer-form-step2.component';
@@ -20,7 +21,7 @@ interface Retailer {
 @Component({
   selector: 'app-retailers',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ModalComponent, RetailerFormStep1Component, RetailerFormStep2Component],
+  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, RetailerFormStep1Component, RetailerFormStep2Component],
   templateUrl: './retailers.component.html',
   styleUrl: './retailers.component.scss'
 })
@@ -29,6 +30,7 @@ export class RetailersComponent {
   totalPages = 2;
   isAddModalOpen = false;
   currentStep = 1;
+  pendingApprovalsCount = 5;
 
   // Filter options
   selectedCountryZone = '';
@@ -189,5 +191,56 @@ export class RetailersComponent {
 
   toggleDisable(retailer: Retailer): void {
     retailer.isDisabled = !retailer.isDisabled;
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  onSearch(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    console.log('Search:', input.value);
+  }
+
+  onRowClick(retailer: Retailer): void {
+    console.log('Row clicked:', retailer);
+  }
+
+  getContactName(contact: string): string {
+    // If contact contains a phone number pattern, return the name part
+    if (contact.includes('+91') || /^\d/.test(contact.trim())) {
+      return '';
+    }
+    return contact;
+  }
+
+  getContactPhone(contact: string, address: string): string {
+    // Check if contact is a phone number
+    if (contact.includes('+91') || /^\d/.test(contact.trim())) {
+      return contact;
+    }
+    // Check if address is a phone number
+    if (address && (address.includes('+91') || /^\d/.test(address.trim()))) {
+      return address;
+    }
+    return '';
+  }
+
+  isPhoneNumber(text: string): boolean {
+    return text.includes('+91') || /^\d/.test(text.trim());
   }
 }
