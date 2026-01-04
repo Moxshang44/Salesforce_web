@@ -1,7 +1,12 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.collapsed]="isCollapsed">
   <div class="sidebar-header">
     <img src="assets/images/company-logo.svg" alt="Company Logo" class="company-logo">
-    <h1 class="company-name">{{ companyName }}</h1>
+    <h1 class="company-name" *ngIf="!isCollapsed">{{ companyName }}</h1>
+    <button class="collapse-btn" (click)="toggleSidebar()" [title]="isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" [class.rotate]="isCollapsed">
+        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </div>
 
   <nav class="sidebar-nav">
@@ -18,12 +23,12 @@
             @if (item.iconImage) {
               <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
             }
-            <span class="nav-label">{{ item.label }}</span>
-            <span class="expand-icon" [class.expanded]="item.isExpanded">▸</span>
+            <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+            <span class="expand-icon" [class.expanded]="item.isExpanded" *ngIf="!isCollapsed">▸</span>
           </div>
           
           <!-- Sub-menu items -->
-          @if (item.isExpanded) {
+          @if (item.isExpanded && !isCollapsed) {
             <div class="sub-menu">
               @for (subItem of item.subItems; track subItem.route) {
                 <a 
@@ -50,7 +55,7 @@
             @if (item.iconImage) {
               <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
             }
-            <span class="nav-label">{{ item.label }}</span>
+            <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
           </a>
         }
       </div>

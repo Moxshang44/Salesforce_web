@@ -13,6 +13,42 @@
   z-index: 100;
   overflow-y: auto;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  transition: width 0.3s ease;
+
+  &.collapsed {
+    width: 70px;
+
+    .sidebar-header {
+      padding: 0;
+      justify-content: center;
+    }
+
+    .company-logo {
+      padding: 12px 0;
+    }
+
+    .company-name {
+      display: none;
+    }
+
+    .nav-item {
+      justify-content: center;
+      padding: 12px;
+      margin: 2px 8px;
+    }
+
+    .nav-label {
+      display: none;
+    }
+
+    .expand-icon {
+      display: none;
+    }
+
+    .sub-menu {
+      display: none;
+    }
+  }
 }
 
 .sidebar-header {
@@ -23,6 +59,7 @@
   align-items: center;
   gap: 5px;
   box-sizing: border-box;
+  position: relative;
 }
 
 .company-logo {
@@ -30,6 +67,7 @@
   height: 30px;
   object-fit: contain;
   flex-shrink: 0;
+  padding: 8px 0;
 }
 
 .company-name {
@@ -192,6 +230,47 @@
 .nav-label {
   flex: 1;
   font-weight: 600; // Make titles bold
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.collapse-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(102, 68, 35, 0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #664423;
+
+  &:hover {
+    background: rgba(102, 68, 35, 0.2);
+  }
+
+  svg {
+    transition: transform 0.3s ease;
+    
+    &.rotate {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.sidebar.collapsed .collapse-btn {
+  right: 50%;
+  transform: translate(50%, -50%);
+  
+  svg {
+    transform: rotate(180deg);
+  }
 }
 
 // Scrollbar styling
