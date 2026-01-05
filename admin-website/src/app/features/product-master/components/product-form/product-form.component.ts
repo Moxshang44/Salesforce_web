@@ -70,8 +70,50 @@ export class ProductFormComponent {
     this.imagePreviews.splice(index, 1);
   }
 
+  errors: { [key: string]: string } = {};
+
   onSave() {
+    this.errors = {};
+    let hasErrors = false;
+
+    if (!this.formData.brand) {
+      this.errors['brand'] = 'Please select brand';
+      hasErrors = true;
+    }
+    if (!this.formData.category) {
+      this.errors['category'] = 'Please select category';
+      hasErrors = true;
+    }
+    if (!this.formData.skuCode) {
+      this.errors['skuCode'] = 'Please enter SKU code';
+      hasErrors = true;
+    }
+    if (!this.formData.productName) {
+      this.errors['productName'] = 'Please enter product name';
+      hasErrors = true;
+    }
+    if (!this.formData.shortDescription) {
+      this.errors['shortDescription'] = 'Please enter short description';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setTimeout(() => {
+        const firstError = document.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return;
+    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(field: string): void {
+    if (this.errors[field]) {
+      delete this.errors[field];
+    }
   }
 
   onCancel() {

@@ -3,9 +3,14 @@
     <div class="modal-container" [style.width]="width" (click)="onModalClick($event)">
       <div class="modal-header">
         <h2 class="modal-title">{{ title }}</h2>
-        @if (showCloseButton) {
-          <button class="modal-close" (click)="onClose()">✕</button>
-        }
+        <div class="modal-header-right">
+          @if (stepIndicator) {
+            <span class="step-indicator">{{ stepIndicator }}</span>
+          }
+          @if (showCloseButton) {
+            <button class="modal-close" (click)="onClose()">✕</button>
+          }
+        </div>
       </div>
       <div class="modal-body">
         <ng-content></ng-content>

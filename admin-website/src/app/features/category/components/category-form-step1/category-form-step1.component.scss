@@ -1,14 +1,7 @@
 .category-form-step1 {
-  padding: 0;
-}
-
-.step-indicator {
-  text-align: right;
-  font-size: 14px;
-  color: #6c757d;
-  margin-bottom: 24px;
-  margin-top: 8px;
-  font-weight: 500;
+  padding: 2px 24px 24px 24px;
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 .form-row {
@@ -38,22 +31,36 @@
 .form-select {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid rgba(221, 221, 221, 0.7);
   border-radius: 6px;
   font-size: 14px;
   color: #2c3e50;
-  background-color: white;
+  background: rgba(255, 255, 255, 0.4);
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
     border-color: #664423;
+    background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 
   &::placeholder {
     color: #9ca3af;
   }
+
+  &.error {
+    border-color: #dc3545;
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
 }
 
 .form-select {
@@ -74,8 +81,8 @@
 .add-sub-btn {
   width: 42px;
   height: 42px;
-  border: 1px solid #664423;
-  background-color: white;
+  border: 1px solid rgba(102, 68, 35, 0.7);
+  background: rgba(255, 255, 255, 0.5);
   color: #664423;
   border-radius: 6px;
   font-size: 24px;
@@ -88,7 +95,7 @@
   justify-content: center;
 
   &:hover {
-    background-color: #664423;
+    background: rgba(102, 68, 35, 0.8);
     color: white;
   }
 }
@@ -105,8 +112,8 @@
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background-color: #f3f4f6;
-  border: 1px solid #d1d5db;
+  background: rgba(243, 244, 246, 0.7);
+  border: 1px solid rgba(209, 213, 219, 0.7);
   border-radius: 20px;
   font-size: 13px;
   color: #2c3e50;
@@ -136,6 +143,10 @@
 
 .form-section {
   margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(224, 224, 224, 0.5);
+  border-radius: 8px;
 }
 
 .section-label {
@@ -150,6 +161,9 @@
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
 }
 
 .checkbox-label {
@@ -173,24 +187,33 @@
 }
 
 .upload-area {
-  border: 2px dashed #d1d5db;
+  border: 2px dashed rgba(209, 213, 219, 0.7);
   border-radius: 8px;
   padding: 40px 20px;
   text-align: center;
-  background-color: #f9fafb;
+  background: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover,
   &.drag-over {
-    border-color: #664423;
-    background-color: #f3f4f6;
+    border-color: rgba(102, 68, 35, 0.7);
+    background: rgba(243, 244, 246, 0.3);
   }
 }
 
 .upload-icon {
   font-size: 48px;
   margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  svg {
+    width: 48px;
+    height: 48px;
+    color: #664423;
+  }
 }
 
 .upload-text {
@@ -220,8 +243,11 @@
   justify-content: flex-end;
   gap: 12px;
   margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  padding: 10px 0 0 0;
+  border-top: 1px solid rgba(229, 231, 235, 0.5);
+  background: transparent;
+  position: sticky;
+  bottom: 0;
 }
 
 // Responsive

@@ -262,6 +262,7 @@
     <app-modal
       [isOpen]="isAddModalOpen"
       [title]="getModalTitle()"
+      [stepIndicator]="'Step ' + currentStep + ' of 2'"
       width="1400px"
       (close)="closeAddModal()"
     >

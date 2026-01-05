@@ -1,9 +1,4 @@
 <div class="form-container">
-  <div class="form-step-indicator">
-    <span class="step-text">Step 3 of 3</span>
-    <button type="button" class="close-btn" (click)="onPrevious()">×</button>
-  </div>
-
   <form class="routes-form">
     <!-- Filter Row -->
     <div class="filter-row">
@@ -97,7 +92,11 @@
                 class="btn-assigned"
                 (click)="unassignRoute(route)"
               >
-                <span class="btn-icon">🔄</span>
+                <span class="btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                  </svg>
+                </span>
                 Assigned
               </button>
             </div>
@@ -132,7 +131,11 @@
                 class="btn-assign"
                 (click)="assignRoute(route)"
               >
-                <span class="btn-icon">➕</span>
+                <span class="btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                  </svg>
+                </span>
                 Assign
               </button>
             </div>

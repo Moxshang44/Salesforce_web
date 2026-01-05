@@ -43,8 +43,34 @@ export class BrandFormStep2Component {
   countryOptions = ['India', 'USA', 'UK', 'Germany', 'Japan', 'China', 'Other'];
   tagInput: string = '';
 
+  errors: { [key: string]: string } = {};
+
   onSaveAndFinish(): void {
+    this.errors = {};
+    let hasErrors = false;
+
+    if (!this.formData.status) {
+      this.errors['status'] = 'Please select status';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setTimeout(() => {
+        const firstError = document.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return;
+    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(field: string): void {
+    if (this.errors[field]) {
+      delete this.errors[field];
+    }
   }
 
   onPrevious(): void {

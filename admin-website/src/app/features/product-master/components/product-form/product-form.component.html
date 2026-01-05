@@ -1,13 +1,4 @@
 <form class="product-form">
-  <!-- Step Header -->
-  <div class="step-header">
-    <div class="step-indicator">
-      <span class="step-dot active"></span>
-      <span class="step-label">Step 1 of 3</span>
-    </div>
-    <div class="step-title">Basic Product Information</div>
-  </div>
-
   <!-- Form Grid -->
   <div class="form-grid">
     <!-- Brand -->
@@ -17,15 +8,21 @@
         <span class="required">*</span>
       </label>
       <select 
-        class="form-select" 
+        class="form-select"
+        [class.error]="errors['brand']"
         [(ngModel)]="formData.brand" 
         name="brand"
+        (change)="clearError('brand')"
+        required
       >
         <option value="">Select Brand</option>
         @for (brand of brands; track brand) {
           <option [value]="brand">{{ brand }}</option>
         }
       </select>
+      @if (errors['brand']) {
+        <span class="error-message">{{ errors['brand'] }}</span>
+      }
     </div>
 
     <!-- Category -->
@@ -35,15 +32,21 @@
         <span class="required">*</span>
       </label>
       <select 
-        class="form-select" 
+        class="form-select"
+        [class.error]="errors['category']"
         [(ngModel)]="formData.category" 
         name="category"
+        (change)="clearError('category')"
+        required
       >
         <option value="">Select Category</option>
         @for (category of categories; track category) {
           <option [value]="category">{{ category }}</option>
         }
       </select>
+      @if (errors['category']) {
+        <span class="error-message">{{ errors['category'] }}</span>
+      }
     </div>
 
     <!-- Subcategory -->
@@ -71,11 +74,17 @@
       </label>
       <input 
         type="text" 
-        class="form-input" 
+        class="form-input"
+        [class.error]="errors['skuCode']"
         [(ngModel)]="formData.skuCode" 
         name="skuCode"
         placeholder="Enter SKU code"
+        (input)="clearError('skuCode')"
+        required
       />
+      @if (errors['skuCode']) {
+        <span class="error-message">{{ errors['skuCode'] }}</span>
+      }
     </div>
 
     <!-- Product Name (Full Width) -->
@@ -86,11 +95,17 @@
       </label>
       <input 
         type="text" 
-        class="form-input" 
+        class="form-input"
+        [class.error]="errors['productName']"
         [(ngModel)]="formData.productName" 
         name="productName"
         placeholder="Enter product name"
+        (input)="clearError('productName')"
+        required
       />
+      @if (errors['productName']) {
+        <span class="error-message">{{ errors['productName'] }}</span>
+      }
     </div>
 
     <!-- Organic Whole Grain Energy Bar (Static Text) -->
@@ -110,12 +125,18 @@
         <span class="required">*</span>
       </label>
       <textarea 
-        class="form-textarea" 
+        class="form-textarea"
+        [class.error]="errors['shortDescription']"
         [(ngModel)]="formData.shortDescription" 
         name="shortDescription"
         placeholder="A delicious and wholesome organic energy bar, packed with whole grains, nuts, and dried fruits for sustained energy, perfect for on the go activities."
         rows="3"
+        (input)="clearError('shortDescription')"
+        required
       ></textarea>
+      @if (errors['shortDescription']) {
+        <span class="error-message">{{ errors['shortDescription'] }}</span>
+      }
     </div>
 
     <!-- Product Images (Full Width) -->
@@ -123,7 +144,13 @@
       <label class="form-label">Product Images</label>
       <div class="image-upload-section">
         <div class="upload-area" (click)="fileInput.click()">
-          <div class="upload-icon">📁</div>
+          <div class="upload-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
           <div class="upload-text">Drop a file image here or click to browse</div>
           <div class="upload-hint">PNG, JPG or GIF (max. 800x400px)</div>
           <input 

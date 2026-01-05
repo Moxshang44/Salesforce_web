@@ -1,16 +1,20 @@
 <div class="category-form-step1">
-  <div class="step-indicator">Step 1 of 2</div>
-
   <div class="form-row">
     <div class="form-group full-width">
       <label for="categoryName">Category Name</label>
       <input
         type="text"
         id="categoryName"
+        [class.error]="errors['categoryName']"
         [(ngModel)]="categoryData.categoryName"
         placeholder="e.g., North India Visible"
         class="form-input"
+        (input)="clearError('categoryName')"
+        required
       />
+      @if (errors['categoryName']) {
+        <span class="error-message">{{ errors['categoryName'] }}</span>
+      }
     </div>
   </div>
 
@@ -48,10 +52,16 @@
       <input
         type="text"
         id="categoryCode"
+        [class.error]="errors['categoryCode']"
         [(ngModel)]="categoryData.categoryCode"
         placeholder="#CAT1000"
         class="form-input"
+        (input)="clearError('categoryCode')"
+        required
       />
+      @if (errors['categoryCode']) {
+        <span class="error-message">{{ errors['categoryCode'] }}</span>
+      }
     </div>
   </div>
 
@@ -162,7 +172,13 @@
       (drop)="onDrop($event)"
       (click)="fileInput.click()"
     >
-      <div class="upload-icon">📁</div>
+      <div class="upload-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <div class="upload-text">
         <strong>Drag & drop images here or click to browse</strong>
       </div>

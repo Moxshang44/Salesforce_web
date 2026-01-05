@@ -63,6 +63,18 @@
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
+.modal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.step-indicator {
+  font-size: 14px;
+  font-weight: 500;
+  color: #999;
+}
+
 .modal-title {
   font-size: 20px;
   font-weight: 600;

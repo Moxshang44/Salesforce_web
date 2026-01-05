@@ -53,6 +53,8 @@ export class DistributorFormStep1Component {
   isDraggingImages = false;
   documentPreviews: Array<{file: File, preview: string}> = [];
   imagePreviews: Array<{file: File, preview: string}> = [];
+  
+  errors: { [key: string]: string } = {};
 
   // Auto-generate distributor ID
   generateDistributorId(): void {
@@ -60,6 +62,8 @@ export class DistributorFormStep1Component {
       const prefix = this.formData.companyName.substring(0, 3).toUpperCase();
       const randomNum = Math.floor(100 + Math.random() * 900);
       this.formData.distributorId = `SR-EMP-${randomNum}`;
+      this.clearError('companyName');
+      this.clearError('distributorId');
     }
   }
 
@@ -177,24 +181,44 @@ export class DistributorFormStep1Component {
   }
 
   onSaveAndNext(): void {
+    // Clear previous errors
+    this.errors = {};
+    let hasErrors = false;
+
     // Basic validation
-    if (!this.formData.companyName) {
-      alert('Please enter distributor company name');
+    if (!this.formData.companyName || this.formData.companyName.trim() === '') {
+      this.errors['companyName'] = 'Please enter distributor company name';
+      hasErrors = true;
+    }
+    if (!this.formData.distributorId || this.formData.distributorId.trim() === '') {
+      this.errors['distributorId'] = 'Please enter distributor ID';
+      hasErrors = true;
+    }
+    if (!this.formData.contactPersonName || this.formData.contactPersonName.trim() === '') {
+      this.errors['contactPersonName'] = 'Please enter contact person name';
+      hasErrors = true;
+    }
+    if (!this.formData.mobileNumber || this.formData.mobileNumber.trim() === '') {
+      this.errors['mobileNumber'] = 'Please enter mobile number';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      // Scroll to first error
+      const firstErrorField = document.querySelector('.error-message');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
-    if (!this.formData.distributorId) {
-      alert('Please enter distributor ID');
-      return;
-    }
-    if (!this.formData.contactPersonName) {
-      alert('Please enter contact person name');
-      return;
-    }
-    if (!this.formData.mobileNumber) {
-      alert('Please enter mobile number');
-      return;
-    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(fieldName: string): void {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
+    }
   }
 
   onCancel(): void {

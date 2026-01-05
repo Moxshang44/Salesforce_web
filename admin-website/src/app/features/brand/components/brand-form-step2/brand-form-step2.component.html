@@ -1,23 +1,24 @@
 <div class="form-container">
-  <div class="form-step-indicator">
-    <span class="step-text">Step 2 of 2</span>
-  </div>
-
   <form class="brand-form">
     <!-- Status and Active -->
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Status <span class="required">*</span></label>
         <select 
-          class="form-select" 
+          class="form-select"
+          [class.error]="errors['status']"
           [(ngModel)]="formData.status"
           name="status"
+          (change)="clearError('status')"
           required
         >
           @for (option of statusOptions; track option) {
             <option [value]="option">{{ option }}</option>
           }
         </select>
+        @if (errors['status']) {
+          <span class="error-message">{{ errors['status'] }}</span>
+        }
       </div>
 
       <div class="form-group">

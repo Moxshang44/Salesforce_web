@@ -41,7 +41,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 24px;
+  padding: 2px 24px 24px 24px;
 }
 
 .form-row {
@@ -60,6 +60,14 @@
   gap: 8px;
 }
 
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+}
+
 .form-label {
   font-size: 13px;
   font-weight: 600;
@@ -69,11 +77,11 @@
 .form-input,
 .form-select {
   padding: 10px 14px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(221, 221, 221, 0.7);
   border-radius: 6px;
   font-size: 14px;
   transition: all 0.2s ease;
-  background: white;
+  background: rgba(255, 255, 255, 0.4);
 
   &::placeholder {
     color: #999;
@@ -82,13 +90,25 @@
   &:focus {
     outline: none;
     border-color: #664423;
+    background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+
+  &.error {
+    border-color: #dc3545;
+    background: rgba(255, 255, 255, 0.5);
+    
+    &:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
   }
 }
 
 .form-select {
   cursor: pointer;
   appearance: none;
+  background-color: rgba(255, 255, 255, 0.4);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
@@ -104,10 +124,10 @@
 .country-code-select {
   flex: 0 0 80px;
   padding: 10px 8px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(221, 221, 221, 0.7);
   border-radius: 6px;
   font-size: 14px;
-  background: white;
+  background: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
@@ -118,6 +138,7 @@
   &:focus {
     outline: none;
     border-color: #664423;
+    background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -125,10 +146,10 @@
 .phone-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(221, 221, 221, 0.7);
   border-radius: 6px;
   font-size: 14px;
-  background: white;
+  background: rgba(255, 255, 255, 0.4);
 
   &::placeholder {
     color: #999;
@@ -137,7 +158,18 @@
   &:focus {
     outline: none;
     border-color: #664423;
+    background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+
+  &.error {
+    border-color: #dc3545;
+    background: rgba(255, 255, 255, 0.5);
+    
+    &:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
   }
 }
 
@@ -180,15 +212,16 @@
 .date-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(221, 221, 221, 0.7);
   border-radius: 6px;
   font-size: 14px;
-  background: white;
+  background: rgba(255, 255, 255, 0.4);
   cursor: pointer;
 
   &:focus {
     outline: none;
     border-color: #664423;
+    background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -201,8 +234,8 @@
 
 // Schedule Section
 .schedule-section {
-  background: #fafafa;
-  border: 1px solid #e0e0e0;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(224, 224, 224, 0.5);
   border-radius: 8px;
   padding: 20px;
   margin-top: 8px;
@@ -214,7 +247,7 @@
   gap: 16px;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid rgba(224, 224, 224, 0.5);
 }
 
 .schedule-title {
@@ -252,10 +285,10 @@
 .route-select {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(221, 221, 221, 0.7);
   border-radius: 6px;
   font-size: 14px;
-  background: white;
+  background: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
@@ -267,6 +300,7 @@
   &:focus {
     outline: none;
     border-color: #664423;
+    background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -276,9 +310,9 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 20px 24px;
-  border-top: 1px solid #e0e0e0;
-  background: #f8f9fa;
+  padding: 10px 24px;
+  border-top: 1px solid rgba(224, 224, 224, 0.5);
+  background: transparent;
   position: sticky;
   bottom: 0;
 }
@@ -304,12 +338,12 @@
 }
 
 .btn-cancel {
-  background: white;
+  background: rgba(255, 255, 255, 0.5);
   color: #666;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(221, 221, 221, 0.7);
 
   &:hover {
-    background: #f8f9fa;
+    background: rgba(255, 255, 255, 0.7);
     border-color: #999;
   }
 }

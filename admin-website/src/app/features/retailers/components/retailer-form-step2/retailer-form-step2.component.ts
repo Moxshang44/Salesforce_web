@@ -49,22 +49,44 @@ export class RetailerFormStep2Component {
   areaOptions = ['Area A', 'Area B', 'Area C', 'Area D', 'Area E'];
   divisionOptions = ['Division 1', 'Division 2', 'Division 3', 'Division 4'];
   routeOptions = ['Route 1', 'Route 2', 'Route 3', 'Route 4', 'Route 5'];
+  
+  errors: { [key: string]: string } = {};
 
   onSaveAndNext(): void {
+    // Clear previous errors
+    this.errors = {};
+    let hasErrors = false;
+
     // Basic validation
-    if (!this.formData.selectedCountry) {
-      alert('Please select country');
+    if (!this.formData.selectedCountry || this.formData.selectedCountry.trim() === '') {
+      this.errors['selectedCountry'] = 'Please select country';
+      hasErrors = true;
+    }
+    if (!this.formData.bankName || this.formData.bankName.trim() === '') {
+      this.errors['bankName'] = 'Please enter bank name';
+      hasErrors = true;
+    }
+    if (!this.formData.accountNo || this.formData.accountNo.trim() === '') {
+      this.errors['accountNo'] = 'Please enter account number';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      // Scroll to first error
+      const firstErrorField = document.querySelector('.error-message');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
-    if (!this.formData.bankName) {
-      alert('Please enter bank name');
-      return;
-    }
-    if (!this.formData.accountNo) {
-      alert('Please enter account number');
-      return;
-    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(fieldName: string): void {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
+    }
   }
 
   onPrevious(): void {

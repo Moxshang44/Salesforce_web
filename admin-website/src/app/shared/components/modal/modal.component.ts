@@ -13,6 +13,7 @@ export class ModalComponent {
   @Input() title = '';
   @Input() width = '800px';
   @Input() showCloseButton = true;
+  @Input() stepIndicator = '';
   @Output() close = new EventEmitter<void>();
 
   onClose() {

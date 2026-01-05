@@ -53,6 +53,8 @@ export class RetailerFormStep1Component {
   isDraggingImages = false;
   documentPreviews: Array<{file: File, preview: string}> = [];
   imagePreviews: Array<{file: File, preview: string}> = [];
+  
+  errors: { [key: string]: string } = {};
 
   // Auto-generate retailer ID
   generateRetailerId(): void {
@@ -60,6 +62,8 @@ export class RetailerFormStep1Component {
       const prefix = 'SR-EMP';
       const randomNum = Math.floor(100 + Math.random() * 900);
       this.formData.retailerId = `${prefix}-${randomNum}`;
+      this.clearError('storeName');
+      this.clearError('retailerId');
     }
   }
 
@@ -176,24 +180,44 @@ export class RetailerFormStep1Component {
   }
 
   onSaveAndNext(): void {
+    // Clear previous errors
+    this.errors = {};
+    let hasErrors = false;
+
     // Basic validation
-    if (!this.formData.storeName) {
-      alert('Please enter retailer store name');
+    if (!this.formData.storeName || this.formData.storeName.trim() === '') {
+      this.errors['storeName'] = 'Please enter retailer store name';
+      hasErrors = true;
+    }
+    if (!this.formData.retailerId || this.formData.retailerId.trim() === '') {
+      this.errors['retailerId'] = 'Please enter retailer ID';
+      hasErrors = true;
+    }
+    if (!this.formData.contactPersonName || this.formData.contactPersonName.trim() === '') {
+      this.errors['contactPersonName'] = 'Please enter contact person name';
+      hasErrors = true;
+    }
+    if (!this.formData.mobileNumber || this.formData.mobileNumber.trim() === '') {
+      this.errors['mobileNumber'] = 'Please enter mobile number';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      // Scroll to first error
+      const firstErrorField = document.querySelector('.error-message');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
-    if (!this.formData.retailerId) {
-      alert('Please enter retailer ID');
-      return;
-    }
-    if (!this.formData.contactPersonName) {
-      alert('Please enter contact person name');
-      return;
-    }
-    if (!this.formData.mobileNumber) {
-      alert('Please enter mobile number');
-      return;
-    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(fieldName: string): void {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
+    }
   }
 
   onCancel(): void {

@@ -441,6 +441,30 @@
   color: #666;
 }
 
+// Modal Overrides for Routes
+::ng-deep {
+  app-modal {
+    .modal-container {
+      background: rgba(255, 255, 255, 0.3) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    }
+  
+    .modal-header {
+      background: rgba(255, 255, 255, 0.2) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      padding: 10px var(--spacing-xl) !important;
+    }
+  
+    .modal-body {
+      background: rgba(255, 255, 255, 0.15) !important;
+    }
+  }
+}
+
 // Responsive Design
 @media (max-width: $breakpoint-desktop) {
   .main-content {

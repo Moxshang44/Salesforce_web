@@ -125,7 +125,8 @@
     <app-modal
       [isOpen]="isAddModalOpen"
       [title]="getModalTitle()"
-      width="900px"
+      [stepIndicator]="'Step ' + currentStep + ' of 1'"
+      width="1400px"
       (close)="closeAddModal()"
     >
       @if (currentStep === 1) {
