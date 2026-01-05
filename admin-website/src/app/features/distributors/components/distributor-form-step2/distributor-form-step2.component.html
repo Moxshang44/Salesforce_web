@@ -1,9 +1,4 @@
 <div class="form-container">
-  <div class="form-step-indicator">
-    <span class="step-text">Step 2 of 2</span>
-    <button type="button" class="close-btn" (click)="onPrevious()">×</button>
-  </div>
-
   <form class="distributor-form">
     <!-- Row 1: Vehicle Counts and Salesman -->
     <div class="form-row three-col">
@@ -83,12 +78,17 @@
         <label class="form-label">Bank Name</label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['bankName']"
           placeholder="Axis Bank"
           [(ngModel)]="formData.bankName"
           name="bankName"
+          (input)="clearError('bankName')"
           required
         >
+        @if (errors['bankName']) {
+          <span class="error-message">{{ errors['bankName'] }}</span>
+        }
       </div>
 
       <div class="form-group">
@@ -114,46 +114,50 @@
       </div>
     </div>
 
-    <!-- Employee Route (Account Type) -->
-    <div class="form-section">
-      <label class="section-label">Employee Route</label>
-      <div class="radio-row">
-        <label class="radio-item">
-          <input 
-            type="radio" 
-            name="accountType" 
-            value="Current Account"
-            [(ngModel)]="formData.accountType"
-            class="radio-input"
-          >
-          <span class="radio-label">Current Account</span>
-        </label>
+    <!-- Row 3: Employee Route, Account No., Account Name -->
+    <div class="form-row three-col">
+      <div class="form-group">
+        <label class="form-label">Employee Route</label>
+        <div class="radio-row">
+          <label class="radio-item">
+            <input 
+              type="radio" 
+              name="accountType" 
+              value="Current Account"
+              [(ngModel)]="formData.accountType"
+              class="radio-input"
+            >
+            <span class="radio-label">Current Account</span>
+          </label>
 
-        <label class="radio-item">
-          <input 
-            type="radio" 
-            name="accountType" 
-            value="Saving Account"
-            [(ngModel)]="formData.accountType"
-            class="radio-input"
-          >
-          <span class="radio-label">Saving Account</span>
-        </label>
+          <label class="radio-item">
+            <input 
+              type="radio" 
+              name="accountType" 
+              value="Saving Account"
+              [(ngModel)]="formData.accountType"
+              class="radio-input"
+            >
+            <span class="radio-label">Saving Account</span>
+          </label>
+        </div>
       </div>
-    </div>
 
-    <!-- Row 3: Account Details -->
-    <div class="form-row">
       <div class="form-group">
         <label class="form-label">Account No.</label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['accountNumber']"
           placeholder="e.g., 9182000XXXX"
           [(ngModel)]="formData.accountNumber"
           name="accountNumber"
+          (input)="clearError('accountNumber')"
           required
         >
+        @if (errors['accountNumber']) {
+          <span class="error-message">{{ errors['accountNumber'] }}</span>
+        }
       </div>
 
       <div class="form-group">

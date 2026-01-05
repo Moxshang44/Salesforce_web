@@ -48,8 +48,38 @@ export class SchemeFormStep1Component {
 
   unitOptions = ['Pcs', 'Box', 'Kg', 'Ltr'];
 
+  errors: { [key: string]: string } = {};
+
   onSaveAndNext(): void {
+    this.errors = {};
+    let hasErrors = false;
+
+    if (!this.formData.schemeName) {
+      this.errors['schemeName'] = 'Please enter scheme name';
+      hasErrors = true;
+    }
+    if (!this.formData.schemeCode) {
+      this.errors['schemeCode'] = 'Please enter scheme code';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setTimeout(() => {
+        const firstError = document.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return;
+    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(field: string): void {
+    if (this.errors[field]) {
+      delete this.errors[field];
+    }
   }
 
   onCancel(): void {

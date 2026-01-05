@@ -81,8 +81,38 @@ export class CategoryFormStep1Component {
     }
   }
 
+  errors: { [key: string]: string } = {};
+
   onSave() {
+    this.errors = {};
+    let hasErrors = false;
+
+    if (!this.categoryData.categoryName) {
+      this.errors['categoryName'] = 'Please enter category name';
+      hasErrors = true;
+    }
+    if (!this.categoryData.categoryCode) {
+      this.errors['categoryCode'] = 'Please enter category code';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setTimeout(() => {
+        const firstError = document.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return;
+    }
+
     this.save.emit(this.categoryData);
+  }
+
+  clearError(field: string): void {
+    if (this.errors[field]) {
+      delete this.errors[field];
+    }
   }
 
   onCancel() {

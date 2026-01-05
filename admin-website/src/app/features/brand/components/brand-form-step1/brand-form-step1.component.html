@@ -1,9 +1,4 @@
 <div class="form-container">
-  <div class="form-step-indicator">
-    <span class="step-text">Step 1 of 2</span>
-    <button type="button" class="close-btn" (click)="onCancel()">×</button>
-  </div>
-
   <form class="brand-form">
     <!-- Brand Name -->
     <div class="form-row">
@@ -11,13 +6,18 @@
         <label class="form-label">Brand Name</label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['brandName']"
           placeholder="e.g., Maude Hlaze"
           [(ngModel)]="formData.brandName"
           name="brandName"
           (blur)="generateBrandCode()"
+          (input)="clearError('brandName')"
           required
         >
+        @if (errors['brandName']) {
+          <span class="error-message">{{ errors['brandName'] }}</span>
+        }
       </div>
     </div>
 
@@ -29,12 +29,17 @@
         </label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['brandCode']"
           placeholder="e.g., BCAT1001"
           [(ngModel)]="formData.brandCode"
           name="brandCode"
+          (input)="clearError('brandCode')"
           required
         >
+        @if (errors['brandCode']) {
+          <span class="error-message">{{ errors['brandCode'] }}</span>
+        }
       </div>
     </div>
 
@@ -210,7 +215,13 @@
             (dragleave)="onDragLeave($event)"
             (drop)="onDrop($event)"
           >
-            <div class="upload-icon">📁</div>
+            <div class="upload-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
             <p class="upload-text">Drag & drop image here or click to browse</p>
             <p class="upload-hint">PNG, JPG, JPEG up to 5MB</p>
             <input 

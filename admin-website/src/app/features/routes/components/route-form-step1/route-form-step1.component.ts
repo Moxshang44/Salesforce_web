@@ -92,17 +92,40 @@ export class RouteFormStep1Component {
     }
   }
 
+  errors: { [key: string]: string } = {};
+
   onSaveAndNext(): void {
+    this.errors = {};
+    let hasErrors = false;
+
     // Basic validation
     if (!this.formData.routeName) {
-      alert('Please enter route name');
-      return;
+      this.errors['routeName'] = 'Please enter route name';
+      hasErrors = true;
     }
     if (!this.formData.routeCode) {
-      alert('Please enter route code');
+      this.errors['routeCode'] = 'Please enter route code';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      // Scroll to first error
+      setTimeout(() => {
+        const firstError = document.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
       return;
     }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(field: string): void {
+    if (this.errors[field]) {
+      delete this.errors[field];
+    }
   }
 
   onCancel(): void {

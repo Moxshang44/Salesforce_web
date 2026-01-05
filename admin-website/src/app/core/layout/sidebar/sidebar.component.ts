@@ -70,7 +70,7 @@ export class SidebarComponent {
   constructor(private router: Router) {
     this.currentRoute = this.router.url;
     // Initialize CSS variable
-    document.documentElement.style.setProperty('--sidebar-width', '255px');
+    document.documentElement.style.setProperty('--sidebar-width', '220px');
     
     // Listen to route changes
     this.router.events
@@ -111,7 +111,7 @@ export class SidebarComponent {
       });
     }
     // Update CSS variable for main content margin
-    document.documentElement.style.setProperty('--sidebar-width', this.isCollapsed ? '70px' : '255px');
+    document.documentElement.style.setProperty('--sidebar-width', this.isCollapsed ? '70px' : '220px');
   }
 }
 

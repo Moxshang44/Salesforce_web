@@ -1,9 +1,4 @@
 <div class="form-container">
-  <div class="form-step-indicator">
-    <span class="step-text">Step 1 of 2</span>
-    <button type="button" class="close-btn" (click)="onCancel()">×</button>
-  </div>
-
   <form class="employee-form">
     <!-- Row 1: Employee Name, Employee ID, Mobile Number -->
     <div class="form-row three-col">
@@ -11,25 +6,35 @@
         <label class="form-label">Employee Name</label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['employeeName']"
           placeholder="e.g., Manoj Badayani"
           [(ngModel)]="formData.employeeName"
           name="employeeName"
           (blur)="generateEmployeeId()"
+          (input)="clearError('employeeName')"
           required
         >
+        @if (errors['employeeName']) {
+          <span class="error-message">{{ errors['employeeName'] }}</span>
+        }
       </div>
 
       <div class="form-group">
         <label class="form-label">Employee ID</label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['employeeId']"
           placeholder="SR-EMP-001"
           [(ngModel)]="formData.employeeId"
           name="employeeId"
+          (input)="clearError('employeeId')"
           required
         >
+        @if (errors['employeeId']) {
+          <span class="error-message">{{ errors['employeeId'] }}</span>
+        }
       </div>
 
       <div class="form-group">
@@ -46,13 +51,18 @@
           </select>
           <input 
             type="text" 
-            class="phone-input" 
+            class="phone-input"
+            [class.error]="errors['mobileNumber']"
             placeholder="eg. 9449910-00090"
             [(ngModel)]="formData.mobileNumber"
             name="mobileNumber"
+            (input)="clearError('mobileNumber')"
             required
           >
         </div>
+        @if (errors['mobileNumber']) {
+          <span class="error-message">{{ errors['mobileNumber'] }}</span>
+        }
       </div>
     </div>
 

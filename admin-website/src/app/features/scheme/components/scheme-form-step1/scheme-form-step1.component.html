@@ -1,8 +1,4 @@
 <div class="form-container">
-  <div class="form-step-indicator">
-    <span class="step-text">Step 1 of 2</span>
-  </div>
-
   <form class="scheme-form">
     <!-- Scheme Based On -->
     <div class="form-row">
@@ -23,22 +19,34 @@
         <label class="form-label">Scheme Name</label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['schemeName']"
           placeholder="e.g., Monsoon Special Scheme"
           [(ngModel)]="formData.schemeName"
           name="schemeName"
+          (input)="clearError('schemeName')"
+          required
         >
+        @if (errors['schemeName']) {
+          <span class="error-message">{{ errors['schemeName'] }}</span>
+        }
       </div>
 
       <div class="form-group">
         <label class="form-label">Scheme Code</label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['schemeCode']"
           placeholder="#1031"
           [(ngModel)]="formData.schemeCode"
           name="schemeCode"
+          (input)="clearError('schemeCode')"
+          required
         >
+        @if (errors['schemeCode']) {
+          <span class="error-message">{{ errors['schemeCode'] }}</span>
+        }
       </div>
     </div>
 
@@ -152,7 +160,10 @@
         class="add-rule-btn"
         (click)="onAddSchemeRule()"
       >
-        ➕ Add Scheme Rule
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle;">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Add Scheme Rule
       </button>
     </div>
   </form>

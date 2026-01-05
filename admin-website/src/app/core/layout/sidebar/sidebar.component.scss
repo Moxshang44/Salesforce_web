@@ -5,7 +5,7 @@
   left: 0;
   top: 0;
   height: 100vh;
-  width: 255px;
+  width: 220px;
   background: #F5F5F5;
   border-right: 1px solid #e0e0e0;
   display: flex;
@@ -24,7 +24,9 @@
     }
 
     .company-logo {
-      padding: 12px 0;
+      width: 38px;
+      height: 38px;
+      padding: 28px 0;
     }
 
     .company-name {
@@ -33,8 +35,8 @@
 
     .nav-item {
       justify-content: center;
-      padding: 12px;
-      margin: 2px 8px;
+      padding: 8px;
+      margin: 1px 8px;
     }
 
     .nav-label {
@@ -53,7 +55,7 @@
 
 .sidebar-header {
   height: 56px;
-  padding: 0 var(--spacing-lg);
+  padding: 0 12px;
   border-bottom: 1px solid #e0e0e0;
   display: flex;
   align-items: center;
@@ -71,11 +73,11 @@
 }
 
 .company-name {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #664423;
   margin: 0;
-  padding: 15px;
+  padding: 15px 10px;
   flex: 1;
 }
 
@@ -84,7 +86,7 @@
   padding: var(--spacing-sm) 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 4px;
 }
 
 .nav-item-wrapper {
@@ -95,12 +97,12 @@
 .nav-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: 12px var(--spacing-lg);
+  gap: 10px;
+  padding: 8px 12px;
   color: #4a3a2a;
   text-decoration: none;
   border-radius: var(--radius-md);
-  margin: 2px var(--spacing-md);
+  margin: 1px 8px;
   transition: all $transition-speed-fast ease;
   font-size: 14px;
   font-weight: 500;
@@ -150,7 +152,7 @@
   display: flex;
   flex-direction: column;
   background: rgba(102, 68, 35, 0.03);
-  margin: 0 var(--spacing-md);
+  margin: 0 8px;
   border-radius: var(--radius-md);
   overflow: hidden;
   animation: slideDown 0.2s ease-out;
@@ -170,7 +172,7 @@
 .sub-nav-item {
   display: flex;
   align-items: center;
-  padding: 10px var(--spacing-lg) 10px 40px;
+  padding: 6px 12px 6px 32px;
   color: #4a3a2a;
   text-decoration: none;
   transition: all $transition-speed-fast ease;

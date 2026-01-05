@@ -46,18 +46,40 @@ export class DistributorFormStep2Component {
     accountNumber: '',
     accountName: ''
   };
+  
+  errors: { [key: string]: string } = {};
 
   onSaveAndFinish(): void {
+    // Clear previous errors
+    this.errors = {};
+    let hasErrors = false;
+
     // Basic validation
-    if (!this.formData.bankName) {
-      alert('Please enter bank name');
+    if (!this.formData.bankName || this.formData.bankName.trim() === '') {
+      this.errors['bankName'] = 'Please enter bank name';
+      hasErrors = true;
+    }
+    if (!this.formData.accountNumber || this.formData.accountNumber.trim() === '') {
+      this.errors['accountNumber'] = 'Please enter account number';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      // Scroll to first error
+      const firstErrorField = document.querySelector('.error-message');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
-    if (!this.formData.accountNumber) {
-      alert('Please enter account number');
-      return;
-    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(fieldName: string): void {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
+    }
   }
 
   onPrevious(): void {

@@ -1,9 +1,4 @@
 <div class="form-container">
-  <div class="form-step-indicator">
-    <span class="step-text">Step 1 of 3</span>
-    <button type="button" class="close-btn" (click)="onCancel()">×</button>
-  </div>
-
   <form class="route-form">
     <!-- Route Name -->
     <div class="form-row">
@@ -11,13 +6,18 @@
         <label class="form-label">Route Name</label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['routeName']"
           placeholder="Kasthuri-East"
           [(ngModel)]="formData.routeName"
           name="routeName"
           (blur)="generateRouteCode()"
+          (input)="clearError('routeName')"
           required
         >
+        @if (errors['routeName']) {
+          <span class="error-message">{{ errors['routeName'] }}</span>
+        }
       </div>
 
       <!-- Route Code -->
@@ -27,12 +27,17 @@
         </label>
         <input 
           type="text" 
-          class="form-input" 
+          class="form-input"
+          [class.error]="errors['routeCode']"
           placeholder="RT-BORA-KT"
           [(ngModel)]="formData.routeCode"
           name="routeCode"
+          (input)="clearError('routeCode')"
           required
         >
+        @if (errors['routeCode']) {
+          <span class="error-message">{{ errors['routeCode'] }}</span>
+        }
       </div>
     </div>
 

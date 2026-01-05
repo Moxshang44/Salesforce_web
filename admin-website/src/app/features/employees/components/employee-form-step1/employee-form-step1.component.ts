@@ -71,6 +71,8 @@ export class EmployeeFormStep1Component {
   regionOptions = ['1 Selected', 'North Region', 'South Region', 'East Region', 'West Region'];
   areaOptions = ['India', 'Area 1', 'Area 2', 'Area 3'];
   routeOptions = ['Route 1 Name', 'Route 2 Name', 'Route 3 Name', 'Route 4 Name', 'Route 5 Name', 'Disable'];
+  
+  errors: { [key: string]: string } = {};
 
   // Auto-generate employee ID
   generateEmployeeId(): void {
@@ -78,24 +80,46 @@ export class EmployeeFormStep1Component {
       const prefix = 'SR-EMP';
       const randomNum = Math.floor(100 + Math.random() * 900);
       this.formData.employeeId = `${prefix}-${randomNum}`;
+      this.clearError('employeeName');
+      this.clearError('employeeId');
     }
   }
 
   onSaveAndNext(): void {
+    // Clear previous errors
+    this.errors = {};
+    let hasErrors = false;
+
     // Basic validation
-    if (!this.formData.employeeName) {
-      alert('Please enter employee name');
+    if (!this.formData.employeeName || this.formData.employeeName.trim() === '') {
+      this.errors['employeeName'] = 'Please enter employee name';
+      hasErrors = true;
+    }
+    if (!this.formData.employeeId || this.formData.employeeId.trim() === '') {
+      this.errors['employeeId'] = 'Please enter employee ID';
+      hasErrors = true;
+    }
+    if (!this.formData.mobileNumber || this.formData.mobileNumber.trim() === '') {
+      this.errors['mobileNumber'] = 'Please enter mobile number';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      // Scroll to first error
+      const firstErrorField = document.querySelector('.error-message');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
-    if (!this.formData.employeeId) {
-      alert('Please enter employee ID');
-      return;
-    }
-    if (!this.formData.mobileNumber) {
-      alert('Please enter mobile number');
-      return;
-    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(fieldName: string): void {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
+    }
   }
 
   onCancel(): void {

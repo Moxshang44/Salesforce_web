@@ -208,17 +208,40 @@ export class BrandFormStep1Component {
     }
   }
 
+  errors: { [key: string]: string } = {};
+
   onSaveAndNext(): void {
+    this.errors = {};
+    let hasErrors = false;
+
     // Basic validation
     if (!this.formData.brandName) {
-      alert('Please enter brand name');
-      return;
+      this.errors['brandName'] = 'Please enter brand name';
+      hasErrors = true;
     }
     if (!this.formData.brandCode) {
-      alert('Please enter brand code');
+      this.errors['brandCode'] = 'Please enter brand code';
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      // Scroll to first error
+      setTimeout(() => {
+        const firstError = document.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
       return;
     }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(field: string): void {
+    if (this.errors[field]) {
+      delete this.errors[field];
+    }
   }
 
   onCancel(): void {
