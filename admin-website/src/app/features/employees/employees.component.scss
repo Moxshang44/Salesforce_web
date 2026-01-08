@@ -319,12 +319,16 @@
 
 .employee-name {
   font-size: 14px;
+  padding-left: 55px;
+  text-align: justify;
   font-weight: 600;
   color: #000000;
 }
 
 .employee-code {
   font-size: 13px;
+  padding-left: 55px;
+  text-align: justify;
   color: #7f8c8d;
 }
 
@@ -336,6 +340,8 @@
 
 .role-title {
   font-size: 15px;
+  padding-left: 55px;
+  text-align: justify;
   font-weight: 600;
   color: #000000;
 }
@@ -343,6 +349,8 @@
 .reporting-to {
   font-size: 13px;
   color: #495057;
+  padding-left: 55px;
+  text-align: justify;
   font-weight: 400;
 }
 
@@ -354,12 +362,16 @@
 
 .area-text {
   font-size: 14px;
+  padding-left: 20px;
+  text-align: justify;
   color: #000000;
   font-weight: 500;
 }
 
 .routes-count {
   font-size: 13px;
+  padding-left: 20px;
+  text-align: justify;
   color: #7f8c8d;
   font-weight: 400;
 }
