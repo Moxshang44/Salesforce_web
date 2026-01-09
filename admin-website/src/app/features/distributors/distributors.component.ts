@@ -206,11 +206,11 @@ export class DistributorsComponent {
 
   onView(distributor: Distributor): void {
     console.log('View distributor:', distributor);
-    this.router.navigate(['/distributors', distributor.id, 'stock']);
+    this.router.navigate(['/admin/distributors', distributor.id, 'stock']);
   }
 
   onRowClick(distributor: Distributor): void {
-    this.router.navigate(['/distributors', distributor.id, 'stock']);
+    this.router.navigate(['/admin/distributors', distributor.id, 'stock']);
   }
 
   onSearch(event: Event) {

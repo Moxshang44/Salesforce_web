@@ -1,0 +1,230 @@
+<div class="billing-mode-layout">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Billing Mode Content -->
+    <div class="billing-content">
+      <!-- Page Title -->
+      <h1 class="page-title">Billing Mode</h1>
+
+      <!-- Current Mode Section -->
+      <div class="current-mode-section">
+        <div class="mode-info">
+          <div class="mode-header">
+            <span class="mode-label">Current Mode:</span>
+            <span class="mode-value">{{ currentMode }} Billing ({{ modeType }})</span>
+          </div>
+          <p class="mode-description">
+            TALLY Flexi mode enables dynamic incremental data pulls, minimizing system impact and ensuring real-time stock visibility without Tally slowdowns.
+          </p>
+        </div>
+        <app-button variant="primary" size="md" (click)="onSwitchMode()">
+          Switch Mode
+        </app-button>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="tabs-section">
+        <button 
+          class="tab-btn"
+          [class.active]="activeTab === 'overview'"
+          (click)="setActiveTab('overview')"
+        >
+          Overview
+        </button>
+        <button 
+          class="tab-btn"
+          [class.active]="activeTab === 'mapping'"
+          (click)="setActiveTab('mapping')"
+        >
+          Mapping
+        </button>
+        <button 
+          class="tab-btn"
+          [class.active]="activeTab === 'sync-logs'"
+          (click)="setActiveTab('sync-logs')"
+        >
+          Sync Logs
+        </button>
+        <button 
+          class="tab-btn"
+          [class.active]="activeTab === 'data-trust'"
+          (click)="setActiveTab('data-trust')"
+        >
+          Data Trust Reports
+        </button>
+        <button 
+          class="tab-btn"
+          [class.active]="activeTab === 'tally'"
+          (click)="setActiveTab('tally')"
+        >
+          Tally
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      @if (activeTab === 'overview') {
+        <div class="tab-content">
+          <!-- Data Cards Row -->
+          <div class="data-cards-row">
+            <!-- Last Sync Time Card -->
+            <div class="data-card">
+              <div class="card-label">Last Sync Time</div>
+              <div class="card-value">{{ lastSyncTime }}</div>
+              <div class="card-status" [class.success]="lastSyncStatus.includes('Successful')">
+                {{ lastSyncStatus }}
+              </div>
+            </div>
+
+            <!-- Invoices Pulled Card -->
+            <div class="data-card">
+              <div class="card-label">Invoices Pulled</div>
+              <div class="card-value-large">{{ invoicesPulled | number }}</div>
+              <div class="card-meta">
+                <span>Last 24 hours.</span>
+                <span class="card-change positive">{{ invoicesChange }} from yesterday.</span>
+              </div>
+            </div>
+
+            <!-- Stock Pulled Card -->
+            <div class="data-card">
+              <div class="card-label">Stock Pulled</div>
+              <div class="card-value-large">{{ stockPulled | number }} SKUs</div>
+              <div class="card-meta">
+                Accurate as of {{ stockTime }}.
+              </div>
+            </div>
+
+            <!-- Incremental Pulls Info Card -->
+            <div class="data-card info-card">
+              <div class="info-icon">⚡</div>
+              <div class="info-content">
+                <div class="info-title">Incremental pulls - no Tally slowdown</div>
+                <div class="info-description">
+                  Data is extracted in small, optimized batches during low-activity periods to maintain Tally performance.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Extraction Logs Table -->
+          <div class="table-section">
+            <h3 class="section-title">Extraction Logs</h3>
+            <div class="table-card">
+              <div class="table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th class="col-type">Type</th>
+                      <th class="col-timeframe">Timeframe</th>
+                      <th class="col-rows">Rows</th>
+                      <th class="col-created">Created At</th>
+                      <th class="col-status">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (log of extractionLogs; track log.id) {
+                      <tr>
+                        <td class="col-type">{{ log.type }}</td>
+                        <td class="col-timeframe">{{ log.timeframe }}</td>
+                        <td class="col-rows">{{ log.rows | number }}</td>
+                        <td class="col-created">{{ log.createdAt }}</td>
+                        <td class="col-status">
+                          <span class="status-badge" [class]="getStatusClass(log.status)">
+                            {{ log.status }}
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'mapping') {
+        <div class="tab-content">
+          <div class="mapping-placeholder">
+            <p>Mapping content coming soon</p>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'sync-logs') {
+        <div class="tab-content">
+          <div class="sync-logs-placeholder">
+            <p>Sync Logs content coming soon</p>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'data-trust') {
+        <div class="tab-content">
+          <div class="data-trust-placeholder">
+            <p>Data Trust Reports content coming soon</p>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'tally') {
+        <div class="tab-content tally-content">
+          <app-tally-connection-status></app-tally-connection-status>
+          <app-tally-nav></app-tally-nav>
+          <router-outlet></router-outlet>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Confirm Switch Modal -->
+  @if (showSwitchModal) {
+    <div class="modal-backdrop" (click)="closeSwitchModal()">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">Confirm Billing Mode Switch</h3>
+        </div>
+        <div class="modal-body">
+          <p class="modal-message">
+            Switching to Manual Upload will require manual CSV imports. This action is irreversible for the current billing cycle.
+          </p>
+        </div>
+        <div class="modal-actions">
+          <app-button variant="outline" size="md" (click)="closeSwitchModal()">
+            Cancel
+          </app-button>
+          <app-button variant="primary" size="md" (click)="confirmSwitch()">
+            Confirm Switch
+          </app-button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Unmapped Products Alert -->
+  @if (showUnmappedAlert && activeTab === 'overview') {
+    <div class="unmapped-alert-card">
+      <div class="alert-header">
+        <span class="alert-icon">⚠️</span>
+        <span class="alert-title">Unmapped Products Alert</span>
+        <button class="alert-close" (click)="dismissUnmappedAlert()">×</button>
+      </div>
+      <div class="alert-body">
+        <div class="alert-count">{{ unmappedCount }}</div>
+        <div class="alert-text">products require mapping to Tally masters.</div>
+      </div>
+      <div class="alert-action">
+        <app-button variant="primary" size="sm" (click)="onFixMapping()">
+          Fix mapping
+        </app-button>
+      </div>
+    </div>
+  }
+</div>
+

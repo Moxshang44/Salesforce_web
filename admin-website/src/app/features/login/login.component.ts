@@ -23,7 +23,7 @@ export class LoginComponent {
   ) {
     // Redirect if already logged in
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/admin/dashboard']);
     }
   }
 
@@ -36,7 +36,7 @@ export class LoginComponent {
     }
 
     if (this.authService.login(this.username, this.password)) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/admin/dashboard']);
     } else {
       this.errorMessage = 'Invalid username or password';
       this.password = '';

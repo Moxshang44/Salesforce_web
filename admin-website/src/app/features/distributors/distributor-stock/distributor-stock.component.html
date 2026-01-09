@@ -1,34 +1,40 @@
 <div class="stock-layout" [class.blurred]="showViewOptionsModal">
-  <app-sidebar></app-sidebar>
+  @if (isDmsMode) {
+    <app-dms-sidebar></app-dms-sidebar>
+  } @else {
+    <app-sidebar></app-sidebar>
+  }
   
   <div class="main-content">
     <app-header></app-header>
     
     <div class="stock-content">
       <!-- Tabs Section -->
-      <div class="tabs-section">
-        <button 
-          class="tab-btn"
-          [class.active]="activeTab === 'stocks'"
-          (click)="setActiveTab('stocks')"
-        >
-          Stocks
-        </button>
-        <button 
-          class="tab-btn"
-          [class.active]="activeTab === 'claims'"
-          (click)="setActiveTab('claims')"
-        >
-          Claims
-        </button>
-        <button 
-          class="tab-btn"
-          [class.active]="activeTab === 'orders'"
-          (click)="setActiveTab('orders')"
-        >
-          Orders/Bills
-        </button>
-      </div>
+      @if (!isDmsMode) {
+        <div class="tabs-section">
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'stocks'"
+            (click)="setActiveTab('stocks')"
+          >
+            Stocks
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'claims'"
+            (click)="setActiveTab('claims')"
+          >
+            Claims
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'orders'"
+            (click)="setActiveTab('orders')"
+          >
+            Orders/Bills
+          </button>
+        </div>
+      }
 
       <!-- Page Header -->
       <div class="page-header">
@@ -65,6 +71,12 @@
             <img src="assets/images/export.png" alt="Export" class="button-icon">
             Excel
           </app-button>
+          @if (isDmsMode && selectedReturnsType !== 'All Claims Summary') {
+            <app-button variant="primary" size="sm" (click)="onAdd()">
+              <img src="assets/images/add.png" alt="Add" class="button-icon">
+              Add
+            </app-button>
+          }
         </div>
       </div>
 
@@ -910,6 +922,189 @@
         <div class="view-options-body">
           <button class="view-option-btn" (click)="onViewBill()">View Bill</button>
           <button class="view-option-btn" (click)="onViewPurchase()">View Purchase</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add Claim Modal -->
+  @if (showAddModal) {
+    <div class="add-modal-backdrop" (click)="closeAddModal()">
+      <div class="add-modal" (click)="$event.stopPropagation()">
+        <div class="add-modal-header">
+          <button class="back-btn" (click)="closeAddModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5M5 12l6-6m-6 6l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h3 class="add-modal-title">Add {{ selectedReturnsType }}</h3>
+        </div>
+
+        <div class="add-modal-body">
+          @if (addFormType === 'sample') {
+            <!-- Sample Form -->
+            <form class="add-claim-form" (ngSubmit)="onSubmitAddForm()">
+              <div class="form-group">
+                <label class="form-label">Retailer Type *</label>
+                <select class="form-select" [(ngModel)]="sampleRetailerType" name="retailerType" required>
+                  <option value="">Select Retailer Type</option>
+                  <option value="New Retailer">New Retailer</option>
+                  <option value="Existing Retailer">Existing Retailer</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Route Name *</label>
+                <select class="form-select" [(ngModel)]="sampleRouteName" name="routeName" required>
+                  <option value="">Select Route</option>
+                  <option value="CG Road Route">CG Road Route</option>
+                  <option value="Satellite Route">Satellite Route</option>
+                  <option value="Maninagar Route">Maninagar Route</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Product Name *</label>
+                <div class="product-quantity-row">
+                  <select class="form-select product-select-row" [(ngModel)]="selectedSampleProduct" name="productName">
+                    <option value="">Select Product</option>
+                    <option value="Ensure Gold Nutrition Powder">Ensure Gold Nutrition Powder</option>
+                    <option value="Horlicks Health Drink">Horlicks Health Drink</option>
+                    <option value="Complan Nutrition Mix">Complan Nutrition Mix</option>
+                    <option value="Boost Energy Drink">Boost Energy Drink</option>
+                    <option value="Bournvita Pro Health">Bournvita Pro Health</option>
+                  </select>
+                  <div class="quantity-controls-inline">
+                    <button type="button" class="quantity-btn minus" (click)="decrementQuantity()">-</button>
+                    <input type="number" class="quantity-input" [(ngModel)]="sampleQuantity" name="quantity" min="1" readonly>
+                    <button type="button" class="quantity-btn plus" (click)="incrementQuantity()">+</button>
+                  </div>
+                  <button type="button" class="add-product-btn" (click)="addSampleProduct()">
+                    + Add Product
+                  </button>
+                </div>
+              </div>
+
+              @if (sampleProducts.length > 0) {
+                <div class="added-products">
+                  @for (product of sampleProducts; track $index) {
+                    <div class="added-product-item">
+                      <span class="product-name">{{ product.productName }}</span>
+                      <span class="product-quantity">Qty: {{ product.quantity }}</span>
+                      <button type="button" class="remove-product-btn" (click)="removeSampleProduct($index)">×</button>
+                    </div>
+                  }
+                </div>
+              }
+
+              <div class="form-group">
+                <label class="form-label optional">Optional Remarks</label>
+                <textarea 
+                  class="form-textarea" 
+                  [(ngModel)]="sampleRemarks" 
+                  name="remarks"
+                  placeholder="Add notes about Anything...">
+                </textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="cancel-btn-modal" (click)="closeAddModal()">Cancel</button>
+                <button type="submit" class="submit-btn-modal">Submit</button>
+              </div>
+            </form>
+          } @else {
+            <!-- Schemes Form -->
+            <form class="add-claim-form" (ngSubmit)="onSubmitAddForm()">
+              <div class="form-group">
+                <label class="form-label">Bill No *</label>
+                <input 
+                  type="text" 
+                  class="form-input" 
+                  [(ngModel)]="schemeBillNo" 
+                  name="billNo"
+                  placeholder="Enter Bill No"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Total Amount *</label>
+                <input 
+                  type="number" 
+                  class="form-input" 
+                  [(ngModel)]="schemeTotalAmount" 
+                  name="totalAmount"
+                  placeholder="Enter Total Amount"
+                  min="0"
+                  step="0.01"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Products *</label>
+                @for (product of schemeProducts; track $index) {
+                  <div class="product-row">
+                    <select 
+                      class="form-select product-select" 
+                      [(ngModel)]="product.productName" 
+                      [name]="'productName' + $index"
+                      required>
+                      <option value="">Select Product</option>
+                      <option value="Ensure Gold Nutrition Powder">Ensure Gold Nutrition Powder</option>
+                      <option value="Horlicks Health Drink">Horlicks Health Drink</option>
+                      <option value="Complan Nutrition Mix">Complan Nutrition Mix</option>
+                    </select>
+                    <input 
+                      type="number" 
+                      class="form-input quantity-input-small" 
+                      [(ngModel)]="product.quantity" 
+                      [name]="'quantity' + $index"
+                      placeholder="Qty"
+                      min="1"
+                      required>
+                    @if (schemeProducts.length > 1) {
+                      <button type="button" class="remove-product-btn-small" (click)="removeSchemeProduct($index)">×</button>
+                    }
+                  </div>
+                }
+                <button type="button" class="add-product-row-btn" (click)="addSchemeProduct()">
+                  + Add Product
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Quantity *</label>
+                <input 
+                  type="number" 
+                  class="form-input" 
+                  [value]="getSchemeTotalQuantity()" 
+                  readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Upload Bill *</label>
+                <div class="file-upload-wrapper">
+                  <input 
+                    type="file" 
+                    class="file-input" 
+                    id="uploadBill"
+                    (change)="onFileSelected($event)"
+                    accept="image/*,.pdf">
+                  <label for="uploadBill" class="file-upload-label">
+                    @if (schemeUploadBill) {
+                      <span>{{ schemeUploadBill.name }}</span>
+                    } @else {
+                      <span>Choose file to upload</span>
+                    }
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="cancel-btn-modal" (click)="closeAddModal()">Cancel</button>
+                <button type="submit" class="submit-btn-modal">Submit</button>
+              </div>
+            </form>
+          }
         </div>
       </div>
     </div>

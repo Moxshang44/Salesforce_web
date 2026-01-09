@@ -1,0 +1,256 @@
+<div class="stock-layout" [class.sidebar-open]="showSidebar">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Stock Content -->
+    <div class="stock-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Stock</h1>
+          <p class="page-subtitle">Last updated: {{ lastUpdated }}</p>
+        </div>
+        <app-button variant="primary" size="sm" (click)="onRequestAdjustment()">
+          <img src="assets/images/add.png" alt="Add" class="button-icon">
+          + Request Adjustment
+        </app-button>
+      </div>
+
+      <!-- Warning Banner -->
+      @if (showUnmappedWarning) {
+        <div class="warning-banner">
+          <div class="warning-content">
+            <svg class="warning-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="warning-text">Unmapped Products found — stock push disabled.</span>
+          </div>
+          <app-button variant="primary" size="sm" (click)="onResolveMappings()">
+            Resolve mappings
+          </app-button>
+        </div>
+      }
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="search-bar-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input 
+            type="text" 
+            class="search-input"
+            placeholder="Search SKU"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+          />
+        </div>
+
+        <select class="filter-dropdown" [(ngModel)]="bucketFilter" (change)="onBucketFilterChange()">
+          <option value="All">Bucket</option>
+          <option value="Salable">Salable</option>
+          <option value="Damaged">Damaged</option>
+          <option value="Sample">Sample</option>
+          <option value="Expired">Expired</option>
+        </select>
+
+        <label class="toggle-wrapper">
+          <input 
+            type="checkbox" 
+            class="toggle-checkbox"
+            [(ngModel)]="lowStockOnly"
+            (change)="onLowStockToggle()"
+          />
+          <span class="toggle-label">Low-stock</span>
+        </label>
+
+        <app-button variant="primary" size="sm" (click)="onExcel()">
+          <img src="assets/images/export.png" alt="Export" class="button-icon">
+          Export
+        </app-button>
+      </div>
+
+      <!-- Stock Table -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-sku">SKU</th>
+                <th class="col-bucket">Bucket</th>
+                <th class="col-qty">Qty</th>
+                <th class="col-status">Status</th>
+                <th class="col-mapping">Mapping status</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of filteredStockItems; track item.id) {
+                <tr [class.selected]="selectedSku?.id === item.id" (click)="onViewSku(item)">
+                  <td class="col-sku">
+                    <div class="sku-code">{{ item.sku }}</div>
+                  </td>
+                  <td class="col-bucket">
+                    <div class="bucket-name">{{ item.bucket }}</div>
+                  </td>
+                  <td class="col-qty">
+                    <div class="quantity-value">{{ formatNumber(item.qty) }}</div>
+                  </td>
+                  <td class="col-status">
+                    <div class="status-cell">
+                      @if (item.statusTimestamp) {
+                        <span class="status-timestamp">{{ item.statusTimestamp }}</span>
+                      }
+                      <span class="status-pill" [class]="getStatusClass(item.status)">
+                        {{ item.status }}
+                      </span>
+                    </div>
+                  </td>
+                  <td class="col-mapping">
+                    <span class="mapping-pill" [class]="getMappingStatusClass(item.mappingStatus)">
+                      {{ item.mappingStatus }}
+                    </span>
+                  </td>
+                  <td class="col-action">
+                    <button class="action-menu-btn" (click)="onActionMenu($event, item)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="5" r="2" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                        <circle cx="12" cy="19" r="2" fill="currentColor"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (filteredStockItems.length === 0) {
+          <div class="empty-state">
+            <p>No stock items found matching your filters.</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- SKU Details Sidebar -->
+  @if (showSidebar && selectedSku && selectedSkuDetails) {
+    <div class="sku-sidebar">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">{{ selectedSku.sku }} Details</h3>
+        <button class="sidebar-close" (click)="closeSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- SKU Information -->
+        <div class="info-section">
+          <h4 class="section-title">SKU Information</h4>
+          <div class="info-item">
+            <span class="info-label">Product Name:</span>
+            <span class="info-value">{{ selectedSkuDetails.productName }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Category:</span>
+            <span class="info-value">{{ selectedSkuDetails.category }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Unit:</span>
+            <span class="info-value">{{ selectedSkuDetails.unit }}</span>
+          </div>
+        </div>
+
+        <!-- Bucket Breakdown -->
+        @if (bucketBreakdown) {
+          <div class="bucket-breakdown-section">
+            <h4 class="section-title">Bucket Breakdown</h4>
+            <div class="bucket-list">
+              <div class="bucket-item">
+                <div class="bucket-header">
+                  <span class="bucket-label">Salable</span>
+                  <span class="bucket-value">{{ formatNumber(bucketBreakdown.salable) }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getBucketPercentage('salable')"></div>
+                </div>
+              </div>
+              <div class="bucket-item">
+                <div class="bucket-header">
+                  <span class="bucket-label">Damaged</span>
+                  <span class="bucket-value">{{ formatNumber(bucketBreakdown.damaged) }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getBucketPercentage('damaged')"></div>
+                </div>
+              </div>
+              <div class="bucket-item">
+                <div class="bucket-header">
+                  <span class="bucket-label">Sample</span>
+                  <span class="bucket-value">{{ formatNumber(bucketBreakdown.sample) }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getBucketPercentage('sample')"></div>
+                </div>
+              </div>
+              <div class="bucket-item">
+                <div class="bucket-header">
+                  <span class="bucket-label">Expired</span>
+                  <span class="bucket-value">{{ formatNumber(bucketBreakdown.expired) }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getBucketPercentage('expired')"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Recent Movements -->
+        <div class="movements-section">
+          <h4 class="section-title">Recent Movements</h4>
+          @if (recentMovements.length > 0) {
+            <div class="movements-list">
+              @for (movement of recentMovements; track movement.id) {
+                <div class="movement-item">
+                  <div class="movement-type">
+                    <span class="movement-label">{{ movement.type }}</span>
+                    <span class="movement-amount" [class.negative]="movement.amount < 0">
+                      {{ movement.amount > 0 ? '+' : '' }}{{ formatNumber(movement.amount) }}
+                    </span>
+                  </div>
+                  <div class="movement-details">
+                    <span class="movement-reference">{{ movement.reference }}</span>
+                    <span class="movement-separator">•</span>
+                    <span class="movement-timestamp">{{ movement.timestamp }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="empty-state-small">
+              <p>No recent movements</p>
+            </div>
+          }
+        </div>
+
+        <!-- Action Button -->
+        <div class="sidebar-actions">
+          <app-button variant="primary" size="md" (click)="onCreateAdjustmentRequest()" [fullWidth]="true">
+            Create adjustment request
+          </app-button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
