@@ -314,21 +314,16 @@
 .brand-info {
   display: flex;
   flex-direction: column;
-  hyphens: auto;
-  line-height: 1.6;
   gap: 4px;
 }
 
 .brand-name {
-  padding-left: 55px;
-  font-weight: 600;text-align: justify;
+  font-weight: 600;
   color: #1a1a1a;
 }
 
 .type-code {
   font-size: 13px;
-  padding-left: 55px;
-  text-align: justify;
   color: #666;
 }
 
@@ -340,15 +335,11 @@
 
 .product-name {
   font-weight: 500;
-  padding-left: 185px;
-  text-align: justify;
   color: #1a1a1a;
 }
 
 .product-category {
   font-size: 13px;
-  padding-left: 185px;
-  text-align: justify;
   color: #666;
 }
 

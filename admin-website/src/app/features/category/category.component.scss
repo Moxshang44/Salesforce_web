@@ -321,16 +321,12 @@
 
 .category-name {
   font-weight: 600;
-  padding-left: 75px;
   color: #000000;
-  text-align: justify;
   font-size: 14px;
 }
 
 .category-code {
-  padding-left: 75px;
   color: #7f8c8d;
-  text-align: justify;
   font-size: 13px;
 }
 
@@ -341,7 +337,7 @@
 }
 
 .created-info {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   gap: 4px;
 }
@@ -354,7 +350,6 @@
 
 .created-ago {
   font-size: 13px;
-  text-align: justify;
   color: #7f8c8d;
 }
 
