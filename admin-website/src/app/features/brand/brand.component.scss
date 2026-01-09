@@ -235,12 +235,11 @@
 }
 
 .col-brand {
-  width: 115px;
+  width: 25%;
 }
 
 .col-category {
   width: 22%;
-  text-align: center;
 }
 
 .col-date {
@@ -314,28 +313,23 @@
 .brand-info {
   display: flex;
   flex-direction: column;
-  gap: -4px;
+  gap: 4px;
 }
 
 .brand-name {
   font-size: 14px;
-  padding-left: 75px;
-  text-align: justify;
   font-weight: 600;
   color: #000000;
 }
 
 .brand-code {
   font-size: 13px;
-  padding-left: 75px;
   color: #7f8c8d;
-  text-align: justify;
 }
 
 .category-products-info {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
-  text-align: center;
   gap: 4px;
 }
 
@@ -349,11 +343,10 @@
   font-size: 13px;
   color: #495057;
   font-weight: 400;
-  text-align: justify;
 }
 
 .created-info {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   gap: 4px;
 }
@@ -366,7 +359,6 @@
 
 .created-ago {
   font-size: 13px;
-  text-align: justify;
   color: #7f8c8d;
 }
 
