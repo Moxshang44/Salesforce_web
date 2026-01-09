@@ -23,11 +23,7 @@
       justify-content: center;
     }
 
-    .company-logo {
-      width: 38px;
-      height: 38px;
-      padding: 28px 0;
-    }
+   
 
     .company-name {
       display: none;
@@ -66,7 +62,7 @@
 
 .company-logo {
   width: 30px;
-  height: 30px;
+  height: 60px;
   object-fit: contain;
   flex-shrink: 0;
   padding: 8px 0;

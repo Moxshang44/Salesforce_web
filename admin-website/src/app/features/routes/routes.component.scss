@@ -231,23 +231,23 @@
 
 // Column Widths
 .col-actions {
-  width: 120px;
+  width: auto;
 }
 
 .col-details {
-  width: 140px;
+  width: auto;
 }
 
 .col-route {
-  width: 25%;
+  width: auto;
 }
 
 .col-channel {
-  width: 18%;
+  width: auto;
 }
 
 .col-assigned {
-  width: 18%;
+  width: auto;
 }
 
 // Action Buttons
@@ -400,7 +400,7 @@
 .area-text {
   font-size: 14px;
   padding-left: 55px;
-  text-align: justify;
+  text-align: left;
   color: #000000;
   font-weight: 500;
 }
@@ -408,7 +408,7 @@
 .region-text {
   font-size: 13px;
  padding-left: 55px;
-  text-align: justify;
+  text-align: left;
   color: #7f8c8d;
 }
 
