@@ -428,33 +428,39 @@
 .retailer-store-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  align-items: center;
+  gap: 4px;;
 }
 
 .retailer-name {
   font-weight: 600;
+  padding-left: 55px;
+  text-align: justify;
   color: #1a1a1a;
 }
 
 .retailer-code {
   font-size: 13px;
+  padding-left: 55px;
+  text-align: justify;
   color: #666;
 }
 
 .contact-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  align-items: center;
+  gap: 4px;;
 }
 
 .contact-name {
+  padding-left: 55px;
+  text-align: justify;
   font-weight: 500;
   color: #1a1a1a;
 }
 
 .contact-phone {
+  padding-left: 55px;
+  text-align: justify;
   font-size: 13px;
   color: #666;
 }
@@ -462,16 +468,19 @@
 .route-address-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  align-items: center;
+  gap: 4px;;
 }
 
 .route-name {
   font-weight: 500;
+  padding-left: 55px;
+  text-align: justify;
   color: #1a1a1a;
 }
 
 .route-address {
+  padding-left: 55px;
+  text-align: justify;
   font-size: 13px;
   color: #666;
 }
