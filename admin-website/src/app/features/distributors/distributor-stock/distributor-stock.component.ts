@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SidebarComponent } from '../../../core/layout/sidebar/sidebar.component';
+import { DmsSidebarComponent } from '../../dms/components/dms-sidebar/dms-sidebar.component';
 import { HeaderComponent } from '../../../core/layout/header/header.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 
@@ -80,7 +81,7 @@ interface MonthWiseSummaryItem {
 @Component({
   selector: 'app-distributor-stock',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent, DmsSidebarComponent, HeaderComponent, ButtonComponent],
   templateUrl: './distributor-stock.component.html',
   styleUrl: './distributor-stock.component.scss'
 })
@@ -92,6 +93,7 @@ export class DistributorStockComponent implements OnInit {
   selectedReturnsType = 'Returns';
   hoveredSampleItem: SampleItem | null = null;
   hoverPosition = { x: 0, y: 0 };
+  isDmsMode = false;
 
   stockItems: StockItem[] = [
     {
@@ -423,7 +425,16 @@ export class DistributorStockComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.distributorId = this.route.snapshot.paramMap.get('id');
+    // Check if accessed from DMS context
+    this.isDmsMode = this.router.url.startsWith('/dms');
+    if (this.isDmsMode) {
+      // For DMS mode, set default distributor ID to 1
+      this.distributorId = '1';
+      this.activeTab = 'claims';
+      this.selectedReturnsType = 'All Claims Summary';
+    } else {
+      this.distributorId = this.route.snapshot.paramMap.get('id');
+    }
   }
 
   setActiveTab(tab: string): void {
@@ -436,6 +447,110 @@ export class DistributorStockComponent implements OnInit {
 
   onExcel(): void {
     console.log('Excel export clicked');
+  }
+
+  showAddModal = false;
+  addFormType: 'schemes' | 'sample' = 'schemes';
+
+  onAdd(): void {
+    if (this.selectedReturnsType === 'Schemes') {
+      this.addFormType = 'schemes';
+      // Reset schemes form
+      this.schemeBillNo = '';
+      this.schemeTotalAmount = 0;
+      this.schemeProducts = [{ productName: '', quantity: 1 }];
+      this.schemeUploadBill = null;
+    } else if (this.selectedReturnsType === 'Sample') {
+      this.addFormType = 'sample';
+      // Reset sample form
+      this.sampleRetailerType = '';
+      this.sampleRouteName = '';
+      this.sampleProducts = [];
+      this.selectedSampleProduct = '';
+      this.sampleQuantity = 1;
+      this.sampleRemarks = '';
+    } else {
+      this.addFormType = 'schemes'; // Default
+    }
+    this.showAddModal = true;
+  }
+
+  closeAddModal(): void {
+    this.showAddModal = false;
+  }
+
+  onSubmitAddForm(): void {
+    console.log('Submit add form');
+    this.closeAddModal();
+  }
+
+  // Sample form fields
+  sampleRetailerType = '';
+  sampleRouteName = '';
+  sampleProducts: { productName: string; quantity: number }[] = [];
+  selectedSampleProduct = '';
+  sampleQuantity = 1;
+  sampleRemarks = '';
+
+  // Schemes form fields
+  schemeBillNo = '';
+  schemeTotalAmount = 0;
+  schemeProducts: { productName: string; quantity: number }[] = [{ productName: '', quantity: 1 }];
+  schemeUploadBill: File | null = null;
+
+  addSampleProduct(): void {
+    if (this.selectedSampleProduct && this.sampleQuantity > 0) {
+      // Replace the first empty product or add a new one
+      const existingEmptyIndex = this.sampleProducts.findIndex(p => !p.productName);
+      if (existingEmptyIndex >= 0) {
+        this.sampleProducts[existingEmptyIndex] = {
+          productName: this.selectedSampleProduct,
+          quantity: this.sampleQuantity
+        };
+      } else {
+        this.sampleProducts.push({
+          productName: this.selectedSampleProduct,
+          quantity: this.sampleQuantity
+        });
+      }
+      this.selectedSampleProduct = '';
+      this.sampleQuantity = 1;
+    }
+  }
+
+  removeSampleProduct(index: number): void {
+    this.sampleProducts.splice(index, 1);
+  }
+
+  incrementQuantity(): void {
+    this.sampleQuantity++;
+  }
+
+  decrementQuantity(): void {
+    if (this.sampleQuantity > 1) {
+      this.sampleQuantity--;
+    }
+  }
+
+  addSchemeProduct(): void {
+    this.schemeProducts.push({ productName: '', quantity: 1 });
+  }
+
+  removeSchemeProduct(index: number): void {
+    if (this.schemeProducts.length > 1) {
+      this.schemeProducts.splice(index, 1);
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.schemeUploadBill = input.files[0];
+    }
+  }
+
+  getSchemeTotalQuantity(): number {
+    return this.schemeProducts.reduce((sum, p) => sum + (p.quantity || 0), 0);
   }
 
   onSearch(event: Event) {

@@ -1,0 +1,241 @@
+<div class="credit-checks-layout" [class.sidebar-open]="showSidebar">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Credit Checks Content -->
+    <div class="credit-content">
+      <!-- Page Title -->
+      <h1 class="page-title">Credit Checks / Collections</h1>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="search-bar-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input 
+            type="text" 
+            class="search-input"
+            placeholder="Search retailer"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+          />
+        </div>
+
+        <select class="filter-dropdown" [(ngModel)]="riskFilter" (change)="onRiskFilterChange()">
+          <option value="All">Risk</option>
+          <option value="Safe">Safe</option>
+          <option value="Warning">Warning</option>
+          <option value="Blocked">Blocked</option>
+        </select>
+
+        <select class="filter-dropdown" [(ngModel)]="overdueFilter" (change)="onOverdueFilterChange()">
+          <option value="All">Overdue</option>
+          <option value="0-15">0-15</option>
+          <option value="16-30">16-30</option>
+          <option value="30+">30+</option>
+        </select>
+
+        <app-button variant="primary" size="sm" (click)="onExcel()">
+          <img src="assets/images/export.png" alt="Export" class="button-icon">
+          Excel
+        </app-button>
+      </div>
+
+      <!-- Retailer Table -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-retailer">Retailer</th>
+                <th class="col-credit-limit">Credit Limit</th>
+                <th class="col-outstanding">Outstanding</th>
+                <th class="col-available">Available Credit</th>
+                <th class="col-overdue">Overdue Days</th>
+                <th class="col-risk">Risk</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (retailer of filteredRetailers; track retailer.id) {
+                <tr [class.selected]="selectedRetailer?.id === retailer.id">
+                  <td class="col-retailer">
+                    <div class="retailer-name">{{ retailer.name }}</div>
+                  </td>
+                  <td class="col-credit-limit">
+                    <div class="amount-value">{{ formatCurrency(retailer.creditLimit) }}</div>
+                  </td>
+                  <td class="col-outstanding">
+                    <div class="amount-value">{{ formatCurrency(retailer.outstanding) }}</div>
+                  </td>
+                  <td class="col-available">
+                    <div class="amount-value" [class.negative]="retailer.availableCredit < 0">
+                      {{ formatCurrency(retailer.availableCredit) }}
+                    </div>
+                  </td>
+                  <td class="col-overdue">
+                    <div class="overdue-days">{{ retailer.overdueDays }}</div>
+                  </td>
+                  <td class="col-risk">
+                    <span class="risk-pill" [class]="getRiskClass(retailer.risk)">
+                      {{ retailer.risk }}
+                    </span>
+                  </td>
+                  <td class="col-action">
+                    <button class="view-btn" (click)="onViewRetailer(retailer)">
+                      View
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (filteredRetailers.length === 0) {
+          <div class="empty-state">
+            <p>No retailers found matching your filters.</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Credit Details Sidebar -->
+  @if (showSidebar && selectedRetailer) {
+    <div class="credit-sidebar">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">{{ selectedRetailer.name }} - Credit Details</h3>
+        <button class="sidebar-close" (click)="closeSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- Retailer Summary Card -->
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Credit Limit</span>
+            <span class="summary-value">{{ formatCurrency(selectedRetailer.creditLimit) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Outstanding</span>
+            <span class="summary-value">{{ formatCurrency(selectedRetailer.outstanding) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Risk</span>
+            <span class="risk-pill" [class]="getRiskClass(selectedRetailer.risk)">
+              {{ selectedRetailer.risk }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Overdue</span>
+            <span class="summary-value">{{ selectedRetailer.overdueDays }} days</span>
+          </div>
+        </div>
+
+        <!-- Outstanding Invoices -->
+        <div class="sidebar-section">
+          <h4 class="section-title">Outstanding Invoices</h4>
+          @if (outstandingInvoices.length > 0) {
+            <div class="invoices-table">
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (invoice of outstandingInvoices; track invoice.id) {
+                    <tr>
+                      <td>{{ invoice.invoiceNo }}</td>
+                      <td>{{ invoice.date }}</td>
+                      <td>{{ formatCurrency(invoice.amount) }}</td>
+                      <td>
+                        <span class="status-badge" [class]="getStatusClass(invoice.status)">
+                          {{ invoice.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="empty-state-small">
+              <p>No outstanding invoices</p>
+            </div>
+          }
+        </div>
+
+        <!-- Payment History -->
+        <div class="sidebar-section">
+          <h4 class="section-title">Payment History</h4>
+          @if (paymentHistory.length > 0) {
+            <div class="payments-table">
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>Payment</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (payment of paymentHistory; track payment.id) {
+                    <tr>
+                      <td>{{ payment.payment }}</td>
+                      <td>{{ formatCurrency(payment.amount) }}</td>
+                      <td>
+                        <span class="status-badge" [class]="getStatusClass(payment.status)">
+                          {{ payment.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="empty-state-small">
+              <p>No payment history</p>
+            </div>
+          }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="sidebar-actions">
+          <app-button variant="primary" size="md" (click)="onRecordCollection()" [fullWidth]="true">
+            Record Collection
+          </app-button>
+          <div class="tooltip-wrapper">
+            <app-button 
+              variant="outline" 
+              size="md" 
+              [disabled]="true" 
+              [fullWidth]="true"
+              title="Disabled for non-admin. Contact administrator for adjustments."
+            >
+              Adjust Credit Limit
+            </app-button>
+            <div class="tooltip">
+              Disabled for non-admin. Contact administrator for adjustments.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
