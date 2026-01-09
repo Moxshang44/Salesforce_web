@@ -347,8 +347,9 @@
 .distributor-store-info {
   display: flex;
   flex-direction: column;
+  padding-left: 45px;
+  text-align: justify;
   gap: 4px;
-  align-items: center;
 }
 
 .distributor-name {
@@ -365,16 +366,19 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  align-items: center;
 }
 
 .contact-name {
   font-weight: 500;
   color: #1a1a1a;
+  padding-left: 45px;
+  text-align: justify;
 }
 
 .contact-phone {
   font-size: 13px;
+  padding-left: 45px;
+  text-align: justify;
   color: #666;
 }
 
