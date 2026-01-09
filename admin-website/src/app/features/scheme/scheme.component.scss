@@ -227,23 +227,23 @@
 }
 
 .col-actions {
-  width: 120px;
+  width: auto;
 }
 
 .col-active {
-  width: 80px;
+  width: auto;
 }
 
 .col-product {
-  width: 30%;
+  width: auto;
 }
 
 .col-schemes {
-  width: 25%;
+  width: auto;
 }
 
 .col-zone {
-  width: 25%;
+  width: auto;
 }
 
 .action-buttons {
@@ -333,8 +333,8 @@
 .product-name {
   font-size: 14px;
   font-weight: 600;
-  padding-left: 15px;
-  text-align: justify;
+  padding-left: 55px;
+  text-align: left;
   color: #000000;
   margin-bottom: 4px;
 }
@@ -342,8 +342,8 @@
 .product-sku {
   font-size: 13px;
   color: #7f8c8d;
-  padding-left: 15px;
-  text-align: justify;
+  padding-left: 55px;
+  text-align: left;
 }
 
 .scheme-info {
@@ -356,7 +356,7 @@
   font-size: 14px;
   color: #000000;
   font-weight: 500;
-  padding-left: 45px;
+  padding-left: 75px;
   text-align: justify;
 }
 
@@ -369,15 +369,15 @@
 .zone-name {
   font-size: 14px;
   color: #000000;
-  padding-left: 75px;
-  text-align: justify;
+  padding-left: 95px;
+  text-align: left;
   font-weight: 500;
 }
 
 .regions-text {
   font-size: 13px;
-  padding-left: 75px;
-  text-align: justify;
+  padding-left: 95px;
+  text-align: left;
   color: #7f8c8d;
 }
 

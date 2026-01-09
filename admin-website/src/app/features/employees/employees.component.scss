@@ -227,23 +227,23 @@
 }
 
 .col-actions {
-  width: 90px;
+  width: auto;
 }
 
 .col-active {
-  width: 80px;
+  width: auto;
 }
 
 .col-employee {
-  width: 25%;
+  width: auto;
 }
 
 .col-role {
-  width: 22%;
+  width: auto;
 }
 
 .col-area {
-  width: 18%;
+  width: auto;
 }
 
 .action-buttons {
@@ -363,7 +363,7 @@
 .area-text {
   font-size: 14px;
   padding-left: 20px;
-  text-align: justify;
+  text-align: left;
   color: #000000;
   font-weight: 500;
 }
@@ -371,7 +371,7 @@
 .routes-count {
   font-size: 13px;
   padding-left: 20px;
-  text-align: justify;
+  text-align: left;
   color: #7f8c8d;
   font-weight: 400;
 }

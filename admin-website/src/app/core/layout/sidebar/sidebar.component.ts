@@ -25,7 +25,7 @@ interface NavItem {
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
-  companyName = 'Company Name';
+  companyName = 'Gaa-Tha';
   currentRoute = '';
   isCollapsed = false;
   

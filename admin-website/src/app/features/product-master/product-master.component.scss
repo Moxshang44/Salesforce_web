@@ -231,15 +231,15 @@
 }
 
 .col-action {
-  width: 120px;
+  width: auto;
 }
 
 .col-active {
-  width: 100px;
+  width: auto;
 }
 
 .col-brand {
-  width: 200px;
+  width: auto;
 }
 
 .col-name {
@@ -321,14 +321,15 @@
 
 .brand-name {
   padding-left: 55px;
-  font-weight: 600;text-align: justify;
+  font-weight: 600;
+  text-align: left;
   color: #1a1a1a;
 }
 
 .type-code {
   font-size: 13px;
   padding-left: 55px;
-  text-align: justify;
+  text-align: left;
   color: #666;
 }
 
