@@ -1,6 +1,6 @@
 # Admin Website - Figma to Angular
 
-An Angular 18+ admin website with pixel-perfect designs powered by Figma through the MCP server integration.
+An Angular 18+ admin website with a modern design system and reusable components.
 
 ## Features
 
@@ -73,44 +73,6 @@ npm start
 - `npm run watch` - Build in watch mode
 - `npm test` - Run unit tests
 - `npm run lint` - Lint the codebase
-
-## Using with Figma MCP Server
-
-### Step 1: Set Up the MCP Server
-
-Follow the instructions in the `figma-mcp-server` README to configure and connect the MCP server to your Figma file.
-
-### Step 2: Extract Design Tokens
-
-Once the MCP server is running, you can extract design tokens from your Figma file:
-
-1. In Claude Desktop, ask: "Extract design tokens from my Figma file in SCSS format"
-2. Copy the generated SCSS variables
-3. Replace the placeholder content in `src/styles/_design-tokens.scss`
-
-### Step 3: Generate Components
-
-To create new components from your Figma designs:
-
-1. Ask Claude: "Generate Angular component code for [Component Name] from my Figma file"
-2. The MCP server will analyze the Figma component and generate:
-   - TypeScript component class
-   - HTML template
-   - SCSS styles
-3. Create the files in the appropriate location (shared/components or features)
-
-### Example Workflow
-
-```
-You: "Show me all the pages in my Figma file"
-Claude: [Lists all pages and components]
-
-You: "Extract the color palette and typography"
-Claude: [Generates design tokens]
-
-You: "Create an Angular component for the User Profile Card"
-Claude: [Generates component files with matching styles]
-```
 
 ## Design System
 
@@ -303,19 +265,13 @@ MIT
 
 ## Next Steps
 
-1. **Configure MCP Server**: Set up the Figma MCP server to extract your designs
-2. **Extract Design Tokens**: Pull colors, typography, and spacing from your Figma file
-3. **Generate Components**: Use the MCP server to create components from Figma
-4. **Build Features**: Create admin features (users, settings, analytics, etc.)
-5. **Add State Management**: Implement NgRx or signals for complex state
-6. **API Integration**: Connect to your backend services
-7. **Authentication**: Add auth guards and login flow
-8. **Testing**: Write unit and e2e tests
+1. **Build Features**: Create admin features (users, settings, analytics, etc.)
+2. **Add State Management**: Implement NgRx or signals for complex state
+3. **API Integration**: Connect to your backend services
+4. **Authentication**: Add auth guards and login flow
+5. **Testing**: Write unit and e2e tests
 
 ## Resources
 
 - [Angular Documentation](https://angular.io/docs)
-- [Figma API Documentation](https://www.figma.com/developers/api)
-- [MCP Protocol](https://modelcontextprotocol.io)
-- [Figma MCP Server README](../figma-mcp-server/README.md)
 
