@@ -198,10 +198,18 @@ export class BrandComponent {
 
   onEdit(brand: Brand): void {
     console.log('Edit brand:', brand);
+     this.currentStep = 1;
+    this.isAddModalOpen = true;
   }
 
   onDelete(brand: Brand): void {
-    console.log('Delete brand:', brand);
+    if (confirm(`Are you sure you want to delete "${brand.brandName}"?`)) {
+      
+      this.brands = this.brands.filter(b => b.id !== brand.id);
+      console.log('Brand deleted:', brand);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(brand: Brand): void {

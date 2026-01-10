@@ -27,7 +27,7 @@ interface NavItem {
 export class SidebarComponent {
   companyName = 'Company Name';
   currentRoute = '';
-  isCollapsed = false;
+  isCollapsed = true;
   
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/admin/dashboard', iconImage: 'assets/images/dashboard.png' },
@@ -69,8 +69,8 @@ export class SidebarComponent {
 
   constructor(private router: Router) {
     this.currentRoute = this.router.url;
-    // Initialize CSS variable
-    document.documentElement.style.setProperty('--sidebar-width', '220px');
+    // Initialize CSS variable based on collapsed state
+    document.documentElement.style.setProperty('--sidebar-width', this.isCollapsed ? '70px' : '220px');
     
     // Listen to route changes
     this.router.events
