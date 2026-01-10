@@ -334,7 +334,7 @@
               </thead>
               <tbody>
                 @for (claim of claimItems; track claim.id) {
-                  <tr>
+                  <tr (click)="onClaimRowClick(claim)" [class.selected]="selectedClaim?.id === claim.id" class="clickable-row">
                     <td class="col-bill-no">
                       <div class="bill-no">{{ claim.billNo }}</div>
                     </td>
@@ -343,12 +343,19 @@
                     </td>
                     <td class="col-product-reason">
                       <div class="product-reason-info">
-                        <div class="product-name">{{ claim.productName }}</div>
-                        <div class="reason-text">Reason: {{ claim.reason }}</div>
+                        <div class="product-name">{{ claim.products[0].productName }}</div>
+                        <div class="reason-text">
+                          Reason: {{ claim.products[0].reason }}
+                          @if (claim.products.length > 1) {
+                            <span class="more-indicator">({{ claim.products.length - 1 }}+ more)</span>
+                          }
+                        </div>
                       </div>
                     </td>
                     <td class="col-qty">
-                      <div class="qty-info">{{ claim.quantity }} {{ claim.unit }}</div>
+                      <div class="qty-info">
+                        {{ getTotalQuantity(claim) }} {{ getFirstUnit(claim) }}
+                      </div>
                     </td>
                     <td class="col-total-amount">
                       <div class="amount-info">₹{{ claim.totalAmount | number }}</div>
@@ -617,50 +624,205 @@
                 </thead>
                 <tbody>
                   @for (item of monthWiseSummary; track item.id) {
-                    <tr>
-                      <td class="col-month">
-                        <div class="month-info">{{ item.month }}</div>
-                      </td>
-                      <td class="col-return-claims">
-                        <div class="claim-amount">
-                          @if (item.returnClaims !== null) {
-                            ₹{{ item.returnClaims | number }}
-                          } @else {
-                            -
+                    @if (isMonthRow(item)) {
+                      <!-- Month Row -->
+                      @if (getDateRowsForMonth(item.month).length > 0) {
+                        <!-- Month Row with Date Children (Expandable) -->
+                        <tr class="month-row" (click)="toggleMonth(item.month)" [class.expanded]="isMonthExpanded(item.month)">
+                          <td class="col-month">
+                            <div class="month-info">
+                              <span class="expand-icon" [class.expanded]="isMonthExpanded(item.month)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                              {{ item.month }}
+                            </div>
+                          </td>
+                          <td class="col-return-claims">
+                            <div class="claim-amount">
+                              @if (item.returnClaims !== null) {
+                                ₹{{ item.returnClaims | number }}
+                              } @else {
+                                -
+                              }
+                            </div>
+                          </td>
+                          <td class="col-scheme-claims">
+                            <div class="claim-amount">
+                              @if (item.schemeClaims !== null) {
+                                ₹{{ item.schemeClaims | number }}
+                              } @else {
+                                -
+                              }
+                            </div>
+                          </td>
+                          <td class="col-sample-claims">
+                            <div class="claim-amount">
+                              @if (item.sampleClaims !== null) {
+                                ₹{{ item.sampleClaims | number }}
+                              } @else {
+                                -
+                              }
+                            </div>
+                          </td>
+                          <td class="col-total-claim">
+                            <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
+                          </td>
+                          <td class="col-cleared-date">
+                            <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
+                              @if (item.clearedDate) {
+                                {{ item.clearedDate }}
+                              } @else {
+                                -
+                              }
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- Date Rows for this Month -->
+                        @if (isMonthExpanded(item.month)) {
+                          @for (dateItem of getDateRowsForMonth(item.month); track dateItem.id) {
+                            <tr class="date-row">
+                              <td class="col-month">
+                                <div class="month-info date-indent">{{ dateItem.month }}</div>
+                              </td>
+                              <td class="col-return-claims">
+                                <div class="claim-amount">
+                                  @if (dateItem.returnClaims !== null) {
+                                    ₹{{ dateItem.returnClaims | number }}
+                                  } @else {
+                                    -
+                                  }
+                                </div>
+                              </td>
+                              <td class="col-scheme-claims">
+                                <div class="claim-amount">
+                                  @if (dateItem.schemeClaims !== null) {
+                                    ₹{{ dateItem.schemeClaims | number }}
+                                  } @else {
+                                    -
+                                  }
+                                </div>
+                              </td>
+                              <td class="col-sample-claims">
+                                <div class="claim-amount">
+                                  @if (dateItem.sampleClaims !== null) {
+                                    ₹{{ dateItem.sampleClaims | number }}
+                                  } @else {
+                                    -
+                                  }
+                                </div>
+                              </td>
+                              <td class="col-total-claim">
+                                <div class="claim-amount">₹{{ dateItem.totalClaim | number }}</div>
+                              </td>
+                              <td class="col-cleared-date">
+                                <div class="cleared-date-info" [class.pending]="dateItem.clearedDate === 'Pending'" [class.cleared]="dateItem.clearedDate && dateItem.clearedDate !== 'Pending'">
+                                  @if (dateItem.clearedDate) {
+                                    {{ dateItem.clearedDate }}
+                                  } @else {
+                                    -
+                                  }
+                                </div>
+                              </td>
+                            </tr>
                           }
-                        </div>
-                      </td>
-                      <td class="col-scheme-claims">
-                        <div class="claim-amount">
-                          @if (item.schemeClaims !== null) {
-                            ₹{{ item.schemeClaims | number }}
-                          } @else {
-                            -
-                          }
-                        </div>
-                      </td>
-                      <td class="col-sample-claims">
-                        <div class="claim-amount">
-                          @if (item.sampleClaims !== null) {
-                            ₹{{ item.sampleClaims | number }}
-                          } @else {
-                            -
-                          }
-                        </div>
-                      </td>
-                      <td class="col-total-claim">
-                        <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
-                      </td>
-                      <td class="col-cleared-date">
-                        <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
-                          @if (item.clearedDate) {
-                            {{ item.clearedDate }}
-                          } @else {
-                            -
-                          }
-                        </div>
-                      </td>
-                    </tr>
+                        }
+                      } @else {
+                        <!-- Month Row without Date Children (Non-expandable) -->
+                        <tr>
+                          <td class="col-month">
+                            <div class="month-info">{{ item.month }}</div>
+                          </td>
+                        <td class="col-return-claims">
+                          <div class="claim-amount">
+                            @if (item.returnClaims !== null) {
+                              ₹{{ item.returnClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-scheme-claims">
+                          <div class="claim-amount">
+                            @if (item.schemeClaims !== null) {
+                              ₹{{ item.schemeClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-sample-claims">
+                          <div class="claim-amount">
+                            @if (item.sampleClaims !== null) {
+                              ₹{{ item.sampleClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-total-claim">
+                          <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
+                        </td>
+                        <td class="col-cleared-date">
+                          <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
+                            @if (item.clearedDate) {
+                              {{ item.clearedDate }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                      }
+                    } @else if (!item.parentMonth) {
+                      <!-- Other month rows (February, March, etc.) without date children -->
+                      <!-- Skip date rows (items with parentMonth) as they are rendered when parent month is expanded -->
+                      <tr>
+                        <td class="col-month">
+                          <div class="month-info">{{ item.month }}</div>
+                        </td>
+                        <td class="col-return-claims">
+                          <div class="claim-amount">
+                            @if (item.returnClaims !== null) {
+                              ₹{{ item.returnClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-scheme-claims">
+                          <div class="claim-amount">
+                            @if (item.schemeClaims !== null) {
+                              ₹{{ item.schemeClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-sample-claims">
+                          <div class="claim-amount">
+                            @if (item.sampleClaims !== null) {
+                              ₹{{ item.sampleClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-total-claim">
+                          <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
+                        </td>
+                        <td class="col-cleared-date">
+                          <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
+                            @if (item.clearedDate) {
+                              {{ item.clearedDate }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    }
                   }
                 </tbody>
               </table>
@@ -1105,6 +1267,57 @@
               </div>
             </form>
           }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Claim Details Right Sidebar -->
+  @if (showClaimSidebar && selectedClaim) {
+    <div class="claim-sidebar-overlay" (click)="closeClaimSidebar()"></div>
+    <div class="claim-sidebar" (click)="$event.stopPropagation()">
+      <div class="claim-sidebar-header">
+        <h2 class="claim-sidebar-title">Return Claim Details</h2>
+        <button class="claim-sidebar-close" (click)="closeClaimSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="claim-sidebar-content">
+        <!-- Financial Details -->
+        <div class="claim-section">
+          <h3 class="claim-section-title">Financial Details</h3>
+          <div class="financial-table-wrapper">
+            <table class="financial-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Reason</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (product of selectedClaim.products; track $index) {
+                  <tr>
+                    <td class="product-name-cell">{{ product.productName }}</td>
+                    <td class="reason-cell">{{ product.reason }}</td>
+                    <td class="quantity-cell">{{ product.quantity }} {{ product.unit }}</td>
+                    <td class="price-cell highlight-amount">₹{{ product.price | number }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="2" class="total-label">Total</td>
+                  <td class="total-quantity">{{ getTotalQuantity(selectedClaim) }} {{ getFirstUnit(selectedClaim) }}</td>
+                  <td class="total-amount highlight-amount">₹{{ selectedClaim.claimAmount | number }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </div>
     </div>

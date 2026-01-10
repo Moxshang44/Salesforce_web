@@ -97,6 +97,9 @@
   transition: all 0.2s ease;
   margin-bottom: -2px;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   &:hover {
     color: #664423;
@@ -107,6 +110,42 @@
     color: #664423;
     border-bottom-color: #664423;
     background: transparent;
+  }
+}
+
+.connection-indicator {
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  &.connected {
+    color: #16a34a;
+    background: rgba(22, 163, 74, 0.1);
+  }
+
+  &.disconnected {
+    color: #de3b40;
+    background: rgba(222, 59, 64, 0.1);
+  }
+
+  &.testing {
+    color: #666;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 

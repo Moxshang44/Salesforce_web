@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { DmsSidebarComponent } from '../components/dms-sidebar/dms-sidebar.component';
 import { HeaderComponent } from '../../../core/layout/header/header.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { TallyService } from '../../tally/services/tally.service';
 
 interface SuperStockistOrder {
   id: number;
@@ -51,8 +52,13 @@ export class OrdersComponent implements OnInit {
   selectedOrders: Set<number> = new Set();
   showUnmappedWarning = false;
   unmappedProductsCount = 0;
+  syncingToTally = false;
+  testOrderLineItems: any[] = [];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private tallyService: TallyService
+  ) {}
 
   orders: SuperStockistOrder[] = [
     {
@@ -133,9 +139,125 @@ export class OrdersComponent implements OnInit {
     // Check for unmapped products (mock - replace with actual API call)
     this.unmappedProductsCount = 0; // Set to > 0 to show warning
     this.showUnmappedWarning = this.unmappedProductsCount > 0;
+    
+    // Load real ledger accounts from Tally and create a test order
+    this.loadTallyLedgersAndCreateTestOrder();
+  }
+
+  loadTallyLedgersAndCreateTestOrder(): void {
+    // Load both ledgers and stock items
+    this.tallyService.getAllLedgers().subscribe({
+      next: (ledgers) => {
+        if (ledgers && ledgers.length > 0) {
+          // Find a suitable ledger (preferably a party/customer ledger, not system ledgers)
+          const suitableLedgers = ledgers.filter(ledger => {
+            const name = (ledger.name || ledger['NAME'] || '').toLowerCase();
+            // Exclude system ledgers like Cash, Sales, etc.
+            return !name.includes('cash') && 
+                   !name.includes('sales') && 
+                   !name.includes('purchase') &&
+                   !name.includes('bank') &&
+                   !name.includes('cheque') &&
+                   !name.includes('credit note') &&
+                   !name.includes('upi') &&
+                   !name.includes('prepaid');
+          });
+          
+          const testLedger = suitableLedgers.length > 0 
+            ? suitableLedgers[0] 
+            : ledgers[0];
+          
+          const ledgerName = testLedger.name || testLedger['NAME'] || 'Test Party';
+          
+          // Now load stock items to add to the test order
+          this.tallyService.getAllStockItems().subscribe({
+            next: (stockItems) => {
+              this.createTestOrderWithItems(ledgerName, stockItems);
+            },
+            error: (error) => {
+              console.error('Error loading stock items:', error);
+              // Create test order without stock items if stock fetch fails
+              this.createTestOrderWithItems(ledgerName, []);
+            }
+          });
+        } else {
+          console.warn('No ledgers found in Tally. Using default test order.');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading Tally ledgers:', error);
+        // Continue with default orders if Tally is not available
+      }
+    });
+  }
+
+  createTestOrderWithItems(ledgerName: string, stockItems: any[]): void {
+    // Select first few stock items for the test order
+    let testLineItems: any[] = [];
+    
+    if (stockItems && stockItems.length > 0) {
+      // Take first 3-5 stock items for the test order
+      const itemsToUse = stockItems.slice(0, Math.min(5, stockItems.length));
+      
+      testLineItems = itemsToUse.map((item, index) => {
+        const itemName = item.name || item['NAME'] || item.stockItemName || item['STOCKITEMNAME'] || `Item ${index + 1}`;
+        // Use reasonable default quantities and rates
+        return {
+          productName: itemName,
+          quantity: (index + 1) * 10, // 10, 20, 30, etc.
+          unitPrice: (index + 1) * 50 // 50, 100, 150, etc.
+        };
+      });
+    } else {
+      // Fallback to default test items if no stock items available
+      testLineItems = [
+        {
+          productName: 'ASSORTED CRUNCH 18061000',
+          quantity: 10,
+          unitPrice: 100.00
+        },
+        {
+          productName: '403 C-1KG 48191010',
+          quantity: 5,
+          unitPrice: 200.00
+        }
+      ];
+    }
+    
+    // Calculate total
+    const orderTotal = testLineItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    
+    // Create a test order with real ledger account and stock items
+    const testOrder: SuperStockistOrder = {
+      id: 999, // Use a high ID to avoid conflicts
+      orderId: `TEST-SYNC-${new Date().getTime().toString().slice(-6)}`,
+      superStockistName: ledgerName,
+      area: 'Test Area - Real Tally Ledger',
+      orderDate: this.formatDate(new Date()),
+      orderTotal: orderTotal,
+      status: 'Pending',
+      selected: false
+    };
+    
+    // Store test line items for this order
+    this.testOrderLineItems = testLineItems;
+    
+    // Add test order to the beginning of the orders array
+    this.orders.unshift(testOrder);
+    this.filteredOrders = [...this.orders];
+    
+    console.log('Test order created with Tally ledger:', ledgerName);
+    console.log('Test order line items:', testLineItems);
   }
 
   formatDate(date: Date): string {
+    if (!date) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -276,8 +398,134 @@ export class OrdersComponent implements OnInit {
   }
 
   onSyncToTally(): void {
-    console.log('Sync to Tally:', Array.from(this.selectedOrders));
-    // Handle sync to Tally logic
+    this.onSyncWithTally();
+  }
+
+  onSyncWithTally(): void {
+    if (this.selectedOrders.size === 0) {
+      return;
+    }
+
+    const selectedOrderIds = Array.from(this.selectedOrders);
+    const selectedOrdersData = this.orders.filter(order => selectedOrderIds.includes(order.id));
+
+    if (selectedOrdersData.length === 0) {
+      return;
+    }
+
+    this.syncingToTally = true;
+
+    // Create sales orders in Tally for each selected order
+    const syncPromises = selectedOrdersData.map(order => {
+      // Load order details if not already loaded
+      const lineItems = this.getOrderLineItems(order.id);
+      
+      // If no line items, try to load them
+      if (lineItems.length === 0) {
+        this.loadOrderDetails(order.id);
+        // Use the loaded orderLineItems
+        const loadedItems = this.orderLineItems.map(item => ({
+          productName: item.productName,
+          quantity: item.orderedQty,
+          unitPrice: item.unitPrice
+        }));
+        
+        if (loadedItems.length > 0) {
+          return this.tallyService.createSalesOrder({
+            orderId: order.orderId,
+            partyName: order.superStockistName,
+            orderDate: order.orderDate,
+            orderTotal: order.orderTotal,
+            lineItems: loadedItems
+          }).toPromise();
+        }
+      }
+      
+      return this.tallyService.createSalesOrder({
+        orderId: order.orderId,
+        partyName: order.superStockistName,
+        orderDate: order.orderDate,
+        orderTotal: order.orderTotal,
+        lineItems: lineItems
+      }).toPromise();
+    });
+
+    Promise.all(syncPromises)
+      .then(results => {
+        const successCount = results.filter(r => r?.success).length;
+        const failCount = results.length - successCount;
+        
+        if (successCount > 0) {
+          alert(`Successfully synced ${successCount} order(s) to Tally${failCount > 0 ? `. ${failCount} order(s) failed.` : ''}`);
+          // Clear selection after successful sync
+          this.onClearSelection();
+        } else {
+          alert(`Failed to sync orders to Tally. Please check the console for details.`);
+        }
+        this.syncingToTally = false;
+      })
+      .catch(error => {
+        console.error('Error syncing to Tally:', error);
+        alert('Error syncing orders to Tally. Please try again.');
+        this.syncingToTally = false;
+      });
+  }
+
+  getOrderLineItems(orderId: number): any[] {
+    // Get line items for the order
+    // Use the orderLineItems if available, otherwise return empty array
+    // In production, this should fetch from API based on orderId
+    
+    // If order details are already loaded for this order
+    if (this.selectedOrder && this.selectedOrder.id === orderId && this.orderLineItems.length > 0) {
+      return this.orderLineItems.map(item => ({
+        productName: item.productName,
+        quantity: item.orderedQty,
+        unitPrice: item.unitPrice
+      }));
+    }
+    
+    // For test order (ID 999), return test line items from Tally stock items
+    if (orderId === 999) {
+      return this.testOrderLineItems.length > 0 
+        ? this.testOrderLineItems 
+        : [
+            {
+              productName: 'ASSORTED CRUNCH 18061000',
+              quantity: 10,
+              unitPrice: 100.00
+            },
+            {
+              productName: '403 C-1KG 48191010',
+              quantity: 5,
+              unitPrice: 200.00
+            }
+          ];
+    }
+    
+    // For order ID 1, return mock data
+    if (orderId === 1) {
+      return [
+        {
+          productName: 'Premium Coffee Beans 1kg',
+          quantity: 50,
+          unitPrice: 250.00
+        },
+        {
+          productName: 'Organic Tea Selection Box',
+          quantity: 30,
+          unitPrice: 150.00
+        },
+        {
+          productName: 'Gourmet Chocolate Bar',
+          quantity: 100,
+          unitPrice: 50.00
+        }
+      ];
+    }
+    
+    // Fallback: return empty array - in production, make API call to fetch order details
+    return [];
   }
 
   onClearSelection(): void {

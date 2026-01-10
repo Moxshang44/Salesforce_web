@@ -94,6 +94,15 @@
           <img src="assets/images/export.png" alt="Export" class="button-icon">
           Excel
         </app-button>
+        <app-button 
+          variant="primary" 
+          size="sm" 
+          (click)="onSyncWithTally()"
+          [disabled]="selectedOrders.size === 0 || syncingToTally">
+          <img src="assets/images/export.png" alt="Sync" class="button-icon" *ngIf="!syncingToTally">
+          <span *ngIf="syncingToTally">Syncing...</span>
+          <span *ngIf="!syncingToTally">Sync with Tally</span>
+        </app-button>
       </div>
 
       <!-- Orders Table -->

@@ -10,17 +10,24 @@ class TallyService {
   /**
    * Send XML request to Tally and get parsed response
    * @param {string} xmlRequest - XML string to send to Tally
-   * @returns {Promise<Object>} Parsed JSON response
+   * @param {boolean} rawResponse - If true, return raw response without parsing (for PDFs)
+   * @returns {Promise<Object|Buffer>} Parsed JSON response or raw buffer
    */
-  async sendRequest(xmlRequest) {
+  async sendRequest(xmlRequest, rawResponse = false) {
     try {
       const response = await axios.post(this.baseUrl, xmlRequest, {
         headers: {
           'Content-Type': 'application/xml',
           'Content-Length': Buffer.byteLength(xmlRequest)
         },
-        timeout: 30000 // 30 second timeout
+        timeout: 60000, // 60 second timeout (increased for detailed voucher queries)
+        responseType: rawResponse ? 'arraybuffer' : 'text' // Get binary data for PDFs
       });
+
+      // If raw response requested (for PDFs), return buffer
+      if (rawResponse) {
+        return Buffer.from(response.data);
+      }
 
       // Parse XML response to JSON
       return await this.parseXmlToJson(response.data);
