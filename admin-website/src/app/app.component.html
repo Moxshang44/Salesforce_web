@@ -1,5 +1,7 @@
 <div class="app-container">
   <router-outlet></router-outlet>
-<app-chat-widget></app-chat-widget>
+  @if (showChatWidget) {
+    <app-chat-widget></app-chat-widget>
+  }
 </div>
 
