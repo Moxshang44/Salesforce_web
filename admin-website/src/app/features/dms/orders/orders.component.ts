@@ -584,5 +584,26 @@ export class OrdersComponent implements OnInit {
     // Navigate to billing mode page with mapping tab
     this.router.navigate(['/dms/billing-mode'], { queryParams: { tab: 'mapping' } });
   }
+
+  onEditOrder(order: SuperStockistOrder): void {
+    console.log('Edit order:', order);
+    // TODO: Implement edit functionality
+    // You can open an edit modal or navigate to an edit page
+  }
+
+  onDeleteOrder(order: SuperStockistOrder): void {
+    console.log('Delete order:', order);
+    // TODO: Implement delete functionality with confirmation
+    if (confirm(`Are you sure you want to delete order ${order.orderId}?`)) {
+      // Handle deletion
+      const index = this.orders.findIndex(o => o.id === order.id);
+      if (index > -1) {
+        this.orders.splice(index, 1);
+        this.applyFilters(); // Refresh filtered list
+        // Also remove from selected orders if it was selected
+        this.selectedOrders.delete(order.id);
+      }
+    }
+  }
 }
 

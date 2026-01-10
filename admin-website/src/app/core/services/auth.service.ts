@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   private readonly AUTH_KEY = 'isAuthenticated';
   private readonly DMS_AUTH_KEY = 'isDmsAuthenticated';
+  private readonly SUPER_ADMIN_AUTH_KEY = 'isSuperAdminAuthenticated';
   
   // Store OTPs temporarily (in production, this would be handled by backend)
   // Format: { mobileNumber: { otp: string, expiresAt: number } }
@@ -15,6 +16,9 @@ export class AuthService {
   // Valid mobile numbers for demo (in production, this would be validated against database)
   private readonly VALID_ADMIN_MOBILE = '9876543210';
   private readonly VALID_DMS_MOBILE = '9999999999';
+  
+  // Super admin password
+  private readonly SUPER_ADMIN_PASSWORD = '111111';
   
   // OTP validity duration (5 minutes)
   private readonly OTP_VALIDITY_MS = 5 * 60 * 1000;
@@ -138,5 +142,23 @@ export class AuthService {
 
   isDmsAuthenticated(): boolean {
     return localStorage.getItem(this.DMS_AUTH_KEY) === 'true';
+  }
+
+  // Super admin authentication methods
+  superAdminLogin(password: string): boolean {
+    if (password === this.SUPER_ADMIN_PASSWORD) {
+      localStorage.setItem(this.SUPER_ADMIN_AUTH_KEY, 'true');
+      return true;
+    }
+    return false;
+  }
+
+  isSuperAdminAuthenticated(): boolean {
+    return localStorage.getItem(this.SUPER_ADMIN_AUTH_KEY) === 'true';
+  }
+
+  superAdminLogout(): void {
+    localStorage.removeItem(this.SUPER_ADMIN_AUTH_KEY);
+    this.router.navigate(['/superadmin']);
   }
 }

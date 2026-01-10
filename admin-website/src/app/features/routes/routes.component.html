@@ -8,6 +8,10 @@
       <div class="page-header">
         <h1 class="page-title">Routes List</h1>
         <div class="header-actions">
+          <app-button variant="primary" size="sm" (click)="onAssignRoutes()">
+            <img src="assets/images/routes.png" alt="Assign Routes" class="button-icon">
+            Assign Routes
+          </app-button>
           <app-button variant="primary" size="sm" (click)="onBulkUpload()">
             <img src="assets/images/bulkupload.png" alt="Bulk Upload" class="button-icon">
             Bulk Upload
@@ -24,11 +28,46 @@
       </div>
 
       <div class="table-controls">
+        <div class="company-selector">
+          <label class="selector-label">Select Company:</label>
+          <select 
+            class="company-select"
+            [(ngModel)]="selectedCompanyForRoutes"
+            (change)="onCompanyChange()"
+            [disabled]="isLoadingRoutes || isLoadingCompanies"
+          >
+            <option value="">-- Select Company --</option>
+            @for (company of companies; track company.id) {
+              <option [value]="company.id">{{ company.name }}</option>
+            }
+          </select>
+        </div>
+
         <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1"><<</button>
-          <button class="page-number active">1</button>
-          <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">>></button>
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 1 || isLoadingRoutes"
+            (click)="goToPage(currentPage - 1)"
+          >
+            &lt;&lt;
+          </button>
+          @for (pageNum of getPageNumbers(); track pageNum) {
+            <button 
+              class="page-number"
+              [class.active]="pageNum === currentPage"
+              [disabled]="isLoadingRoutes"
+              (click)="goToPage(pageNum)"
+            >
+              {{ pageNum }}
+            </button>
+          }
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === totalPages || isLoadingRoutes"
+            (click)="goToPage(currentPage + 1)"
+          >
+            &gt;&gt;
+          </button>
         </div>
         
         <div class="right-controls">
@@ -46,65 +85,84 @@
       </div>
 
       <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="col-actions">Actions</th>
-              <th class="col-details">Details</th>
-              <th class="col-route">Route Name / Code</th>
-              <th class="col-channel">Channel</th>
-              <th class="col-assigned">Area / Region</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (route of routes; track route.id) {
-              <tr class="table-row">
-                <td class="col-actions">
-                  <div class="action-buttons">
-                    <button class="action-icon edit-icon" (click)="onEdit(route)" title="Edit">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button class="action-icon view-icon" (click)="onView(route)" title="View">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button class="action-icon delete-icon" (click)="onDelete(route)" title="Delete">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-                <td class="col-details">
-                  <button class="details-btn" (click)="onViewDetails(route)">View Details</button>
-                </td>
-                <td class="col-route">
-                  <div class="route-info">
-                    <div class="route-name">{{ route.routeName }}</div>
-                    <div class="route-code">{{ route.routeCode }}</div>
-                  </div>
-                </td>
-                <td class="col-channel">
-                  <div class="channel-text">{{ route.channel }}</div>
-                </td>
-                <td class="col-assigned">
-                  <div class="area-region-info">
-                    <div class="area-text">{{ route.area }}</div>
-                    <div class="region-text">{{ route.region }}</div>
-                  </div>
-                </td>
+        @if (isLoadingRoutes) {
+          <div class="loading-state-container">
+            <p>Loading routes...</p>
+          </div>
+        } @else if (routesError) {
+          <div class="error-state-container">
+            <p class="error-text">{{ routesError }}</p>
+            <button class="retry-btn" (click)="retryLoadRoutes()">Retry</button>
+          </div>
+        } @else if (routes.length === 0) {
+          <div class="empty-state-container">
+            <p>No routes found. @if (!selectedCompanyForRoutes) { Please select a company to view routes. } @else { Click "Add" to create a new route. }</p>
+          </div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-actions">Actions</th>
+                <th class="col-route">Route Name / Code</th>
+                <th class="col-channel">Channel</th>
+                <th class="col-assigned">Area / Region</th>
+                <th class="col-country-zone">Country/Zone</th>
+                <th class="col-assign-to">Assign To</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (route of routes; track route.id) {
+                <tr class="table-row">
+                  <td class="col-actions">
+                    <div class="action-buttons">
+                      <button class="action-icon edit-icon" (click)="onEdit(route)" title="Edit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <button class="action-icon view-icon" (click)="onView(route)" title="View">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <button class="action-icon delete-icon" (click)="onDelete(route)" title="Delete">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="col-route">
+                    <div class="route-info">
+                      <div class="route-name">{{ route.routeName }}</div>
+                      <div class="route-code">{{ route.routeCode }}</div>
+                    </div>
+                  </td>
+                  <td class="col-channel">
+                    <div class="channel-text">{{ route.channel }}</div>
+                  </td>
+                  <td class="col-assigned">
+                    <div class="area-region-info">
+                      <div class="area-text">{{ route.area }}</div>
+                      <div class="region-text">{{ route.region }}</div>
+                    </div>
+                  </td>
+                  <td class="col-country-zone">
+                    <div class="country-zone-text">{{ route.countryZone }}</div>
+                  </td>
+                  <td class="col-assign-to">
+                    <div class="assign-to-text">{{ route.assignTo }}</div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       </div>
 
       <div class="table-footer">
@@ -117,7 +175,9 @@
       </div>
 
       <div class="pagination-bottom">
-        <span class="pagination-text">Showing 1 to 10 of 15 entries</span>
+        <span class="pagination-text">
+          Showing {{ getStartRecord() }} to {{ getEndRecord() }} of {{ totalCount }} entries
+        </span>
       </div>
     </div>
 
@@ -125,15 +185,187 @@
     <app-modal
       [isOpen]="isAddModalOpen"
       [title]="getModalTitle()"
-      [stepIndicator]="'Step ' + currentStep + ' of 1'"
+      [stepIndicator]="currentStep > 0 ? 'Step ' + currentStep + ' of 1' : ''"
       width="1400px"
       (close)="closeAddModal()"
     >
+      <!-- Company Selection (shown before step 1) -->
+      @if (currentStep === 0) {
+        <div class="company-selection-container">
+          <div class="form-group">
+            <label class="form-label">Select Company <span class="required">*</span></label>
+            @if (isLoadingCompanies) {
+              <p>Loading companies...</p>
+            } @else if (companyError) {
+              <div class="error-message">{{ companyError }}</div>
+            } @else {
+              <select 
+                class="form-input"
+                [(ngModel)]="selectedCompanyId"
+                name="selectedCompanyId"
+                style="width: 100%; padding: 12px; margin-top: 8px;"
+                (change)="onCompanySelected()"
+              >
+                <option value="">-- Select a Company --</option>
+                @for (company of companies; track company.id) {
+                  <option [value]="company.id">{{ company.name }}</option>
+                }
+              </select>
+              <div class="form-actions" style="margin-top: 24px;">
+                <button 
+                  type="button" 
+                  class="btn-cancel"
+                  (click)="closeAddModal()"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  class="btn-save"
+                  (click)="onCompanySelected()"
+                  [disabled]="!selectedCompanyId"
+                >
+                  Next
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       @if (currentStep === 1) {
         <app-route-form-step1
+          [selectedCompanyId]="selectedCompanyId"
+          [isEditMode]="false"
           (save)="onSaveStep1($event)"
           (cancel)="closeAddModal()"
         ></app-route-form-step1>
+      }
+    </app-modal>
+
+    <!-- Edit Route Modal -->
+    <app-modal
+      [isOpen]="isEditModalOpen"
+      title="Edit Route"
+      width="1400px"
+      (close)="closeEditModal()"
+    >
+      @if (currentStep === 1 && routeDataForEdit) {
+        <app-route-form-step1
+          [selectedCompanyId]="selectedCompanyId"
+          [isEditMode]="true"
+          [routeId]="editingRouteId"
+          [routeData]="routeDataForEdit"
+          (save)="onSaveStep1($event)"
+          (cancel)="closeEditModal()"
+        ></app-route-form-step1>
+      }
+    </app-modal>
+
+    <!-- View Route Modal -->
+    <app-modal
+      [isOpen]="isViewModalOpen"
+      title="Route Details"
+      width="800px"
+      (close)="closeViewModal()"
+    >
+      @if (isLoadingView) {
+        <div class="loading-state">
+          <p>Loading route details...</p>
+        </div>
+      } @else if (viewErrorMessage) {
+        <div class="alert alert-error">
+          <strong>Error:</strong>
+          <pre class="error-pre">{{ viewErrorMessage }}</pre>
+        </div>
+        <div class="form-actions">
+          <app-button
+            type="button"
+            variant="primary"
+            (click)="closeViewModal()"
+          >
+            Close
+          </app-button>
+        </div>
+      } @else if (viewingRoute) {
+        <div class="view-route-details">
+          <div class="detail-row">
+            <div class="detail-label">Route ID:</div>
+            <div class="detail-value">{{ viewingRoute.id }}</div>
+          </div>
+          
+          <div class="detail-row">
+            <div class="detail-label">Route Name:</div>
+            <div class="detail-value">{{ viewingRoute.name || 'N/A' }}</div>
+          </div>
+
+          @if (viewingRoute.code) {
+            <div class="detail-row">
+              <div class="detail-label">Route Code:</div>
+              <div class="detail-value">{{ viewingRoute.code }}</div>
+            </div>
+          }
+
+          @if (viewingRoute.area_id) {
+            <div class="detail-row">
+              <div class="detail-label">Area ID:</div>
+              <div class="detail-value">{{ viewingRoute.area_id }}</div>
+            </div>
+          }
+
+          <div class="detail-row">
+            <div class="detail-label">Channel Types:</div>
+            <div class="detail-value">
+              <div class="channel-badges">
+                @if (viewingRoute.is_general) {
+                  <span class="channel-badge">General</span>
+                }
+                @if (viewingRoute.is_modern) {
+                  <span class="channel-badge">Modern</span>
+                }
+                @if (viewingRoute.is_horeca) {
+                  <span class="channel-badge">Horeca</span>
+                }
+                @if (!viewingRoute.is_general && !viewingRoute.is_modern && !viewingRoute.is_horeca) {
+                  <span class="channel-badge none">None</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Is Active:</div>
+            <div class="detail-value">
+              <span [class.active]="viewingRoute.is_active" [class.inactive]="!viewingRoute.is_active">
+                {{ viewingRoute.is_active ? 'Yes' : 'No' }}
+              </span>
+            </div>
+          </div>
+
+          @if (viewingRoute.created_at) {
+            <div class="detail-row">
+              <div class="detail-label">Created At:</div>
+              <div class="detail-value">{{ viewingRoute.created_at | date:'medium' }}</div>
+            </div>
+          }
+
+          @if (viewingRoute.updated_at) {
+            <div class="detail-row">
+              <div class="detail-label">Updated At:</div>
+              <div class="detail-value">{{ viewingRoute.updated_at | date:'medium' }}</div>
+            </div>
+          }
+        </div>
+
+        <div class="form-actions" style="margin-top: 24px;">
+          <app-button
+            type="button"
+            variant="primary"
+            (click)="closeViewModal()"
+          >
+            Close
+          </app-button>
+        </div>
       }
     </app-modal>
   </div>

@@ -43,8 +43,10 @@ export class HeaderComponent {
 
   onLogout() {
     this.showProfileMenu = false;
-    // Check if we're in DMS context
-    if (this.router.url.startsWith('/dms')) {
+    // Check if we're in super admin context
+    if (this.router.url.startsWith('/super-admin')) {
+      this.authService.superAdminLogout();
+    } else if (this.router.url.startsWith('/dms')) {
       this.authService.dmsLogout();
     } else {
       this.authService.logout();

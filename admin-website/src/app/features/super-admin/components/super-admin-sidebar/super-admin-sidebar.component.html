@@ -1,0 +1,32 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header">
+    <img src="assets/images/company-logo.svg" alt="Company Logo" class="company-logo">
+    @if (!isCollapsed) {
+      <h1 class="company-name">{{ companyName }}</h1>
+    }
+    <button class="collapse-btn" (click)="toggleSidebar()" [title]="isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" [class.rotate]="isCollapsed">
+        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of navItems; track item.label) {
+      <div class="nav-item-wrapper">
+        <a 
+          [routerLink]="item.route" 
+          routerLinkActive="active"
+          class="nav-item"
+          [title]="isCollapsed ? item.label : ''"
+        >
+          <span class="nav-icon" [innerHTML]="item.safeIconSvg"></span>
+          @if (!isCollapsed) {
+            <span class="nav-label">{{ item.label }}</span>
+          }
+        </a>
+      </div>
+    }
+  </nav>
+</aside>
+

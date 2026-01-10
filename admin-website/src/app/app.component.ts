@@ -30,9 +30,10 @@ export class AppComponent implements OnInit {
   }
 
   private checkRoute(url: string) {
-    // Hide chat widget on login page only (single login page for both admin and DMS)
+    // Hide chat widget on login page and super admin routes
     const isLoginPage = url === '/login' || url.startsWith('/login?');
-    this.showChatWidget = !isLoginPage;
+    const isSuperAdminRoute = url === '/superadmin' || url.startsWith('/super-admin');
+    this.showChatWidget = !isLoginPage && !isSuperAdminRoute;
   }
 }
 

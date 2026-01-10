@@ -391,5 +391,24 @@ export class PurchaseOrdersComponent implements OnInit {
     console.log('Export to Excel');
     // Handle Excel export logic
   }
+
+  onEditPO(po: PurchaseOrder): void {
+    console.log('Edit purchase order:', po);
+    // TODO: Implement edit functionality
+    // You can open an edit modal or navigate to an edit page
+  }
+
+  onDeletePO(po: PurchaseOrder): void {
+    console.log('Delete purchase order:', po);
+    // TODO: Implement delete functionality with confirmation
+    if (confirm(`Are you sure you want to delete purchase order ${po.poNo}?`)) {
+      // Handle deletion
+      const index = this.purchaseOrders.findIndex(p => p.id === po.id);
+      if (index > -1) {
+        this.purchaseOrders.splice(index, 1);
+        this.applyFilters(); // Refresh filtered list
+      }
+    }
+  }
 }
 

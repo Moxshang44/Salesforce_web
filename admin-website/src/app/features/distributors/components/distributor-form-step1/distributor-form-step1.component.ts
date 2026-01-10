@@ -1,22 +1,31 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+interface FileData {
+  id?: string;
+  name: string;
+  mime_type: string;
+  extra_info: { [key: string]: any };
+}
+
 interface DistributorFormData {
-  companyName: string;
-  distributorId: string;
-  contactPersonName: string;
-  countryCode: string;
-  mobileNumber: string;
-  email: string;
-  licenseNumber: string;
-  gstNumber: string;
-  panCardNumber: string;
-  pinCode: string;
-  fullAddress: string;
-  mapLink: string;
-  uploadedDocuments: File[];
-  storeImages: File[];
+  name: string;
+  contact_person_name: string;
+  mobile_number: string;
+  email: string; // Will be converted to null if empty
+  gst_no: string;
+  pan_no: string;
+  license_no: string; // Will be converted to null if empty
+  address: string;
+  pin_code: string;
+  map_link: string; // Will be converted to null if empty
+  documents: {
+    files: FileData[];
+  } | null;
+  store_images: {
+    files: FileData[];
+  } | null;
 }
 
 @Component({
@@ -27,45 +36,33 @@ interface DistributorFormData {
   styleUrl: './distributor-form-step1.component.scss'
 })
 export class DistributorFormStep1Component {
+  @Input() selectedCompanyId: string = '';
   @Output() save = new EventEmitter<DistributorFormData>();
   @Output() cancel = new EventEmitter<void>();
 
   formData: DistributorFormData = {
-    companyName: '',
-    distributorId: '',
-    contactPersonName: '',
-    countryCode: '+91',
-    mobileNumber: '',
+    name: '',
+    contact_person_name: '',
+    mobile_number: '',
     email: '',
-    licenseNumber: '',
-    gstNumber: '',
-    panCardNumber: '',
-    pinCode: '',
-    fullAddress: '',
-    mapLink: '',
-    uploadedDocuments: [],
-    storeImages: []
+    gst_no: '',
+    pan_no: '',
+    license_no: '',
+    address: '',
+    pin_code: '',
+    map_link: '',
+    documents: null,
+    store_images: null
   };
-
-  countryCodeOptions = ['+91', '+1', '+44', '+86', '+81', '+61'];
   
   isDraggingDocs = false;
   isDraggingImages = false;
+  documentFiles: File[] = [];
+  storeImageFiles: File[] = [];
   documentPreviews: Array<{file: File, preview: string}> = [];
   imagePreviews: Array<{file: File, preview: string}> = [];
   
   errors: { [key: string]: string } = {};
-
-  // Auto-generate distributor ID
-  generateDistributorId(): void {
-    if (this.formData.companyName) {
-      const prefix = this.formData.companyName.substring(0, 3).toUpperCase();
-      const randomNum = Math.floor(100 + Math.random() * 900);
-      this.formData.distributorId = `SR-EMP-${randomNum}`;
-      this.clearError('companyName');
-      this.clearError('distributorId');
-    }
-  }
 
   // Document Upload Handlers
   onDocumentFileSelected(event: Event): void {
@@ -99,7 +96,20 @@ export class DistributorFormStep1Component {
 
   private handleDocumentFiles(files: File[]): void {
     files.forEach(file => {
-      this.formData.uploadedDocuments.push(file);
+      this.documentFiles.push(file);
+      
+      // Initialize documents if null
+      if (!this.formData.documents) {
+        this.formData.documents = { files: [] };
+      }
+      
+      const fileData: FileData = {
+        id: '',
+        name: file.name,
+        mime_type: file.type || 'application/octet-stream',
+        extra_info: {}
+      };
+      this.formData.documents.files.push(fileData);
       
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -123,7 +133,14 @@ export class DistributorFormStep1Component {
 
   removeDocument(index: number): void {
     this.documentPreviews.splice(index, 1);
-    this.formData.uploadedDocuments.splice(index, 1);
+    this.documentFiles.splice(index, 1);
+    if (this.formData.documents) {
+      this.formData.documents.files.splice(index, 1);
+      // Set to null if no files remaining
+      if (this.formData.documents.files.length === 0) {
+        this.formData.documents = null;
+      }
+    }
   }
 
   // Store Image Upload Handlers
@@ -159,7 +176,20 @@ export class DistributorFormStep1Component {
   private handleImageFiles(files: File[]): void {
     files.forEach(file => {
       if (file.type.startsWith('image/')) {
-        this.formData.storeImages.push(file);
+        this.storeImageFiles.push(file);
+        
+        // Initialize store_images if null
+        if (!this.formData.store_images) {
+          this.formData.store_images = { files: [] };
+        }
+        
+        const fileData: FileData = {
+          id: '',
+          name: file.name,
+          mime_type: file.type || 'image/jpeg',
+          extra_info: {}
+        };
+        this.formData.store_images.files.push(fileData);
         
         const reader = new FileReader();
         reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -177,7 +207,14 @@ export class DistributorFormStep1Component {
 
   removeImage(index: number): void {
     this.imagePreviews.splice(index, 1);
-    this.formData.storeImages.splice(index, 1);
+    this.storeImageFiles.splice(index, 1);
+    if (this.formData.store_images) {
+      this.formData.store_images.files.splice(index, 1);
+      // Set to null if no files remaining
+      if (this.formData.store_images.files.length === 0) {
+        this.formData.store_images = null;
+      }
+    }
   }
 
   onSaveAndNext(): void {
@@ -185,21 +222,71 @@ export class DistributorFormStep1Component {
     this.errors = {};
     let hasErrors = false;
 
-    // Basic validation
-    if (!this.formData.companyName || this.formData.companyName.trim() === '') {
-      this.errors['companyName'] = 'Please enter distributor company name';
+    // Required field validations according to API
+    if (!this.formData.name || this.formData.name.trim() === '') {
+      this.errors['name'] = 'Distributor name is required';
+      hasErrors = true;
+    } else if (this.formData.name.trim().length < 1 || this.formData.name.trim().length > 255) {
+      this.errors['name'] = 'Distributor name must be between 1 and 255 characters';
       hasErrors = true;
     }
-    if (!this.formData.distributorId || this.formData.distributorId.trim() === '') {
-      this.errors['distributorId'] = 'Please enter distributor ID';
+
+    if (!this.formData.contact_person_name || this.formData.contact_person_name.trim() === '') {
+      this.errors['contact_person_name'] = 'Contact person name is required';
+      hasErrors = true;
+    } else if (this.formData.contact_person_name.trim().length < 1 || this.formData.contact_person_name.trim().length > 255) {
+      this.errors['contact_person_name'] = 'Contact person name must be between 1 and 255 characters';
       hasErrors = true;
     }
-    if (!this.formData.contactPersonName || this.formData.contactPersonName.trim() === '') {
-      this.errors['contactPersonName'] = 'Please enter contact person name';
+
+    if (!this.formData.mobile_number || this.formData.mobile_number.trim() === '') {
+      this.errors['mobile_number'] = 'Mobile number is required';
+      hasErrors = true;
+    } else if (this.formData.mobile_number.trim().length < 10 || this.formData.mobile_number.trim().length > 15) {
+      this.errors['mobile_number'] = 'Mobile number must be between 10 and 15 characters';
       hasErrors = true;
     }
-    if (!this.formData.mobileNumber || this.formData.mobileNumber.trim() === '') {
-      this.errors['mobileNumber'] = 'Please enter mobile number';
+
+    if (!this.formData.gst_no || this.formData.gst_no.trim() === '') {
+      this.errors['gst_no'] = 'GST number is required';
+      hasErrors = true;
+    } else if (this.formData.gst_no.trim().length !== 15) {
+      this.errors['gst_no'] = 'GST number must be exactly 15 characters';
+      hasErrors = true;
+    }
+
+    if (!this.formData.pan_no || this.formData.pan_no.trim() === '') {
+      this.errors['pan_no'] = 'PAN number is required';
+      hasErrors = true;
+    } else if (this.formData.pan_no.trim().length !== 10) {
+      this.errors['pan_no'] = 'PAN number must be exactly 10 characters';
+      hasErrors = true;
+    }
+
+    if (!this.formData.address || this.formData.address.trim() === '') {
+      this.errors['address'] = 'Address is required';
+      hasErrors = true;
+    } else if (this.formData.address.trim().length < 1) {
+      this.errors['address'] = 'Address must be at least 1 character';
+      hasErrors = true;
+    }
+
+    if (!this.formData.pin_code || this.formData.pin_code.trim() === '') {
+      this.errors['pin_code'] = 'PIN code is required';
+      hasErrors = true;
+    } else if (this.formData.pin_code.trim().length !== 6) {
+      this.errors['pin_code'] = 'PIN code must be exactly 6 characters';
+      hasErrors = true;
+    }
+
+    // Optional field validations
+    if (this.formData.license_no && this.formData.license_no.trim().length > 255) {
+      this.errors['license_no'] = 'License number must not exceed 255 characters';
+      hasErrors = true;
+    }
+
+    if (this.formData.email && this.formData.email.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.formData.email.trim())) {
+      this.errors['email'] = 'Please enter a valid email address';
       hasErrors = true;
     }
 
@@ -210,6 +297,17 @@ export class DistributorFormStep1Component {
         firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
       return;
+    }
+
+    // Clean up optional fields - trim whitespace (conversion to null will happen in parent component)
+    if (this.formData.email) {
+      this.formData.email = this.formData.email.trim();
+    }
+    if (this.formData.license_no) {
+      this.formData.license_no = this.formData.license_no.trim();
+    }
+    if (this.formData.map_link) {
+      this.formData.map_link = this.formData.map_link.trim();
     }
 
     this.save.emit(this.formData);
