@@ -1,6 +1,10 @@
 <div class="login-container">
   <div class="demo-credentials">
-    <span class="credentials-text">Demo: <strong>dmsuser / dms123</strong></span>
+    <div class="credentials-text">
+      <span>Admin: <strong>9876543210 / 123456</strong> (Admin Panel)</span>
+      <span class="separator">|</span>
+      <span>DMS: <strong>9999999999 / 123456</strong> (DMS Panel)</span>
+    </div>
   </div>
   <div class="login-card">
     <div class="login-header">
@@ -21,68 +25,73 @@
       }
 
       <div class="form-group">
-        <label for="username" class="form-label">
-          Username
+        <label for="mobileNumber" class="form-label">
+          Mobile Number
         </label>
-        <input
-          type="text"
-          id="username"
-          class="form-input"
-          [(ngModel)]="username"
-          name="username"
-          placeholder="Enter your username"
-          autocomplete="username"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="password" class="form-label">
-          Password
-        </label>
-        <div class="password-input-wrapper">
+        <div class="mobile-input-wrapper">
+          <span class="country-code">+91</span>
           <input
-            [type]="showPassword ? 'text' : 'password'"
-            id="password"
-            class="form-input"
-            [(ngModel)]="password"
-            name="password"
-            placeholder="Enter your password"
-            autocomplete="current-password"
+            type="tel"
+            id="mobileNumber"
+            class="form-input mobile-input"
+            [(ngModel)]="mobileNumber"
+            (input)="onMobileNumberChange()"
+            (keypress)="onMobileNumberKeyPress($event)"
+            name="mobileNumber"
+            placeholder="Enter your 10-digit mobile number"
+            autocomplete="tel"
+            maxlength="10"
+            [disabled]="otpSent && !errorMessage"
           />
-          <button
-            type="button"
-            class="toggle-password"
-            (click)="togglePasswordVisibility()"
-            tabindex="-1"
-          >
-            @if (showPassword) {
-              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            } @else {
-              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M17.94 17.94C16.2306 19.243 14.1491 19.9649 12 20C5 20 1 12 1 12C2.24389 9.68192 3.96914 7.65663 6.06 6.06L17.94 17.94Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M1 1L23 23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M6.06 6.06C4.757 7.76938 4.03509 9.85087 4 12C4 19 12 23 12 23C14.3181 21.7561 16.3434 20.0309 17.94 17.94" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            }
-          </button>
         </div>
       </div>
 
-      <div class="form-footer">
-        <label class="remember-me">
-          <input type="checkbox" class="checkbox" />
-          <span>Remember me</span>
-        </label>
-        <a href="#" class="forgot-password">Forgot password?</a>
-      </div>
+      @if (otpSent) {
+        <div class="form-group">
+          <label for="otp" class="form-label">
+            OTP
+          </label>
+          <input
+            type="text"
+            id="otp"
+            class="form-input otp-input"
+            [(ngModel)]="otp"
+            name="otp"
+            placeholder="Enter 6-digit OTP"
+            autocomplete="one-time-code"
+            maxlength="6"
+            pattern="[0-9]*"
+            inputmode="numeric"
+          />
+          <div class="otp-footer">
+            <span class="otp-info">OTP sent to +91 {{ mobileNumber }}</span>
+            <button
+              type="button"
+              class="resend-otp"
+              (click)="onResendOtp()"
+              [disabled]="resendCooldown > 0 || isSendingOtp"
+            >
+              @if (resendCooldown > 0) {
+                Resend OTP ({{ resendCooldown }}s)
+              } @else {
+                Resend OTP
+              }
+            </button>
+          </div>
+        </div>
+      }
 
-      <button type="submit" class="login-button">
-        <span class="button-text">Sign In</span>
-        <span class="button-icon">→</span>
-      </button>
+      @if (!otpSent) {
+        <button type="button" class="login-button" (click)="onSendOtp()" [disabled]="isSendingOtp">
+          <span class="button-text">{{ isSendingOtp ? 'Sending OTP...' : 'Send OTP' }}</span>
+          <span class="button-icon">→</span>
+        </button>
+      } @else {
+        <button type="submit" class="login-button" [disabled]="isSubmitting">
+          <span class="button-text">{{ isSubmitting ? 'Verifying...' : 'Verify & Sign In' }}</span>
+          <span class="button-icon">→</span>
+        </button>
+      }
     </form>
 
   </div>

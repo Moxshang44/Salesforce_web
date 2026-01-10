@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,11 +11,16 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
-  username = '';
-  password = '';
+export class LoginComponent implements OnDestroy {
+  mobileNumber = '';
+  otp = '';
   errorMessage = '';
-  showPassword = false;
+  otpSent = false;
+  otpSentTime: number | null = null;
+  resendCooldown = 60; // seconds
+  resendTimer: any = null;
+  isSubmitting = false;
+  isSendingOtp = false;
 
   constructor(
     private authService: AuthService,
@@ -24,26 +29,139 @@ export class LoginComponent {
     // Redirect if already logged in
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/admin/dashboard']);
+    } else if (this.authService.isDmsAuthenticated()) {
+      this.router.navigate(['/dms/dashboard']);
     }
+  }
+
+  validateMobileNumber(mobile: string): boolean {
+    // Admin mobile number validation (10 digits, can start with 0-9)
+    const mobileRegex = /^\d{10}$/;
+    return mobileRegex.test(mobile);
+  }
+
+  onSendOtp(): void {
+    this.errorMessage = '';
+
+    if (!this.mobileNumber) {
+      this.errorMessage = 'Please enter your mobile number';
+      return;
+    }
+
+    if (!this.validateMobileNumber(this.mobileNumber)) {
+      this.errorMessage = 'Please enter a valid 10-digit mobile number';
+      return;
+    }
+
+    this.isSendingOtp = true;
+    
+    // Simulate OTP sending (replace with actual API call)
+    setTimeout(() => {
+      if (this.authService.sendOtp(this.mobileNumber)) {
+        this.otpSent = true;
+        this.otpSentTime = Date.now();
+        this.startResendTimer();
+        this.errorMessage = '';
+      } else {
+        this.errorMessage = 'Failed to send OTP. Please try again.';
+      }
+      this.isSendingOtp = false;
+    }, 1000);
   }
 
   onSubmit(): void {
     this.errorMessage = '';
 
-    if (!this.username || !this.password) {
-      this.errorMessage = 'Please enter both username and password';
+    if (!this.mobileNumber) {
+      this.errorMessage = 'Please enter your mobile number';
       return;
     }
 
-    if (this.authService.login(this.username, this.password)) {
-      this.router.navigate(['/admin/dashboard']);
+    if (!this.validateMobileNumber(this.mobileNumber)) {
+      this.errorMessage = 'Please enter a valid 10-digit mobile number';
+      return;
+    }
+
+    if (!this.otpSent) {
+      this.errorMessage = 'Please send OTP first';
+      return;
+    }
+
+    if (!this.otp) {
+      this.errorMessage = 'Please enter the OTP';
+      return;
+    }
+
+    if (this.otp.length !== 6) {
+      this.errorMessage = 'Please enter a valid 6-digit OTP';
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    const loginResult = this.authService.loginWithOtp(this.mobileNumber, this.otp);
+    
+    if (loginResult.success) {
+      // Route based on mobile number (admin or DMS)
+      if (loginResult.isDms) {
+        this.router.navigate(['/dms/dashboard']);
+      } else {
+        this.router.navigate(['/admin/dashboard']);
+      }
     } else {
-      this.errorMessage = 'Invalid username or password';
-      this.password = '';
+      this.errorMessage = 'Invalid OTP. Please try again.';
+      this.otp = '';
+      this.isSubmitting = false;
     }
   }
 
-  togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
+  startResendTimer(): void {
+    this.resendCooldown = 60;
+    if (this.resendTimer) {
+      clearInterval(this.resendTimer);
+    }
+    this.resendTimer = setInterval(() => {
+      this.resendCooldown--;
+      if (this.resendCooldown <= 0) {
+        clearInterval(this.resendTimer);
+        this.resendTimer = null;
+      }
+    }, 1000);
+  }
+
+  onResendOtp(): void {
+    if (this.resendCooldown > 0) {
+      return;
+    }
+    this.otp = '';
+    this.onSendOtp();
+  }
+
+  onMobileNumberChange(): void {
+    // Reset OTP fields if mobile number changes
+    if (this.otpSent) {
+      this.otpSent = false;
+      this.otp = '';
+      if (this.resendTimer) {
+        clearInterval(this.resendTimer);
+        this.resendTimer = null;
+      }
+      this.resendCooldown = 60;
+    }
+  }
+
+  onMobileNumberKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !this.otpSent && !this.isSendingOtp) {
+      event.preventDefault();
+      if (this.mobileNumber && this.mobileNumber.length === 10) {
+        this.onSendOtp();
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.resendTimer) {
+      clearInterval(this.resendTimer);
+    }
   }
 }

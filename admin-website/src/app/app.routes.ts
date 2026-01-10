@@ -14,7 +14,8 @@ export const routes: Routes = [
   },
   {
     path: 'dms',
-    loadComponent: () => import('./features/dms/dms-login/dms-login.component').then(m => m.DmsLoginComponent)
+    redirectTo: 'login',
+    pathMatch: 'full'
   },
   {
     path: 'admin/dashboard',

@@ -178,13 +178,13 @@ export class DmsDashboardComponent implements OnInit {
     }
     const routeMap: { [key: string]: string } = {
       '/dms/claims': 'Claims',
-      '/dms/purchase-orders': 'Purchase Orders (Inbound / Primary)',
-      '/dms/orders': 'Orders (Retailer Orders In)',
+      '/dms/purchase-orders': 'Place orders',
+      '/dms/orders': 'Orders',
       '/dms/invoices': 'Invoices',
       '/dms/stock': 'Stock',
       '/dms/place-orders': 'Place Orders (to Super Stockist)',
-      '/dms/credit-checks': 'Credit Checks / Collections',
-      '/dms/compliance': 'E-way / E-invoice Compliance',
+      '/dms/credit-checks': 'Credit Checks',
+      '/dms/compliance': 'E-way Compliance',
       '/dms/billing-mode': 'Billing Mode'
     };
     return routeMap[this.currentRoute] || 'DMS Dashboard';

@@ -10,7 +10,7 @@ export const dmsAuthGuard = () => {
     return true;
   }
 
-  router.navigate(['/dms']);
+  router.navigate(['/login']);
   return false;
 };
 
