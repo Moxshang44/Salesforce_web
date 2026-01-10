@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DmsSidebarComponent } from '../components/dms-sidebar/dms-sidebar.component';
 import { HeaderComponent } from '../../../core/layout/header/header.component';
 
@@ -9,6 +10,23 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+}
+
+interface ChatHistory {
+  id: number;
+  title: string;
+  timestamp: Date;
+  preview: string;
+}
+
+type ChatMode = 'ask' | 'do' | 'plan';
+
+interface ModeItem {
+  value: ChatMode;
+  label: string;
+  iconSvg: string;
+  safeIconSvg?: SafeHtml;
+  description: string;
 }
 
 @Component({
@@ -23,16 +41,57 @@ interface ChatMessage {
   templateUrl: './ai-chatbot.component.html',
   styleUrl: './ai-chatbot.component.scss'
 })
-export class AiChatbotComponent implements OnInit {
+export class AiChatbotComponent implements OnInit, OnDestroy {
   chatMessages: ChatMessage[] = [];
+  chatHistory: ChatHistory[] = [];
+  currentChatId: number | null = null;
   chatInput = '';
   isTyping = false;
+  selectedMode: ChatMode = 'ask';
+  showModeDropdown = false;
   
   @ViewChild('chatMessagesContainer', { static: false }) chatMessagesContainer?: ElementRef;
+  @ViewChild('modeDropdownContainer', { static: false }) modeDropdownContainer?: ElementRef;
+
+  modes: ModeItem[] = [];
+
+  constructor(private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
+    // Initialize modes with sanitized SVG icons
+    this.initializeModes();
     // Initialize chatbot with welcome message
     this.initializeChatbot();
+    this.loadChatHistory();
+  }
+
+  initializeModes(): void {
+    const modeData: Omit<ModeItem, 'safeIconSvg'>[] = [
+      { 
+        value: 'ask', 
+        label: 'Ask Mode', 
+        iconSvg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 8H8M16 12H8M11 16H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        description: 'Ask questions and get answers'
+      },
+      { 
+        value: 'do', 
+        label: 'Do Mode', 
+        iconSvg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        description: 'Perform actions and operations'
+      },
+      { 
+        value: 'plan', 
+        label: 'Plan Mode', 
+        iconSvg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="10 9 9 9 8 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        description: 'Create plans and strategies'
+      }
+    ];
+    
+    // Sanitize SVG icons
+    this.modes = modeData.map(mode => ({
+      ...mode,
+      safeIconSvg: this.sanitizer.bypassSecurityTrustHtml(mode.iconSvg)
+    }));
   }
 
   initializeChatbot(): void {
@@ -47,9 +106,101 @@ export class AiChatbotComponent implements OnInit {
     ];
   }
 
+  loadChatHistory(): void {
+    // Load chat history (mock data - replace with actual storage/API)
+    this.chatHistory = [
+      {
+        id: 1,
+        title: 'New Chat',
+        timestamp: new Date(),
+        preview: 'Hello! I\'m your AI assistant...'
+      }
+    ];
+    if (this.chatHistory.length > 0) {
+      this.currentChatId = this.chatHistory[0].id;
+    }
+  }
+
+  createNewChat(): void {
+    const newChat: ChatHistory = {
+      id: Date.now(),
+      title: 'New Chat',
+      timestamp: new Date(),
+      preview: ''
+    };
+    this.chatHistory.unshift(newChat);
+    this.currentChatId = newChat.id;
+    this.chatMessages = [];
+    this.initializeChatbot();
+  }
+
+  selectChat(chatId: number): void {
+    this.currentChatId = chatId;
+    // In a real app, load messages for this chat
+    // For now, just reset to welcome message
+    this.chatMessages = [];
+    this.initializeChatbot();
+    const chat = this.chatHistory.find(c => c.id === chatId);
+    if (chat) {
+      chat.preview = this.chatMessages.length > 0 
+        ? this.chatMessages[this.chatMessages.length - 1].content.substring(0, 50) + '...'
+        : '';
+    }
+  }
+
+  deleteChat(chatId: number, event: Event): void {
+    event.stopPropagation();
+    this.chatHistory = this.chatHistory.filter(c => c.id !== chatId);
+    if (this.currentChatId === chatId) {
+      if (this.chatHistory.length > 0) {
+        this.selectChat(this.chatHistory[0].id);
+      } else {
+        this.currentChatId = null;
+        this.chatMessages = [];
+        this.createNewChat();
+      }
+    }
+  }
+
+  toggleModeDropdown(): void {
+    this.showModeDropdown = !this.showModeDropdown;
+  }
+
+  selectMode(mode: ChatMode): void {
+    this.selectedMode = mode;
+    this.showModeDropdown = false;
+  }
+
+  getCurrentModeLabel(): string {
+    const mode = this.modes.find(m => m.value === this.selectedMode);
+    return mode?.label || 'Ask Mode';
+  }
+
+  getCurrentModeIconSvg(): SafeHtml {
+    const mode = this.modes.find(m => m.value === this.selectedMode);
+    return mode?.safeIconSvg || this.sanitizer.bypassSecurityTrustHtml('<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event): void {
+    if (this.modeDropdownContainer?.nativeElement && 
+        !this.modeDropdownContainer.nativeElement.contains(event.target)) {
+      this.showModeDropdown = false;
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup if needed
+  }
+
   sendMessage(): void {
     if (!this.chatInput.trim() || this.isTyping) {
       return;
+    }
+
+    // Create new chat if none exists
+    if (this.currentChatId === null) {
+      this.createNewChat();
     }
 
     // Add user message
@@ -64,38 +215,76 @@ export class AiChatbotComponent implements OnInit {
     this.chatInput = '';
     this.isTyping = true;
 
+    // Update chat history preview
+    this.updateChatPreview(currentInput);
+
     // Simulate AI response (replace with actual API call)
     setTimeout(() => {
       const assistantMessage: ChatMessage = {
         id: Date.now() + 1,
         role: 'assistant',
-        content: this.generateResponse(currentInput),
+        content: this.generateResponse(currentInput, this.selectedMode),
         timestamp: new Date()
       };
       this.chatMessages.push(assistantMessage);
       this.isTyping = false;
       this.scrollToBottom();
+      this.updateChatPreview(assistantMessage.content);
     }, 1000);
   }
 
-  generateResponse(userInput: string): string {
-    // Simple response generation (replace with actual AI API call)
+  updateChatPreview(content: string): void {
+    if (this.currentChatId) {
+      const chat = this.chatHistory.find(c => c.id === this.currentChatId);
+      if (chat) {
+        chat.preview = content.substring(0, 50) + (content.length > 50 ? '...' : '');
+        if (chat.title === 'New Chat' && content.trim()) {
+          chat.title = content.substring(0, 30) + (content.length > 30 ? '...' : '');
+        }
+      }
+    }
+  }
+
+  generateResponse(userInput: string, mode: ChatMode): string {
+    // Simple response generation based on mode (replace with actual AI API call)
     const lowerInput = userInput.toLowerCase();
+    const modePrefix = mode === 'ask' ? 'Let me answer that' : mode === 'do' ? 'I\'ll help you perform that' : 'Let me plan that';
     
-    if (lowerInput.includes('order') || lowerInput.includes('orders')) {
-      return 'I can help you with orders! You can view, create, or manage orders in the Orders section. Would you like to know more about any specific order functionality?';
-    } else if (lowerInput.includes('inventory') || lowerInput.includes('stock')) {
-      return 'For inventory and stock management, you can check the Stock section. I can help you track inventory levels, update stock, or answer questions about specific products.';
-    } else if (lowerInput.includes('billing') || lowerInput.includes('tally')) {
-      return 'I can help you with billing mode and Tally integration! You can configure Tally connections, manage mappings, and view sync logs in the Billing Mode section. What specific aspect would you like to know about?';
-    } else if (lowerInput.includes('invoice') || lowerInput.includes('invoices')) {
-      return 'For invoice management, you can access the Invoices section. I can help you understand invoice processing, status tracking, and invoice-related queries.';
-    } else if (lowerInput.includes('help')) {
-      return 'I\'m here to help! I can assist you with:\n- Managing orders and understanding order status\n- Inventory and stock queries\n- Billing mode and Tally integration\n- Invoice management\n- Navigation within the DMS system\n- General questions about features\n\nWhat would you like to know?';
-    } else if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
-      return 'Hello! How can I assist you today? Feel free to ask me anything about orders, inventory, billing, invoices, or the DMS system.';
+    if (mode === 'ask') {
+      if (lowerInput.includes('order') || lowerInput.includes('orders')) {
+        return modePrefix + ': You can view, create, or manage orders in the Orders section. Orders allow you to track inventory requests, manage stock levels, and process sales orders. Would you like to know more about any specific order functionality?';
+      } else if (lowerInput.includes('inventory') || lowerInput.includes('stock')) {
+        return modePrefix + ': For inventory and stock management, you can check the Stock section. I can help you track inventory levels, update stock, or answer questions about specific products.';
+      } else if (lowerInput.includes('billing') || lowerInput.includes('tally')) {
+        return modePrefix + ': Billing Mode allows you to configure Tally integration, manage mappings, and view sync logs. What specific aspect would you like to know about?';
+      } else if (lowerInput.includes('invoice') || lowerInput.includes('invoices')) {
+        return modePrefix + ': For invoice management, you can access the Invoices section. This includes invoice processing, status tracking, and invoice-related queries.';
+      } else if (lowerInput.includes('help')) {
+        return modePrefix + ': I can assist you with:\n- Managing orders and understanding order status\n- Inventory and stock queries\n- Billing mode and Tally integration\n- Invoice management\n- Navigation within the DMS system\n- General questions about features\n\nWhat would you like to know?';
+      }
+    } else if (mode === 'do') {
+      if (lowerInput.includes('create') || lowerInput.includes('add') || lowerInput.includes('new')) {
+        return modePrefix + ' action for you. Based on your request, I can help you create new orders, add inventory items, or perform other operations. What specific action would you like me to perform?';
+      } else if (lowerInput.includes('update') || lowerInput.includes('edit') || lowerInput.includes('modify')) {
+        return modePrefix + ' update operation. I can help you update order status, modify inventory levels, or edit existing records. Which item would you like to update?';
+      } else if (lowerInput.includes('delete') || lowerInput.includes('remove')) {
+        return modePrefix + ' deletion. Please specify which item you\'d like to delete, and I\'ll guide you through the process safely.';
+      } else {
+        return modePrefix + ' operation. I\'m ready to perform actions in the DMS system. What would you like me to do?';
+      }
+    } else if (mode === 'plan') {
+      if (lowerInput.includes('strategy') || lowerInput.includes('plan') || lowerInput.includes('approach')) {
+        return modePrefix + ' strategically. Let me create a comprehensive plan for you. I\'ll break down the strategy into actionable steps and help you organize your approach. What area would you like to plan for?';
+      } else {
+        return modePrefix + ' step-by-step plan. I\'ll help you create a structured approach with clear milestones and actionable items. What would you like to plan?';
+      }
+    }
+    
+    // Default response
+    if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
+      return 'Hello! I\'m your AI assistant in ' + mode + ' mode. How can I help you today?';
     } else {
-      return 'Thank you for your message! I understand you\'re asking about: "' + userInput + '". I\'m here to help with DMS system questions including orders, inventory management, billing mode, and invoices. Could you provide more details about what you\'d like to know?';
+      return modePrefix + '. I understand you\'re asking about: "' + userInput + '". I\'m here to help with DMS system operations. Could you provide more details?';
     }
   }
 
@@ -135,6 +324,23 @@ export class AiChatbotComponent implements OnInit {
   onChatInputChange(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     this.autoResizeTextarea(textarea);
+  }
+
+  onAttachClick(event: Event): void {
+    event.preventDefault();
+    // Create file input element
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.onchange = (e: any) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        console.log('Files selected:', files);
+        // Handle file attachment logic here
+        // You can add files to a list or send them with the message
+      }
+    };
+    input.click();
   }
 }
 
