@@ -1,12 +1,22 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { dmsAuthGuard } from './core/guards/dms-auth.guard';
+import { superAdminGuard } from './core/guards/super-admin.guard';
 
 export const routes: Routes = [
   {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
+  },
+  {
+    path: 'superadmin',
+    loadComponent: () => import('./features/super-admin/super-admin-login/super-admin-login.component').then(m => m.SuperAdminLoginComponent)
+  },
+  {
+    path: 'super-admin/companies',
+    loadComponent: () => import('./features/super-admin/companies/companies.component').then(m => m.CompaniesComponent),
+    canActivate: [superAdminGuard]
   },
   {
     path: 'login',
@@ -68,11 +78,6 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'admin/routes/assign',
-    loadComponent: () => import('./features/routes/components/assign-routes/assign-routes.component').then(m => m.AssignRoutesComponent),
-    canActivate: [authGuard]
-  },
-  {
     path: 'admin/distributors',
     loadComponent: () => import('./features/distributors/distributors.component').then(m => m.DistributorsComponent),
     canActivate: [authGuard]
@@ -123,6 +128,16 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'admin/sales',
+    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/live-view',
+    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'admin/settings',
     loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
@@ -159,6 +174,11 @@ export const routes: Routes = [
   },
   {
     path: 'dms/credit-checks',
+    loadComponent: () => import('./features/dms/credit-checks/credit-checks.component').then(m => m.CreditChecksComponent),
+    canActivate: [dmsAuthGuard]
+  },
+  {
+    path: 'dms/credit-checks/:id',
     loadComponent: () => import('./features/dms/credit-checks/credit-checks.component').then(m => m.CreditChecksComponent),
     canActivate: [dmsAuthGuard]
   },

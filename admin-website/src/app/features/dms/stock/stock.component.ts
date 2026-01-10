@@ -300,5 +300,24 @@ export class StockComponent implements OnInit {
     console.log('Action menu for:', item.sku);
     // Handle action menu logic
   }
+
+  onEditStock(item: StockItem): void {
+    console.log('Edit stock item:', item);
+    // TODO: Implement edit functionality
+    // You can open an edit modal or navigate to an edit page
+  }
+
+  onDeleteStock(item: StockItem): void {
+    console.log('Delete stock item:', item);
+    // TODO: Implement delete functionality with confirmation
+    if (confirm(`Are you sure you want to delete stock item ${item.sku}?`)) {
+      // Handle deletion
+      const index = this.stockItems.findIndex(s => s.id === item.id);
+      if (index > -1) {
+        this.stockItems.splice(index, 1);
+        this.applyFilters(); // Refresh filtered list
+      }
+    }
+  }
 }
 

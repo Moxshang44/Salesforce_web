@@ -33,10 +33,14 @@
           [(ngModel)]="formData.routeCode"
           name="routeCode"
           (input)="clearError('routeCode')"
-          required
+          [disabled]="isEditMode"
+          [required]="!isEditMode"
         >
         @if (errors['routeCode']) {
           <span class="error-message">{{ errors['routeCode'] }}</span>
+        }
+        @if (isEditMode) {
+          <span class="form-hint">Route code cannot be changed</span>
         }
       </div>
     </div>
@@ -46,55 +50,128 @@
       <h3 class="section-title">Geographic Mapping</h3>
       <p class="section-subtitle">Select existing values or add new ones if missing</p>
 
-      <!-- Select Country and Type New Country -->
-      <div class="form-row">
+      <!-- Row 1: Select Country, Select Zone, Select Region -->
+      <div class="form-row three-col">
         <div class="form-group">
           <label class="form-label">Select Country</label>
           <select 
-            class="form-select" 
-            [(ngModel)]="formData.selectedCountry"
-            name="selectedCountry"
+            class="form-select"
+            [class.error]="errors['selectedCountryId']"
+            [ngModel]="formData.selectedCountryId"
+            (ngModelChange)="onCountryChange($event)"
+            name="selectedCountryId"
+            [disabled]="isLoadingAllAreas || !selectedCompanyId"
           >
-            @for (country of countryOptions; track country) {
-              <option [value]="country">{{ country }}</option>
+            <option [value]="null">
+              @if (isLoadingAllAreas) {
+                Loading...
+              } @else {
+                Select Country
+              }
+            </option>
+            @for (country of countryOptions; track country.id) {
+              <option [value]="country.id">{{ country.name }}</option>
             }
           </select>
+          @if (errors['selectedCountryId']) {
+            <span class="error-message">{{ errors['selectedCountryId'] }}</span>
+          }
+          @if (isLoadingAllAreas) {
+            <span class="form-hint">Loading areas...</span>
+          }
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Select Zone</label>
+          <select 
+            class="form-select"
+            [class.error]="errors['selectedZoneId']"
+            [ngModel]="formData.selectedZoneId"
+            (ngModelChange)="onZoneChange($event)"
+            name="selectedZoneId"
+            [disabled]="!formData.selectedCountryId || isLoadingZones || isLoadingAllAreas"
+          >
+            <option [value]="null">
+              @if (isLoadingZones) {
+                Loading zones...
+              } @else {
+                Select Zone
+              }
+            </option>
+            @for (zone of zoneOptions; track zone.id) {
+              <option [value]="zone.id">{{ zone.name }}</option>
+            }
+          </select>
+          @if (errors['selectedZoneId']) {
+            <span class="error-message">{{ errors['selectedZoneId'] }}</span>
+          }
+          @if (isLoadingZones) {
+            <span class="form-hint">Loading zones...</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Region</label>
+          <select 
+            class="form-select"
+            [class.error]="errors['selectedRegionId']"
+            [ngModel]="formData.selectedRegionId"
+            (ngModelChange)="onRegionChange($event)"
+            name="selectedRegionId"
+            [disabled]="!formData.selectedZoneId || isLoadingRegions || isLoadingAllAreas"
+          >
+            <option [value]="null">
+              @if (isLoadingRegions) {
+                Loading regions...
+              } @else {
+                Select Region
+              }
+            </option>
+            @for (region of regionOptions; track region.id) {
+              <option [value]="region.id">{{ region.name }}</option>
+            }
+          </select>
+          @if (errors['selectedRegionId']) {
+            <span class="error-message">{{ errors['selectedRegionId'] }}</span>
+          }
+          @if (isLoadingRegions) {
+            <span class="form-hint">Loading regions...</span>
+          }
+        </div>
+      </div>
+
+      <!-- Row 2: Type New Country, Type New Zone, Type New Region -->
+      <div class="form-row three-col">
         <div class="form-group">
           <label class="form-label">Type New Country</label>
           <div class="input-with-button">
             <input 
               type="text" 
-              class="form-input" 
+              class="form-input"
+              [class.error]="errors['newCountry']"
               placeholder="Type New Country"
               [(ngModel)]="formData.newCountry"
               name="newCountry"
+              (input)="clearError('newCountry')"
+              maxlength="64"
+              [disabled]="isLoadingCountry"
             >
             <button 
               type="button" 
               class="add-btn"
               (click)="addCountry()"
+              [disabled]="isLoadingCountry || !selectedCompanyId"
             >
-              + Add
+              @if (isLoadingCountry) {
+                <span>Adding...</span>
+              } @else {
+                <span>+ Add</span>
+              }
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Select Zone and Type New Zone -->
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Select Zone</label>
-          <select 
-            class="form-select" 
-            [(ngModel)]="formData.selectedZone"
-            name="selectedZone"
-          >
-            @for (zone of zoneOptions; track zone) {
-              <option [value]="zone">{{ zone }}</option>
-            }
-          </select>
+          @if (errors['newCountry']) {
+            <span class="error-message">{{ errors['newCountry'] }}</span>
+          }
         </div>
 
         <div class="form-group">
@@ -102,36 +179,31 @@
           <div class="input-with-button">
             <input 
               type="text" 
-              class="form-input" 
+              class="form-input"
+              [class.error]="errors['newZone']"
               placeholder="Type New Zone"
               [(ngModel)]="formData.newZone"
               name="newZone"
+              (input)="clearError('newZone')"
+              maxlength="64"
+              [disabled]="isLoadingZone || !formData.selectedCountryId"
             >
             <button 
               type="button" 
               class="add-btn"
               (click)="addZone()"
+              [disabled]="isLoadingZone || !selectedCompanyId || !formData.selectedCountryId"
             >
-              + Add
+              @if (isLoadingZone) {
+                <span>Adding...</span>
+              } @else {
+                <span>+ Add</span>
+              }
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Select Region and Type New Region -->
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Select Region</label>
-          <select 
-            class="form-select" 
-            [(ngModel)]="formData.selectedRegion"
-            name="selectedRegion"
-          >
-            <option value="">+ Add New Region</option>
-            @for (region of regionOptions; track region) {
-              <option [value]="region">{{ region }}</option>
-            }
-          </select>
+          @if (errors['newZone']) {
+            <span class="error-message">{{ errors['newZone'] }}</span>
+          }
         </div>
 
         <div class="form-group">
@@ -139,116 +211,185 @@
           <div class="input-with-button">
             <input 
               type="text" 
-              class="form-input" 
+              class="form-input"
+              [class.error]="errors['newRegion']"
               placeholder="Type New Region"
               [(ngModel)]="formData.newRegion"
               name="newRegion"
+              (input)="clearError('newRegion')"
+              maxlength="64"
+              [disabled]="isLoadingRegion || !formData.selectedZoneId"
             >
             <button 
               type="button" 
               class="add-btn"
               (click)="addRegion()"
+              [disabled]="isLoadingRegion || !selectedCompanyId || !formData.selectedZoneId"
             >
-              + Add
+              @if (isLoadingRegion) {
+                <span>Adding...</span>
+              } @else {
+                <span>+ Add</span>
+              }
             </button>
           </div>
+          @if (errors['newRegion']) {
+            <span class="error-message">{{ errors['newRegion'] }}</span>
+          }
         </div>
       </div>
 
-      <!-- Select Area and Type New Area -->
+      <!-- Row 3: Select Area, Select Division -->
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Select Area</label>
           <select 
-            class="form-select" 
-            [(ngModel)]="formData.selectedArea"
-            name="selectedArea"
+            class="form-select"
+            [class.error]="errors['selectedAreaId']"
+            [ngModel]="formData.selectedAreaId"
+            (ngModelChange)="onAreaChange($event)"
+            name="selectedAreaId"
+            [disabled]="!formData.selectedRegionId || isLoadingAreas || isLoadingAllAreas"
           >
-            <option value="">+ Add New Area</option>
-            @for (area of areaOptions; track area) {
-              <option [value]="area">{{ area }}</option>
+            <option [value]="null">
+              @if (isLoadingAreas) {
+                Loading areas...
+              } @else {
+                Select Area
+              }
+            </option>
+            @for (area of areaOptions; track area.id) {
+              <option [value]="area.id">{{ area.name }}</option>
             }
           </select>
+          @if (errors['selectedAreaId']) {
+            <span class="error-message">{{ errors['selectedAreaId'] }}</span>
+          }
+          @if (isLoadingAreas) {
+            <span class="form-hint">Loading areas...</span>
+          }
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Select Division</label>
+          <select 
+            class="form-select"
+            [class.error]="errors['selectedDivisionId']"
+            [ngModel]="formData.selectedDivisionId"
+            name="selectedDivisionId"
+            [disabled]="!formData.selectedAreaId || isLoadingDivisions || isLoadingAllAreas"
+          >
+            <option [value]="null">
+              @if (isLoadingDivisions) {
+                Loading divisions...
+              } @else {
+                Select Division
+              }
+            </option>
+            @for (division of divisionOptions; track division.id) {
+              <option [value]="division.id">{{ division.name }}</option>
+            }
+          </select>
+          @if (errors['selectedDivisionId']) {
+            <span class="error-message">{{ errors['selectedDivisionId'] }}</span>
+          }
+          @if (isLoadingDivisions) {
+            <span class="form-hint">Loading divisions...</span>
+          }
+        </div>
+      </div>
+
+      <!-- Row 4: Type New Area -->
+      <div class="form-row">
         <div class="form-group">
           <label class="form-label">Type New Area</label>
           <div class="input-with-button">
             <input 
               type="text" 
-              class="form-input" 
+              class="form-input"
+              [class.error]="errors['newArea']"
               placeholder="Type New Area"
               [(ngModel)]="formData.newArea"
               name="newArea"
+              (input)="clearError('newArea')"
+              maxlength="64"
+              [disabled]="isLoadingArea || !formData.selectedRegionId"
             >
             <button 
               type="button" 
               class="add-btn"
               (click)="addArea()"
+              [disabled]="isLoadingArea || !selectedCompanyId || !formData.selectedRegionId"
             >
-              + Add
+              @if (isLoadingArea) {
+                <span>Adding...</span>
+              } @else {
+                <span>+ Add</span>
+              }
             </button>
           </div>
+          @if (errors['newArea']) {
+            <span class="error-message">{{ errors['newArea'] }}</span>
+          }
         </div>
-      </div>
-
-      <!-- Select Distributor -->
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Select Distributor</label>
-          <select 
-            class="form-select" 
-            [(ngModel)]="formData.selectedDistributor"
-            name="selectedDistributor"
-          >
-            <option value="">Select</option>
-            @for (distributor of distributorOptions; track distributor) {
-              <option [value]="distributor">{{ distributor }}</option>
-            }
-          </select>
-        </div>
-        <div class="form-group"></div>
       </div>
     </div>
 
     <!-- Channel Type -->
     <div class="form-section">
       <label class="section-label">Channel Type</label>
-      <div class="radio-group">
-        <label class="radio-option">
+      <div class="checkbox-group">
+        <label class="checkbox-option">
           <input 
-            type="radio" 
-            name="channelType" 
-            value="General Trade"
-            [(ngModel)]="formData.channelType"
-            class="radio-input"
+            type="checkbox" 
+            [(ngModel)]="formData.is_general"
+            name="is_general"
+            class="checkbox-input"
           >
-          <span class="radio-label">General Trade</span>
+          <span class="checkbox-label">General Trade</span>
         </label>
 
-        <label class="radio-option">
+        <label class="checkbox-option">
           <input 
-            type="radio" 
-            name="channelType" 
-            value="Modern Trade"
-            [(ngModel)]="formData.channelType"
-            class="radio-input"
+            type="checkbox" 
+            [(ngModel)]="formData.is_modern"
+            name="is_modern"
+            class="checkbox-input"
           >
-          <span class="radio-label">Modern Trade</span>
+          <span class="checkbox-label">Modern Trade</span>
         </label>
 
-        <label class="radio-option">
+        <label class="checkbox-option">
           <input 
-            type="radio" 
-            name="channelType" 
-            value="HoReCa Trade"
-            [(ngModel)]="formData.channelType"
-            class="radio-input"
+            type="checkbox" 
+            [(ngModel)]="formData.is_horeca"
+            name="is_horeca"
+            class="checkbox-input"
           >
-          <span class="radio-label">HoReCa Trade</span>
+          <span class="checkbox-label">HoReCa Trade</span>
         </label>
       </div>
     </div>
+
+    <!-- Active Status -->
+    <div class="form-section">
+      <label class="checkbox-option">
+        <input 
+          type="checkbox" 
+          [(ngModel)]="formData.is_active"
+          name="is_active"
+          class="checkbox-input"
+        >
+        <span class="checkbox-label">Active</span>
+      </label>
+    </div>
+
+    <!-- Submit Error -->
+    @if (errors['submit']) {
+      <div class="alert alert-error">
+        {{ errors['submit'] }}
+      </div>
+    }
   </form>
 
   <!-- Action Buttons -->
@@ -264,8 +405,21 @@
       type="button" 
       class="btn-save"
       (click)="onSaveAndNext()"
+      [disabled]="isSubmitting"
     >
-      Save & Next
+      @if (isSubmitting) {
+        @if (isEditMode) {
+          Updating Route...
+        } @else {
+          Creating Route...
+        }
+      } @else {
+        @if (isEditMode) {
+          Update Route
+        } @else {
+          Save & Next
+        }
+      }
     </button>
   </div>
 </div>

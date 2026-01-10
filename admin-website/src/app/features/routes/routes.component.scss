@@ -54,6 +54,11 @@
       display: inline-block;
     }
   }
+
+  // Make the Assign Routes button icon white (first app-button with routes.png icon)
+  ::ng-deep app-button:first-of-type .button-icon {
+    filter: brightness(0) invert(1);
+  }
 }
 
 // Table Controls
@@ -62,6 +67,44 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.company-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selector-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.company-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  min-width: 200px;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #664423;
+    box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+
+  &:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
 .pagination-controls {
@@ -234,19 +277,23 @@
   width: 120px;
 }
 
-.col-details {
-  width: 140px;
-}
-
 .col-route {
-  width: 25%;
+  width: 20%;
 }
 
 .col-channel {
-  width: 18%;
+  width: 15%;
 }
 
 .col-assigned {
+  width: 15%;
+}
+
+.col-country-zone {
+  width: 18%;
+}
+
+.col-assign-to {
   width: 18%;
 }
 
@@ -357,27 +404,6 @@
   color: #7f8c8d;
 }
 
-// Details Button
-.details-btn {
-  padding: 6px 16px;
-  background: #664423;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #5a3a1f;
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
 
 // Channel Text
 .channel-text {
@@ -402,6 +428,20 @@
 .region-text {
   font-size: 13px;
   color: #7f8c8d;
+}
+
+// Country/Zone Text
+.country-zone-text {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 500;
+}
+
+// Assign To Text
+.assign-to-text {
+  font-size: 14px;
+  color: #000000;
+  font-weight: 500;
 }
 
 // Footer
@@ -507,6 +547,240 @@
 
   .data-table {
     min-width: 800px;
+  }
+}
+
+// Company Selection Container
+.company-selection-container {
+  padding: 24px;
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: white;
+
+    &:focus {
+      outline: none;
+      border-color: #664423;
+      box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+    }
+
+    &:disabled {
+      background: #f5f5f5;
+      cursor: not-allowed;
+    }
+  }
+
+  .required {
+    color: #dc3545;
+    font-weight: 600;
+  }
+
+  .error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-cancel {
+    background: #f5f5f5;
+    color: #666;
+
+    &:hover:not(:disabled) {
+      background: #e0e0e0;
+    }
+  }
+
+  .btn-save {
+    background: #664423;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #4a3119;
+    }
+  }
+}
+
+// View Route Details
+.view-route-details {
+  padding: 24px;
+}
+
+.loading-state {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.alert {
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px 24px;
+
+  &.alert-error {
+    background: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+
+    .error-pre {
+      margin: 8px 0 0 0;
+      padding: 12px;
+      background: white;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  }
+}
+
+.detail-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #666;
+  min-width: 150px;
+  font-size: 14px;
+}
+
+.detail-value {
+  flex: 1;
+  color: #333;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.channel-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.channel-badge {
+  padding: 4px 12px;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &.none {
+    background: #f5f5f5;
+    color: #999;
+  }
+}
+
+.detail-value {
+  span.active {
+    color: #4caf50;
+    font-weight: 600;
+  }
+
+  span.inactive {
+    color: #f44336;
+    font-weight: 600;
+  }
+}
+
+// Loading, Error, and Empty States
+.loading-state-container,
+.error-state-container,
+.empty-state-container {
+  padding: 60px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.loading-state-container {
+  p {
+    font-size: 16px;
+    color: #666;
+  }
+}
+
+.error-state-container {
+  .error-text {
+    font-size: 16px;
+    color: #dc3545;
+    margin-bottom: 12px;
+  }
+
+  .retry-btn {
+    padding: 10px 20px;
+    background: #664423;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #4a3119;
+    }
+  }
+}
+
+.empty-state-container {
+  p {
+    font-size: 16px;
+    color: #666;
   }
 }
 

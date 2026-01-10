@@ -1122,4 +1122,70 @@ export class DistributorStockComponent implements OnInit {
   getFirstUnit(claim: ClaimItem): string {
     return claim.products[0]?.unit || '';
   }
+
+  onEditClaim(claim: ClaimItem): void {
+    console.log('Edit claim:', claim);
+    // TODO: Implement edit functionality
+  }
+
+  onViewClaim(claim: ClaimItem): void {
+    console.log('View claim:', claim);
+    this.onClaimRowClick(claim);
+  }
+
+  onDeleteClaim(claim: ClaimItem): void {
+    console.log('Delete claim:', claim);
+    // TODO: Implement delete functionality with confirmation
+    if (confirm(`Are you sure you want to delete claim ${claim.billNo}?`)) {
+      // Handle deletion
+      const index = this.claimItems.findIndex(c => c.id === claim.id);
+      if (index > -1) {
+        this.claimItems.splice(index, 1);
+      }
+    }
+  }
+
+  onEditSample(sample: SampleItem): void {
+    console.log('Edit sample:', sample);
+    // TODO: Implement edit functionality
+  }
+
+  onViewSample(sample: SampleItem): void {
+    console.log('View sample:', sample);
+    // TODO: Implement view functionality
+  }
+
+  onDeleteSample(sample: SampleItem): void {
+    console.log('Delete sample:', sample);
+    // TODO: Implement delete functionality with confirmation
+    if (confirm(`Are you sure you want to delete sample entry for ${sample.salesmanName}?`)) {
+      // Handle deletion
+      const index = this.sampleItems.findIndex(s => s.id === sample.id);
+      if (index > -1) {
+        this.sampleItems.splice(index, 1);
+      }
+    }
+  }
+
+  onEditScheme(scheme: SchemeClaimItem): void {
+    console.log('Edit scheme:', scheme);
+    // TODO: Implement edit functionality
+  }
+
+  onViewScheme(scheme: SchemeClaimItem): void {
+    console.log('View scheme:', scheme);
+    // TODO: Implement view functionality
+  }
+
+  onDeleteScheme(scheme: SchemeClaimItem): void {
+    console.log('Delete scheme:', scheme);
+    // TODO: Implement delete functionality with confirmation
+    if (confirm(`Are you sure you want to delete scheme claim ${scheme.billNo}?`)) {
+      // Handle deletion
+      const index = this.schemeClaimItems.findIndex(s => s.id === scheme.id);
+      if (index > -1) {
+        this.schemeClaimItems.splice(index, 1);
+      }
+    }
+  }
 }

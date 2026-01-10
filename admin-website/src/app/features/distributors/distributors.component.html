@@ -252,27 +252,94 @@
     <app-modal
       [isOpen]="isAddModalOpen"
       [title]="getModalTitle()"
-      [stepIndicator]="'Step ' + currentStep + ' of 3'"
+      [stepIndicator]="currentStep > 0 ? 'Step ' + currentStep + ' of 3' : ''"
       width="1400px"
       (close)="closeAddModal()"
     >
+      <!-- Company Selection (shown before step 1) -->
+      @if (currentStep === 0) {
+        <div class="company-selection-container">
+          <div class="form-group">
+            <label class="form-label">Select Company <span class="required">*</span></label>
+            @if (isLoadingCompanies) {
+              <p>Loading companies...</p>
+            } @else if (companyError) {
+              <div class="error-message">{{ companyError }}</div>
+            } @else {
+              <select 
+                class="form-input"
+                [(ngModel)]="selectedCompanyId"
+                name="selectedCompanyId"
+                style="width: 100%; padding: 12px; margin-top: 8px;"
+              >
+                <option value="">-- Select a Company --</option>
+                @for (company of companies; track company.id) {
+                  <option [value]="company.id">{{ company.name }}</option>
+                }
+              </select>
+              <div class="form-actions" style="margin-top: 24px;">
+                <button 
+                  type="button" 
+                  class="btn-cancel"
+                  (click)="closeAddModal()"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  class="btn-save"
+                  (click)="currentStep = 1"
+                  [disabled]="!selectedCompanyId"
+                >
+                  Next
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       @if (currentStep === 1) {
         <app-distributor-form-step1
+          [selectedCompanyId]="selectedCompanyId"
           (save)="onSaveStep1($event)"
           (cancel)="closeAddModal()"
         ></app-distributor-form-step1>
       }
       @if (currentStep === 2) {
         <app-distributor-form-step2
+          [step1Data]="step1FormData"
           (save)="onSaveStep2($event)"
           (previous)="onPreviousStep()"
         ></app-distributor-form-step2>
       }
       @if (currentStep === 3) {
+        <div>
         <app-distributor-form-step3
+            [step1Data]="step1FormData"
+            [step2Data]="step2FormData"
           (save)="onSaveStep3($event)"
           (previous)="onPreviousStep()"
         ></app-distributor-form-step3>
+          
+          @if (submitError) {
+            <div class="error-alert" style="margin-top: 20px; padding: 12px; background: #fee; border: 1px solid #fcc; border-radius: 4px; color: #c33;">
+              {{ submitError }}
+            </div>
+          }
+          
+          @if (submitSuccess) {
+            <div class="success-alert" style="margin-top: 20px; padding: 12px; background: #efe; border: 1px solid #cfc; border-radius: 4px; color: #3c3;">
+              Distributor created successfully!
+            </div>
+          }
+          
+          @if (isSubmitting) {
+            <div style="margin-top: 20px; text-align: center; padding: 20px;">
+              <p>Submitting distributor data...</p>
+            </div>
+          }
+        </div>
       }
     </app-modal>
   </div>
