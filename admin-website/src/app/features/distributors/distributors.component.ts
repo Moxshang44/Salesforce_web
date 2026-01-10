@@ -202,6 +202,13 @@ export class DistributorsComponent {
 
   onDelete(distributor: Distributor): void {
     console.log('Delete distributor:', distributor);
+      if (confirm(`Are you sure you want to delete "${distributor.name}"?`)) {
+      // Remove the distributor from the list
+      this.distributors = this.distributors.filter(d => d.id !== distributor.id);
+      console.log('Distributor deleted:', distributor);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(distributor: Distributor): void {

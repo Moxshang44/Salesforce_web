@@ -160,8 +160,16 @@ export class CategoryComponent {
   }
 
   onDelete(category: Category): void {
-    console.log('Delete category:', category);
+    if (confirm(`Are you sure you want to delete "${category.categoryName}"?`)) {
+      
+      this.categories = this.categories.filter(b => b.id !== category.id);
+      console.log('category deleted:', category);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
+
+  
 
   onView(category: Category): void {
     console.log('View category:', category);

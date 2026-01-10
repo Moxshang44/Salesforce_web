@@ -183,6 +183,13 @@ export class RetailersComponent {
 
   onDelete(retailer: Retailer): void {
     console.log('Delete retailer:', retailer);
+      if (confirm(`Are you sure you want to delete "${retailer.name}"?`)) {
+      // Remove the retailer from the list
+      this.retailers = this.retailers.filter(d => d.id !== retailer.id);
+      console.log('retailer deleted:', retailer);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(retailer: Retailer): void {

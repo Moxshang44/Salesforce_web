@@ -132,6 +132,13 @@ export class ProductMasterComponent {
 
   onDelete(product: Product) {
     console.log('Delete product:', product);
+      if (confirm(`Are you sure you want to delete "${product.name}"?`)) {
+      // Remove the product from the list
+      this.products = this.products.filter(d => d.id !== product.id);
+      console.log('product deleted:', product);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onToggleActive(product: Product) {

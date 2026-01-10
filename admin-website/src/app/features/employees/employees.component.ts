@@ -180,6 +180,13 @@ export class EmployeesComponent {
 
   onDelete(employee: Employee): void {
     console.log('Delete employee:', employee);
+      if (confirm(`Are you sure you want to delete "${employee.name}"?`)) {
+      // Remove the employee from the list
+      this.employees = this.employees.filter(d => d.id !== employee.id);
+      console.log('employee deleted:', employee);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(employee: Employee): void {

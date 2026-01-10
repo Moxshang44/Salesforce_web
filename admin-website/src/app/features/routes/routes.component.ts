@@ -182,6 +182,13 @@ export class RoutesComponent {
 
   onDelete(route: Route): void {
     console.log('Delete route:', route);
+      if (confirm(`Are you sure you want to delete "${route.routeName}"?`)) {
+      // Remove the route from the list
+      this.routes = this.routes.filter(d => d.id !== route.id);
+      console.log('route deleted:', route);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(route: Route): void {

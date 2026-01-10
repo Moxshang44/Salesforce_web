@@ -224,6 +224,13 @@ export class SchemeComponent {
 
   onDelete(scheme: Scheme): void {
     console.log('Delete scheme:', scheme);
+      if (confirm(`Are you sure you want to delete "${scheme.scheme}"?`)) {
+      // Remove the scheme from the list
+      this.schemes = this.schemes.filter(d => d.id !== scheme.id);
+      console.log('scheme deleted:', scheme);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(scheme: Scheme): void {
