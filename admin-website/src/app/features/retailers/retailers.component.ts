@@ -29,8 +29,10 @@ export class RetailersComponent {
   currentPage = 1;
   totalPages = 2;
   isAddModalOpen = false;
+  isViewModalOpen = false;
   currentStep = 1;
   pendingApprovalsCount = 5;
+  viewingRetailer: Retailer | null = null;
 
   // Filter options
   selectedCountryZone = '';
@@ -186,7 +188,13 @@ export class RetailersComponent {
   }
 
   onView(retailer: Retailer): void {
-    console.log('View retailer:', retailer);
+    this.viewingRetailer = retailer;
+    this.isViewModalOpen = true;
+  }
+
+  closeViewModal(): void {
+    this.isViewModalOpen = false;
+    this.viewingRetailer = null;
   }
 
   toggleDisable(retailer: Retailer): void {

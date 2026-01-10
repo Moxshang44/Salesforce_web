@@ -28,7 +28,9 @@ export class EmployeesComponent {
   currentPage = 1;
   totalPages = 2;
   isAddModalOpen = false;
+  isViewModalOpen = false;
   currentStep = 1;
+  viewingEmployee: Employee | null = null;
 
   employees: Employee[] = [
     {
@@ -183,7 +185,13 @@ export class EmployeesComponent {
   }
 
   onView(employee: Employee): void {
-    console.log('View employee:', employee);
+    this.viewingEmployee = employee;
+    this.isViewModalOpen = true;
+  }
+
+  closeViewModal(): void {
+    this.isViewModalOpen = false;
+    this.viewingEmployee = null;
   }
 
   onInfo(employee: Employee): void {

@@ -27,7 +27,9 @@ export class CategoryComponent {
   currentPage = 1;
   totalPages = 2;
   isAddModalOpen = false;
+  isViewModalOpen = false;
   currentStep = 1;
+  viewingCategory: Category | null = null;
 
   categories: Category[] = [
     {
@@ -164,7 +166,13 @@ export class CategoryComponent {
   }
 
   onView(category: Category): void {
-    console.log('View category:', category);
+    this.viewingCategory = category;
+    this.isViewModalOpen = true;
+  }
+
+  closeViewModal(): void {
+    this.isViewModalOpen = false;
+    this.viewingCategory = null;
   }
 
   toggleActive(category: Category): void {

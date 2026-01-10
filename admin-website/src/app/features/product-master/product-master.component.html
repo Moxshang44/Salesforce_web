@@ -93,7 +93,7 @@
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                       </button>
-                      <button class="action-btn view" (click)="onEdit(product)" title="View">
+                      <button class="action-btn view" (click)="onView(product)" title="View">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                           <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -181,6 +181,72 @@
         (save)="onSaveStep4($event)"
         (previous)="onPreviousStep()"
       ></app-product-form-step4>
+    }
+  </app-modal>
+
+  <!-- View Product Modal -->
+  <app-modal
+    [isOpen]="isViewModalOpen"
+    [title]="viewingProduct ? 'View Product Details' : 'Product Details'"
+    width="800px"
+    (close)="closeViewModal()"
+  >
+    @if (viewingProduct) {
+      <div class="view-modal-content">
+        <div class="detail-section">
+          <h3 class="detail-section-title">Basic Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label class="detail-label">Product Name</label>
+              <p class="detail-value">{{ viewingProduct.name }}</p>
+            </div>
+            <div class="detail-item">
+              <label class="detail-label">Product ID</label>
+              <p class="detail-value">{{ viewingProduct.id }}</p>
+            </div>
+            <div class="detail-item">
+              <label class="detail-label">Brand</label>
+              <p class="detail-value">{{ viewingProduct.brand }}</p>
+            </div>
+            <div class="detail-item">
+              <label class="detail-label">Type Code</label>
+              <p class="detail-value">{{ viewingProduct.typeCode }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3 class="detail-section-title">Classification</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label class="detail-label">Category</label>
+              <p class="detail-value">{{ viewingProduct.category }}</p>
+            </div>
+            <div class="detail-item">
+              <label class="detail-label">Subcategory</label>
+              <p class="detail-value">{{ viewingProduct.subcategory }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3 class="detail-section-title">Status</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label class="detail-label">Active</label>
+              <p class="detail-value">
+                <span class="status-badge" [class.active]="viewingProduct.active" [class.inactive]="!viewingProduct.active">
+                  {{ viewingProduct.active ? 'Yes' : 'No' }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-close" (click)="closeViewModal()">Close</button>
+        </div>
+      </div>
     }
   </app-modal>
 </div>

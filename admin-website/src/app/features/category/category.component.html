@@ -143,4 +143,60 @@
       ></app-category-form-step1>
     }
   </app-modal>
+
+  <!-- View Category Modal -->
+  <app-modal
+    [isOpen]="isViewModalOpen"
+    [title]="viewingCategory ? 'View Category Details' : 'Category Details'"
+    width="800px"
+    (close)="closeViewModal()"
+  >
+    @if (viewingCategory) {
+      <div class="view-modal-content">
+        <div class="detail-section">
+          <h3 class="detail-section-title">Basic Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label class="detail-label">Category Name</label>
+              <p class="detail-value">{{ viewingCategory.categoryName }}</p>
+            </div>
+            <div class="detail-item">
+              <label class="detail-label">Category Code</label>
+              <p class="detail-value">{{ viewingCategory.categoryCode }}</p>
+            </div>
+            <div class="detail-item">
+              <label class="detail-label">Products Count</label>
+              <p class="detail-value">{{ viewingCategory.productsCount }}</p>
+            </div>
+            <div class="detail-item">
+              <label class="detail-label">Status</label>
+              <p class="detail-value">
+                <span class="status-badge" [class.active]="viewingCategory.isActive" [class.inactive]="!viewingCategory.isActive">
+                  {{ viewingCategory.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3 class="detail-section-title">Timestamp Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label class="detail-label">Created Date</label>
+              <p class="detail-value">{{ viewingCategory.createdDate }}</p>
+            </div>
+            <div class="detail-item">
+              <label class="detail-label">Created Ago</label>
+              <p class="detail-value">{{ viewingCategory.createdAgo }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-close" (click)="closeViewModal()">Close</button>
+        </div>
+      </div>
+    }
+  </app-modal>
 </div>

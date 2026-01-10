@@ -136,5 +136,61 @@
         ></app-route-form-step1>
       }
     </app-modal>
+
+    <!-- View Route Modal -->
+    <app-modal
+      [isOpen]="isViewModalOpen"
+      [title]="viewingRoute ? 'View Route Details' : 'Route Details'"
+      width="800px"
+      (close)="closeViewModal()"
+    >
+      @if (viewingRoute) {
+        <div class="view-modal-content">
+          <div class="detail-section">
+            <h3 class="detail-section-title">Basic Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Route Name</label>
+                <p class="detail-value">{{ viewingRoute.routeName }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Route Code</label>
+                <p class="detail-value">{{ viewingRoute.routeCode }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Channel</label>
+                <p class="detail-value">{{ viewingRoute.channel }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Status</label>
+                <p class="detail-value">
+                  <span class="status-badge" [class.active]="viewingRoute.active" [class.inactive]="!viewingRoute.active">
+                    {{ viewingRoute.active ? 'Active' : 'Inactive' }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="detail-section-title">Location Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Area</label>
+                <p class="detail-value">{{ viewingRoute.area }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Region</label>
+                <p class="detail-value">{{ viewingRoute.region }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-close" (click)="closeViewModal()">Close</button>
+          </div>
+        </div>
+      }
+    </app-modal>
   </div>
 </div>

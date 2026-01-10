@@ -151,6 +151,76 @@
         ></app-brand-form-step2>
       }
     </app-modal>
+
+    <!-- View Brand Modal -->
+    <app-modal
+      [isOpen]="isViewModalOpen"
+      [title]="viewingBrand ? 'View Brand Details' : 'Brand Details'"
+      width="800px"
+      (close)="closeViewModal()"
+    >
+      @if (viewingBrand) {
+        <div class="view-modal-content">
+          <div class="detail-section">
+            <h3 class="detail-section-title">Basic Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Brand Name</label>
+                <p class="detail-value">{{ viewingBrand.brandName }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Brand Code</label>
+                <p class="detail-value">{{ viewingBrand.brandCode }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Description</label>
+                <p class="detail-value">{{ viewingBrand.description }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Status</label>
+                <p class="detail-value">
+                  <span class="status-badge" [class.active]="viewingBrand.isActive" [class.inactive]="!viewingBrand.isActive">
+                    {{ viewingBrand.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="detail-section-title">Catalog Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Categories</label>
+                <p class="detail-value">{{ viewingBrand.categoriesCount }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Products</label>
+                <p class="detail-value">{{ viewingBrand.productsCount }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="detail-section-title">Timestamp Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Created Date</label>
+                <p class="detail-value">{{ viewingBrand.createdDate }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Created Ago</label>
+                <p class="detail-value">{{ viewingBrand.createdAgo }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-close" (click)="closeViewModal()">Close</button>
+          </div>
+        </div>
+      }
+    </app-modal>
   </div>
 </div>
 

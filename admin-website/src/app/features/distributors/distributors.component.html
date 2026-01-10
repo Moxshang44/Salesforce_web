@@ -275,5 +275,57 @@
         ></app-distributor-form-step3>
       }
     </app-modal>
+
+    <!-- View Distributor Modal -->
+    <app-modal
+      [isOpen]="isViewModalOpen"
+      [title]="viewingDistributor ? 'View Distributor Details' : 'Distributor Details'"
+      width="800px"
+      (close)="closeViewModal()"
+    >
+      @if (viewingDistributor) {
+        <div class="view-modal-content">
+          <div class="detail-section">
+            <h3 class="detail-section-title">Basic Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Distributor Name</label>
+                <p class="detail-value">{{ viewingDistributor.name }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Distributor ID</label>
+                <p class="detail-value">{{ viewingDistributor.distributorId }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Contact Name</label>
+                <p class="detail-value">{{ viewingDistributor.contactName }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Contact Phone</label>
+                <p class="detail-value">{{ viewingDistributor.contactPhone }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="detail-section-title">Location Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Area Address</label>
+                <p class="detail-value">{{ viewingDistributor.areaAddress }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Routes Coverage</label>
+                <p class="detail-value">{{ viewingDistributor.routesCover }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-close" (click)="closeViewModal()">Close</button>
+          </div>
+        </div>
+      }
+    </app-modal>
   </div>
 </div>

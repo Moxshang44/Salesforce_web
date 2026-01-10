@@ -31,7 +31,9 @@ export class ProductMasterComponent {
   currentPage = 1;
   totalPages = 2;
   isAddModalOpen = false;
+  isViewModalOpen = false;
   currentStep: number = 1;
+  viewingProduct: Product | null = null;
   
   products: Product[] = [
     {
@@ -218,6 +220,16 @@ export class ProductMasterComponent {
 
   onFilter() {
     console.log('Filter');
+  }
+
+  onView(product: Product): void {
+    this.viewingProduct = product;
+    this.isViewModalOpen = true;
+  }
+
+  closeViewModal(): void {
+    this.isViewModalOpen = false;
+    this.viewingProduct = null;
   }
 
   onSearch(event: Event) {

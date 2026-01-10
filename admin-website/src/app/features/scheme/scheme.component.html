@@ -152,5 +152,79 @@
         ></app-scheme-form-step2>
       }
     </app-modal>
+
+    <!-- View Scheme Modal -->
+    <app-modal
+      [isOpen]="isViewModalOpen"
+      [title]="viewingScheme ? 'View Scheme Details' : 'Scheme Details'"
+      width="800px"
+      (close)="closeViewModal()"
+    >
+      @if (viewingScheme) {
+        <div class="view-modal-content">
+          <div class="detail-section">
+            <h3 class="detail-section-title">Product Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Product Name</label>
+                <p class="detail-value">{{ viewingScheme.productName }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">SKU Code</label>
+                <p class="detail-value">{{ viewingScheme.skuCode }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Status</label>
+                <p class="detail-value">
+                  <span class="status-badge" [class.active]="viewingScheme.isActive" [class.inactive]="!viewingScheme.isActive">
+                    {{ viewingScheme.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="detail-section-title">Scheme Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Scheme</label>
+                <p class="detail-value">{{ viewingScheme.scheme }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Scheme Type</label>
+                <p class="detail-value">{{ viewingScheme.schemeType }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Date Range</label>
+                <p class="detail-value">{{ viewingScheme.dateRange }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Options</label>
+                <p class="detail-value">{{ viewingScheme.options }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="detail-section-title">Geographic Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Zone</label>
+                <p class="detail-value">{{ viewingScheme.zone }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Regions</label>
+                <p class="detail-value">{{ viewingScheme.regions }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-close" (click)="closeViewModal()">Close</button>
+          </div>
+        </div>
+      }
+    </app-modal>
   </div>
 </div>

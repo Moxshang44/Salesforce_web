@@ -28,7 +28,9 @@ export class RoutesComponent {
   currentPage = 1;
   totalPages = 2;
   isAddModalOpen = false;
+  isViewModalOpen = false;
   currentStep = 1;
+  viewingRoute: Route | null = null;
 
   routes: Route[] = [
     {
@@ -185,7 +187,13 @@ export class RoutesComponent {
   }
 
   onView(route: Route): void {
-    console.log('View route:', route);
+    this.viewingRoute = route;
+    this.isViewModalOpen = true;
+  }
+
+  closeViewModal(): void {
+    this.isViewModalOpen = false;
+    this.viewingRoute = null;
   }
 
   onViewDetails(route: Route): void {

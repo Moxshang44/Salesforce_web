@@ -32,7 +32,9 @@ export class SchemeComponent {
   currentPage = 1;
   totalPages = 2;
   isAddModalOpen = false;
+  isViewModalOpen = false;
   currentStep = 1;
+  viewingScheme: Scheme | null = null;
 
   schemes: Scheme[] = [
     {
@@ -227,7 +229,13 @@ export class SchemeComponent {
   }
 
   onView(scheme: Scheme): void {
-    console.log('View scheme:', scheme);
+    this.viewingScheme = scheme;
+    this.isViewModalOpen = true;
+  }
+
+  closeViewModal(): void {
+    this.isViewModalOpen = false;
+    this.viewingScheme = null;
   }
 
   toggleActive(scheme: Scheme): void {

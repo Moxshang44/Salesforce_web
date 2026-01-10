@@ -279,5 +279,61 @@
         ></app-retailer-form-step2>
       }
     </app-modal>
+
+    <!-- View Retailer Modal -->
+    <app-modal
+      [isOpen]="isViewModalOpen"
+      [title]="viewingRetailer ? 'View Retailer Details' : 'Retailer Details'"
+      width="800px"
+      (close)="closeViewModal()"
+    >
+      @if (viewingRetailer) {
+        <div class="view-modal-content">
+          <div class="detail-section">
+            <h3 class="detail-section-title">Basic Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Retailer Name</label>
+                <p class="detail-value">{{ viewingRetailer.name }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Retailer Code</label>
+                <p class="detail-value">{{ viewingRetailer.code }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Contact</label>
+                <p class="detail-value">{{ viewingRetailer.contact }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Status</label>
+                <p class="detail-value">
+                  <span class="status-badge" [class.active]="!viewingRetailer.isDisabled" [class.inactive]="viewingRetailer.isDisabled">
+                    {{ viewingRetailer.isDisabled ? 'Disabled' : 'Active' }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3 class="detail-section-title">Location Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label class="detail-label">Route</label>
+                <p class="detail-value">{{ viewingRetailer.route }}</p>
+              </div>
+              <div class="detail-item">
+                <label class="detail-label">Address</label>
+                <p class="detail-value">{{ viewingRetailer.address || 'N/A' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-close" (click)="closeViewModal()">Close</button>
+          </div>
+        </div>
+      }
+    </app-modal>
   </div>
 </div>

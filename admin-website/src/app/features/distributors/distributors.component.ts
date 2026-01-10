@@ -31,7 +31,9 @@ export class DistributorsComponent {
   currentPage = 1;
   totalPages = 2;
   isAddModalOpen = false;
+  isViewModalOpen = false;
   currentStep = 1;
+  viewingDistributor: Distributor | null = null;
 
   constructor(private router: Router) {}
 
@@ -205,8 +207,13 @@ export class DistributorsComponent {
   }
 
   onView(distributor: Distributor): void {
-    console.log('View distributor:', distributor);
-    this.router.navigate(['/admin/distributors', distributor.id, 'stock']);
+    this.viewingDistributor = distributor;
+    this.isViewModalOpen = true;
+  }
+
+  closeViewModal(): void {
+    this.isViewModalOpen = false;
+    this.viewingDistributor = null;
   }
 
   onRowClick(distributor: Distributor): void {
