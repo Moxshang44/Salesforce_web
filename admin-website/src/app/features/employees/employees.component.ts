@@ -29,6 +29,18 @@ export class EmployeesComponent {
   totalPages = 2;
   isAddModalOpen = false;
   currentStep = 1;
+  searchTerm = '';
+
+  get filteredEmployees(): Employee[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.employees;
+    return this.employees.filter(e =>
+      (e.name || '').toLowerCase().includes(term) ||
+      (e.code || '').toLowerCase().includes(term) ||
+      (e.role || '').toLowerCase().includes(term) ||
+      (e.reportingTo || '').toLowerCase().includes(term)
+    );
+  }
 
   employees: Employee[] = [
     {
@@ -172,6 +184,10 @@ export class EmployeesComponent {
 
   onFilter(): void {
     console.log('Filter clicked');
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term || '';
   }
 
   onEdit(employee: Employee): void {

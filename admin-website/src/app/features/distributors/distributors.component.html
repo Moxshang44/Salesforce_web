@@ -107,17 +107,12 @@
           </button>
         </div>
 
-        <div class="search-filter">
+          <div class="search-filter">
           <div class="search-box">
             <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <input 
-              type="text" 
-              placeholder="Q Search..." 
-              class="search-input"
-              (input)="onSearch($event)"
-            />
+            <input #searchBox type="text" placeholder="Search..." class="search-input" (input)="onSearch(searchBox.value)" [value]="searchTerm" />
           </div>
         </div>
       </div>
@@ -187,7 +182,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (distributor of distributors; track distributor.id) {
+              @for (distributor of filteredDistributors; track distributor.id) {
                 <tr class="table-row" (click)="onRowClick(distributor)">
                   <td class="col-action" (click)="$event.stopPropagation()">
                     <div class="action-buttons">

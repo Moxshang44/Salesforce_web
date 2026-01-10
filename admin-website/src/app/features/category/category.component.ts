@@ -28,6 +28,16 @@ export class CategoryComponent {
   totalPages = 2;
   isAddModalOpen = false;
   currentStep = 1;
+  searchTerm = '';
+
+  get filteredCategories(): Category[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.categories;
+    return this.categories.filter(c =>
+      (c.categoryName || '').toLowerCase().includes(term) ||
+      (c.categoryCode || '').toLowerCase().includes(term)
+    );
+  }
 
   categories: Category[] = [
     {
@@ -153,6 +163,10 @@ export class CategoryComponent {
 
   onFilter(): void {
     console.log('Filter clicked');
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term || '';
   }
 
   onEdit(category: Category): void {

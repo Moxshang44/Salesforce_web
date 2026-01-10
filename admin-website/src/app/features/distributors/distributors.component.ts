@@ -46,6 +46,19 @@ export class DistributorsComponent {
   areaOptions = ['Area A', 'Area B', 'Area C', 'Area D', 'Area E'];
   superStockistOptions = ['Super Stockist 1', 'Super Stockist 2', 'Super Stockist 3', 'Super Stockist 4'];
 
+  searchTerm = '';
+
+  get filteredDistributors(): Distributor[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.distributors;
+    return this.distributors.filter(d =>
+      (d.name || '').toLowerCase().includes(term) ||
+      (d.distributorId || '').toLowerCase().includes(term) ||
+      (d.contactName || '').toLowerCase().includes(term) ||
+      (d.areaAddress || '').toLowerCase().includes(term)
+    );
+  }
+
   distributors: Distributor[] = [
     {
       id: 1,
@@ -213,9 +226,8 @@ export class DistributorsComponent {
     this.router.navigate(['/admin/distributors', distributor.id, 'stock']);
   }
 
-  onSearch(event: Event) {
-    const input = event.target as HTMLInputElement;
-    console.log('Search:', input.value);
+  onSearch(term: string) {
+    this.searchTerm = term || '';
   }
 
   goToPage(page: number) {

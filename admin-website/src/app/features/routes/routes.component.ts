@@ -29,6 +29,18 @@ export class RoutesComponent {
   totalPages = 2;
   isAddModalOpen = false;
   currentStep = 1;
+  searchTerm = '';
+
+  get filteredRoutes(): Route[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.routes;
+    return this.routes.filter(r =>
+      (r.routeName || '').toLowerCase().includes(term) ||
+      (r.routeCode || '').toLowerCase().includes(term) ||
+      (r.area || '').toLowerCase().includes(term) ||
+      (r.region || '').toLowerCase().includes(term)
+    );
+  }
 
   routes: Route[] = [
     {
@@ -174,6 +186,10 @@ export class RoutesComponent {
 
   onFilter(): void {
     console.log('Filter clicked');
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term || '';
   }
 
   onEdit(route: Route): void {

@@ -107,16 +107,11 @@
         </div>
         
           <div class="search-filter">
-          <div class="search-box">
+            <div class="search-box">
               <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                class="search-input"
-                (input)="onSearch($event)"
-              />
+              <input #searchBox type="text" placeholder="Search..." class="search-input" (input)="onSearch(searchBox.value)" [value]="searchTerm" />
             </div>
           </div>
         </div>
@@ -177,7 +172,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (item of stockItems; track item.id) {
+            @for (item of filteredStockItems; track item.id) {
                   <tr>
                 <td class="col-sku">
                   <div class="sku-info">

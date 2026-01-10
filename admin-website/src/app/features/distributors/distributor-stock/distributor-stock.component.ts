@@ -104,6 +104,21 @@ export class DistributorStockComponent implements OnInit {
   selectedClaim: ClaimItem | null = null;
   showClaimSidebar = false;
 
+  searchTerm = '';
+
+  get filteredStockItems(): StockItem[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.stockItems;
+    return this.stockItems.filter(i =>
+      (i.productName || '').toLowerCase().includes(term) ||
+      (i.sku || '').toLowerCase().includes(term)
+    );
+  }
+
+  onSearch(term: string) {
+    this.searchTerm = term || '';
+  }
+
   stockItems: StockItem[] = [
     {
       id: 1,
@@ -621,10 +636,7 @@ export class DistributorStockComponent implements OnInit {
     return this.schemeProducts.reduce((sum, p) => sum + (p.quantity || 0), 0);
   }
 
-  onSearch(event: Event) {
-    const input = event.target as HTMLInputElement;
-    console.log('Search:', input.value);
-  }
+  
 
   goToPage(page: number) {
     this.currentPage = page;

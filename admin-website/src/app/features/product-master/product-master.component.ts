@@ -32,6 +32,17 @@ export class ProductMasterComponent {
   totalPages = 2;
   isAddModalOpen = false;
   currentStep: number = 1;
+  searchTerm = '';
+
+  get filteredProducts(): Product[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.products;
+    return this.products.filter(p =>
+      (p.brand || '').toLowerCase().includes(term) ||
+      (p.typeCode || '').toLowerCase().includes(term) ||
+      (p.name || '').toLowerCase().includes(term)
+    );
+  }
   
   products: Product[] = [
     {
@@ -220,9 +231,8 @@ export class ProductMasterComponent {
     console.log('Filter');
   }
 
-  onSearch(event: Event) {
-    const input = event.target as HTMLInputElement;
-    console.log('Search:', input.value);
+  onSearch(term: string) {
+    this.searchTerm = term || '';
   }
 
   goToPage(page: number) {

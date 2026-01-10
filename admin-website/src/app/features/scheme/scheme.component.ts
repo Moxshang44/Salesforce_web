@@ -33,6 +33,17 @@ export class SchemeComponent {
   totalPages = 2;
   isAddModalOpen = false;
   currentStep = 1;
+  searchTerm = '';
+
+  get filteredSchemes(): Scheme[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.schemes;
+    return this.schemes.filter(s =>
+      (s.productName || '').toLowerCase().includes(term) ||
+      (s.skuCode || '').toLowerCase().includes(term) ||
+      (s.scheme || '').toLowerCase().includes(term)
+    );
+  }
 
   schemes: Scheme[] = [
     {
@@ -216,6 +227,10 @@ export class SchemeComponent {
 
   onFilter(): void {
     console.log('Filter clicked');
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term || '';
   }
 
   onEdit(scheme: Scheme): void {

@@ -31,6 +31,18 @@ export class RetailersComponent {
   isAddModalOpen = false;
   currentStep = 1;
   pendingApprovalsCount = 5;
+  searchTerm = '';
+
+  get filteredRetailers(): Retailer[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.retailers;
+    return this.retailers.filter(r =>
+      (r.name || '').toLowerCase().includes(term) ||
+      (r.code || '').toLowerCase().includes(term) ||
+      (r.contact || '').toLowerCase().includes(term) ||
+      (r.route || '').toLowerCase().includes(term)
+    );
+  }
 
   // Filter options
   selectedCountryZone = '';
@@ -211,9 +223,8 @@ export class RetailersComponent {
     }
   }
 
-  onSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    console.log('Search:', input.value);
+  onSearch(term: string): void {
+    this.searchTerm = term || '';
   }
 
   onRowClick(retailer: Retailer): void {

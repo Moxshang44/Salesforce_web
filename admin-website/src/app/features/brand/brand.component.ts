@@ -31,6 +31,17 @@ export class BrandComponent {
   totalPages = 2;
   isAddModalOpen = false;
   currentStep = 1;
+  searchTerm = '';
+
+  get filteredBrands(): Brand[] {
+    const term = this.searchTerm?.trim().toLowerCase();
+    if (!term) return this.brands;
+    return this.brands.filter(b =>
+      (b.brandName || '').toLowerCase().includes(term) ||
+      (b.brandCode || '').toLowerCase().includes(term) ||
+      (b.description || '').toLowerCase().includes(term)
+    );
+  }
 
   brands: Brand[] = [
     {
@@ -194,6 +205,10 @@ export class BrandComponent {
 
   onFilter(): void {
     console.log('Filter clicked');
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term || '';
   }
 
   onEdit(brand: Brand): void {
