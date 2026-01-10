@@ -36,11 +36,32 @@
                   routerLinkActive="active"
                   class="sub-nav-item"
                 >
+                  @if (subItem.iconImage) {
+                    <img [src]="subItem.iconImage" [alt]="subItem.label" class="sub-nav-icon-img">
+                  }
                   <span class="sub-nav-label">
                     <span class="arrow-left">>></span>
                     {{ subItem.label }}
                     <span class="arrow-right"><<</span>
                   </span>
+                </a>
+              }
+            </div>
+          }
+
+          <!-- Sub-menu items (collapsed view - icon grid) -->
+          @if (item.isExpanded && isCollapsed) {
+            <div class="sub-menu-collapsed">
+              @for (subItem of item.subItems; track subItem.route) {
+                <a 
+                  [routerLink]="subItem.route" 
+                  routerLinkActive="active"
+                  class="sub-nav-item-collapsed"
+                  [title]="subItem.label"
+                >
+                  @if (subItem.iconImage) {
+                    <img [src]="subItem.iconImage" [alt]="subItem.label" class="sub-nav-icon-img">
+                  }
                 </a>
               }
             </div>
