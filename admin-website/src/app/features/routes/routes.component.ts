@@ -178,10 +178,18 @@ export class RoutesComponent {
 
   onEdit(route: Route): void {
     console.log('Edit route:', route);
+     this.currentStep = 1;
+    this.isAddModalOpen = true;
   }
 
   onDelete(route: Route): void {
-    console.log('Delete route:', route);
+    if (confirm(`Are you sure you want to delete "${route.routeName}"?`)) {
+      // Remove the route from the list
+      this.routes = this.routes.filter(r => r.id !== route.id);
+      console.log('Route deleted:', route);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(route: Route): void {

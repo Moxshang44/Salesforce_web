@@ -1,6 +1,7 @@
 <div class="category-form-step1">
+  <!-- Row 1: Category Name | Select Brand | Category Code -->
   <div class="form-row">
-    <div class="form-group full-width">
+    <div class="form-group col-fluid">
       <label for="categoryName">Category Name</label>
       <input
         type="text"
@@ -16,10 +17,42 @@
         <span class="error-message">{{ errors['categoryName'] }}</span>
       }
     </div>
+
+    <div class="form-group col-auto">
+      <label for="selectBrand">Select Brand</label>
+      <select
+        id="selectBrand"
+        [(ngModel)]="categoryData.selectedBrand"
+        class="form-select"
+      >
+        <option value="">Select</option>
+        <option value="brand1">Brand 1</option>
+        <option value="brand2">Brand 2</option>
+        <option value="brand3">Brand 3</option>
+      </select>
+    </div>
+
+    <div class="form-group col-auto">
+      <label for="categoryCode">Category Code (Auto)</label>
+      <input
+        type="text"
+        id="categoryCode"
+        [class.error]="errors['categoryCode']"
+        [(ngModel)]="categoryData.categoryCode"
+        placeholder="#CAT1000"
+        class="form-input"
+        (input)="clearError('categoryCode')"
+        required
+      />
+      @if (errors['categoryCode']) {
+        <span class="error-message">{{ errors['categoryCode'] }}</span>
+      }
+    </div>
   </div>
 
+  <!-- Row 2: Sub Category | Select Country | Select Zone -->
   <div class="form-row">
-    <div class="form-group">
+    <div class="form-group col-fluid">
       <label for="subCategoryName">Sub Category Name (Optional)</label>
       <div class="sub-category-input-group">
         <input
@@ -47,39 +80,8 @@
         </div>
       }
     </div>
-    <div class="form-group">
-      <label for="categoryCode">Category Code (Auto)</label>
-      <input
-        type="text"
-        id="categoryCode"
-        [class.error]="errors['categoryCode']"
-        [(ngModel)]="categoryData.categoryCode"
-        placeholder="#CAT1000"
-        class="form-input"
-        (input)="clearError('categoryCode')"
-        required
-      />
-      @if (errors['categoryCode']) {
-        <span class="error-message">{{ errors['categoryCode'] }}</span>
-      }
-    </div>
-  </div>
 
-  <div class="form-row">
-    <div class="form-group">
-      <label for="selectBrand">Select Brand</label>
-      <select
-        id="selectBrand"
-        [(ngModel)]="categoryData.selectedBrand"
-        class="form-select"
-      >
-        <option value="">Select</option>
-        <option value="brand1">Brand 1</option>
-        <option value="brand2">Brand 2</option>
-        <option value="brand3">Brand 3</option>
-      </select>
-    </div>
-    <div class="form-group">
+    <div class="form-group col-auto">
       <label for="selectCountry">Select Country</label>
       <select
         id="selectCountry"
@@ -91,7 +93,8 @@
         <option value="All Selected">All Selected</option>
       </select>
     </div>
-    <div class="form-group">
+
+    <div class="form-group col-auto">
       <label for="selectZone">Select Zone</label>
       <select
         id="selectZone"
@@ -197,7 +200,13 @@
   </div>
 
   <div class="form-actions">
-    <app-button variant="secondary" (click)="onCancel()">Cancel</app-button>
+    <button 
+      type="button" 
+      class="btn-cancel"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
     <app-button variant="primary" (click)="onSave()">Save & Next</app-button>
   </div>
 </div>

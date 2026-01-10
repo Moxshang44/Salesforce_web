@@ -128,10 +128,18 @@ export class ProductMasterComponent {
 
   onEdit(product: Product) {
     console.log('Edit product:', product);
+     this.currentStep = 1;
+    this.isAddModalOpen = true;
   }
 
   onDelete(product: Product) {
-    console.log('Delete product:', product);
+    if (confirm(`Are you sure you want to delete "${product.name}"?`)) {
+      // Remove the product from the list
+      this.products = this.products.filter(p => p.id !== product.id);
+      console.log('Product deleted:', product);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onToggleActive(product: Product) {

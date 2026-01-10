@@ -1,8 +1,9 @@
 <div class="form-container">
   <form class="brand-form">
-    <!-- Brand Name -->
-    <div class="form-row">
-      <div class="form-group full-width">
+    <!-- Brand Name, Brand Code, and Brand Visibility Control - Top Row -->
+    <div class="form-row form-row-three-cols">
+      <!-- Brand Name -->
+      <div class="form-group">
         <label class="form-label">Brand Name</label>
         <input 
           type="text" 
@@ -19,11 +20,9 @@
           <span class="error-message">{{ errors['brandName'] }}</span>
         }
       </div>
-    </div>
 
-    <!-- Brand Code -->
-    <div class="form-row">
-      <div class="form-group full-width">
+      <!-- Brand Code -->
+      <div class="form-group">
         <label class="form-label">
           Brand Code <span class="auto-badge">Auto</span>
         </label>
@@ -41,30 +40,30 @@
           <span class="error-message">{{ errors['brandCode'] }}</span>
         }
       </div>
-    </div>
 
-    <!-- Brand Visibility Control -->
-    <div class="form-section">
-      <label class="section-label">Brand Visibility Control</label>
-      <div class="checkbox-row">
-        <label class="checkbox-item">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="formData.availableInAllRegions"
-            name="availableInAllRegions"
-            class="checkbox-input"
-          >
-          <span class="checkbox-label">Available in all regions</span>
-        </label>
-        <label class="checkbox-item">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="formData.limitedLaunch"
-            name="limitedLaunch"
-            class="checkbox-input"
-          >
-          <span class="checkbox-label">Limited launch</span>
-        </label>
+      <!-- Brand Visibility Control -->
+      <div class="form-group">
+        <label class="form-label">Brand Visibility Control</label>
+        <div class="checkbox-inline">
+          <label class="checkbox-item">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="formData.availableInAllRegions"
+              name="availableInAllRegions"
+              class="checkbox-input"
+            >
+            <span class="checkbox-label">Available in all regions</span>
+          </label>
+          <label class="checkbox-item">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="formData.limitedLaunch"
+              name="limitedLaunch"
+              class="checkbox-input"
+            >
+            <span class="checkbox-label">Limited launch</span>
+          </label>
+        </div>
       </div>
     </div>
 

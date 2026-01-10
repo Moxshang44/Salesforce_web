@@ -10,6 +10,17 @@
   margin-bottom: 20px;
 }
 
+/* Column helpers for responsive rows */
+.col-fluid {
+  flex: 1 1 0;
+  min-width: 160px;
+}
+
+.col-auto {
+  flex: 0 0 240px;
+  max-width: 320px;
+}
+
 .form-group {
   flex: 1;
   display: flex;
@@ -118,6 +129,8 @@
   font-size: 13px;
   color: #2c3e50;
 
+
+
   .remove-btn {
     background: none;
     border: none;
@@ -141,7 +154,39 @@
   }
 }
 
+
+.btn-cancel{
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.5);
+  color: #666;
+  border: 1px solid rgba(221, 221, 221, 0.7);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: #999;
+  }
+}
+
 .form-section {
+  width: max-content;
   margin-bottom: 24px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.2);
