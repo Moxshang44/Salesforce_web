@@ -100,18 +100,20 @@ export class SidebarComponent {
     }
   }
 
-  toggleSidebar(): void {
-    this.isCollapsed = !this.isCollapsed;
+  onSidebarHover(): void {
+    this.isCollapsed = false;
+    document.documentElement.style.setProperty('--sidebar-width', '220px');
+  }
+
+  onSidebarLeave(): void {
+    this.isCollapsed = true;
     // Close all sub-menus when collapsing
-    if (this.isCollapsed) {
-      this.navItems.forEach(item => {
-        if (item.subItems) {
-          item.isExpanded = false;
-        }
-      });
-    }
-    // Update CSS variable for main content margin
-    document.documentElement.style.setProperty('--sidebar-width', this.isCollapsed ? '70px' : '220px');
+    this.navItems.forEach(item => {
+      if (item.subItems) {
+        item.isExpanded = false;
+      }
+    });
+    document.documentElement.style.setProperty('--sidebar-width', '70px');
   }
 }
 

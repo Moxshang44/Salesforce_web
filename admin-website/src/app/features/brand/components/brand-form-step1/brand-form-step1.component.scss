@@ -49,6 +49,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+
+  &.form-row-three-cols {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }
 
 .form-group {
@@ -121,6 +125,7 @@
 
 // Form Sections
 .form-section {
+  width: max-content;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -148,6 +153,13 @@
   padding: 12px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 6px;
+}
+
+.checkbox-inline {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .checkbox-item {
@@ -250,6 +262,7 @@
 
 // File Upload Area
 .file-upload-area {
+  width: max-content;
   border: 2px dashed rgba(221, 221, 221, 0.7);
   border-radius: 8px;
   padding: 40px 20px;

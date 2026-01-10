@@ -176,10 +176,18 @@ export class EmployeesComponent {
 
   onEdit(employee: Employee): void {
     console.log('Edit employee:', employee);
+     this.currentStep = 1;
+    this.isAddModalOpen = true;
   }
 
   onDelete(employee: Employee): void {
-    console.log('Delete employee:', employee);
+    if (confirm(`Are you sure you want to delete "${employee.name}"?`)) {
+      // Remove the employee from the list
+      this.employees = this.employees.filter(e => e.id !== employee.id);
+      console.log('Employee deleted:', employee);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(employee: Employee): void {

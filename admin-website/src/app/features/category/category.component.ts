@@ -157,10 +157,18 @@ export class CategoryComponent {
 
   onEdit(category: Category): void {
     console.log('Edit category:', category);
+    this.currentStep = 1;
+    this.isAddModalOpen = true;
   }
 
   onDelete(category: Category): void {
-    console.log('Delete category:', category);
+    if (confirm(`Are you sure you want to delete "${category.categoryName}"?`)) {
+      // Remove the category from the list
+      this.categories = this.categories.filter(c => c.id !== category.id);
+      console.log('Category deleted:', category);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(category: Category): void {

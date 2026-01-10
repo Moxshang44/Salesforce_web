@@ -179,10 +179,18 @@ export class RetailersComponent {
 
   onEdit(retailer: Retailer): void {
     console.log('Edit retailer:', retailer);
+     this.currentStep = 1;
+    this.isAddModalOpen = true;
   }
 
   onDelete(retailer: Retailer): void {
-    console.log('Delete retailer:', retailer);
+    if (confirm(`Are you sure you want to delete "${retailer.name}"?`)) {
+      // Remove the retailer from the list
+      this.retailers = this.retailers.filter(r => r.id !== retailer.id);
+      console.log('Retailer deleted:', retailer);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(retailer: Retailer): void {

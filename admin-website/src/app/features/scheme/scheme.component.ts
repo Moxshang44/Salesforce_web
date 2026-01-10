@@ -220,10 +220,18 @@ export class SchemeComponent {
 
   onEdit(scheme: Scheme): void {
     console.log('Edit scheme:', scheme);
+     this.currentStep = 1;
+    this.isAddModalOpen = true;
   }
 
   onDelete(scheme: Scheme): void {
-    console.log('Delete scheme:', scheme);
+    if (confirm(`Are you sure you want to delete "${scheme.schemeName}"?`)) {
+      // Remove the scheme from the list
+      this.schemes = this.schemes.filter(s => s.id !== scheme.id);
+      console.log('Scheme deleted:', scheme);
+    } else {
+      console.log('Delete cancelled');
+    }
   }
 
   onView(scheme: Scheme): void {
