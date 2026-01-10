@@ -10,21 +10,36 @@ router.get('/', async (req, res) => {
     const xmlRequest = xmlBuilder.getAllStockItems();
     const response = await tallyService.sendRequest(xmlRequest);
     
-    // Extract from importdata structure similar to ledgers
-    let tallyMessages = response?.envelope?.body?.importdata?.requestdata?.tallymessage || [];
+    // Stock Summary report returns data in exportdata structure
+    let stockItems = [];
     
-    // Also try direct path for stock summary
-    let stockItems = response?.envelope?.dspstkitem || [];
+    // Try multiple possible response paths for Stock Summary
+    const exportData = response?.envelope?.body?.exportdata || response?.envelope?.body?.data || response?.body?.exportdata || response?.body?.data;
     
-    // If we got tallymessages, extract stock items
-    if (Array.isArray(tallyMessages) && tallyMessages.length > 0) {
-      stockItems = [];
-      tallyMessages.forEach(msg => {
-        if (msg.stockitem) {
-          const items = Array.isArray(msg.stockitem) ? msg.stockitem : [msg.stockitem];
-          stockItems.push(...items);
-        }
-      });
+    if (exportData) {
+      // Stock Summary can return data in various structures
+      const collection = exportData.collection || exportData.COLLECTION || exportData.row || exportData.ROW;
+      
+      if (collection) {
+        stockItems = Array.isArray(collection) ? collection : [collection];
+      } else if (exportData.stockitem) {
+        stockItems = Array.isArray(exportData.stockitem) ? exportData.stockitem : [exportData.stockitem];
+      } else if (exportData.dspstkitem) {
+        stockItems = Array.isArray(exportData.dspstkitem) ? exportData.dspstkitem : [exportData.dspstkitem];
+      }
+    }
+    
+    // Also try importdata path (sometimes used)
+    if (stockItems.length === 0) {
+      const tallyMessages = response?.envelope?.body?.importdata?.requestdata?.tallymessage || [];
+      if (Array.isArray(tallyMessages) && tallyMessages.length > 0) {
+        tallyMessages.forEach(msg => {
+          if (msg.stockitem) {
+            const items = Array.isArray(msg.stockitem) ? msg.stockitem : [msg.stockitem];
+            stockItems.push(...items);
+          }
+        });
+      }
     }
     
     // Normalize to array

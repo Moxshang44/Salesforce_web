@@ -6,6 +6,7 @@ import ledgersRouter from './routes/ledgers.js';
 import vouchersRouter from './routes/vouchers.js';
 import stockRouter from './routes/stock.js';
 import reportsRouter from './routes/reports.js';
+import salesOrdersRouter from './routes/salesOrders.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/api/ledgers', ledgersRouter);
 app.use('/api/vouchers', vouchersRouter);
 app.use('/api/stock', stockRouter);
 app.use('/api/reports', reportsRouter);
+app.use('/api/sales-orders', salesOrdersRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

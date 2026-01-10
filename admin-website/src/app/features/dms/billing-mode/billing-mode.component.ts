@@ -5,7 +5,7 @@ import { DmsSidebarComponent } from '../components/dms-sidebar/dms-sidebar.compo
 import { HeaderComponent } from '../../../core/layout/header/header.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TallyNavComponent } from '../../tally/components/tally-nav/tally-nav.component';
-import { TallyConnectionStatusComponent } from '../../tally/components/tally-connection-status/tally-connection-status.component';
+import { TallyService } from '../../tally/services/tally.service';
 
 interface ExtractionLog {
   id: number;
@@ -25,19 +25,20 @@ interface ExtractionLog {
     HeaderComponent,
     ButtonComponent,
     RouterOutlet,
-    TallyNavComponent,
-    TallyConnectionStatusComponent
+    TallyNavComponent
   ],
   templateUrl: './billing-mode.component.html',
   styleUrl: './billing-mode.component.scss'
 })
 export class BillingModeComponent implements OnInit {
-  activeTab = 'overview';
+  activeTab = 'tally';
   currentMode = 'TALLY';
   modeType = 'Flexi';
   showSwitchModal = false;
   showUnmappedAlert = true;
   unmappedCount = 85;
+  isTallyConnected = false;
+  testingConnection = false;
   
   // Overview data
   lastSyncTime = 'Today, 10:45 AM';
@@ -84,7 +85,8 @@ export class BillingModeComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private tallyService: TallyService
   ) {}
 
   ngOnInit() {
@@ -93,6 +95,22 @@ export class BillingModeComponent implements OnInit {
     if (tab && ['overview', 'mapping', 'sync-logs', 'data-trust', 'tally'].includes(tab)) {
       this.activeTab = tab;
     }
+    // Check Tally connection status
+    this.checkTallyConnection();
+  }
+
+  checkTallyConnection(): void {
+    this.testingConnection = true;
+    this.tallyService.testConnection().subscribe({
+      next: (connected) => {
+        this.isTallyConnected = connected;
+        this.testingConnection = false;
+      },
+      error: () => {
+        this.isTallyConnected = false;
+        this.testingConnection = false;
+      }
+    });
   }
 
   setActiveTab(tab: string): void {

@@ -16,10 +16,9 @@
           [routerLink]="item.route" 
           routerLinkActive="active"
           class="nav-item"
+          [title]="isCollapsed ? item.label : ''"
         >
-          @if (item.iconImage) {
-            <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
-          }
+          <span class="nav-icon" [innerHTML]="item.iconSvg"></span>
           <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
         </a>
       </div>

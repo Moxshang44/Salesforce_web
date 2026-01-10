@@ -12,24 +12,22 @@
       <!-- Page Title -->
       <h1 class="page-title">Billing Mode</h1>
 
-      <!-- Current Mode Section -->
-      <div class="current-mode-section">
-        <div class="mode-info">
-          <div class="mode-header">
-            <span class="mode-label">Current Mode:</span>
-            <span class="mode-value">{{ currentMode }} Billing ({{ modeType }})</span>
-          </div>
-          <p class="mode-description">
-            TALLY Flexi mode enables dynamic incremental data pulls, minimizing system impact and ensuring real-time stock visibility without Tally slowdowns.
-          </p>
-        </div>
-        <app-button variant="primary" size="md" (click)="onSwitchMode()">
-          Switch Mode
-        </app-button>
-      </div>
-
       <!-- Tabs Navigation -->
       <div class="tabs-section">
+        <button 
+          class="tab-btn"
+          [class.active]="activeTab === 'tally'"
+          (click)="setActiveTab('tally')"
+        >
+          Tally
+          @if (testingConnection) {
+            <span class="connection-indicator testing">⟳</span>
+          } @else {
+            <span class="connection-indicator" [class.connected]="isTallyConnected" [class.disconnected]="!isTallyConnected">
+              {{ isTallyConnected ? '✓' : '✗' }}
+            </span>
+          }
+        </button>
         <button 
           class="tab-btn"
           [class.active]="activeTab === 'overview'"
@@ -57,13 +55,6 @@
           (click)="setActiveTab('data-trust')"
         >
           Data Trust Reports
-        </button>
-        <button 
-          class="tab-btn"
-          [class.active]="activeTab === 'tally'"
-          (click)="setActiveTab('tally')"
-        >
-          Tally
         </button>
       </div>
 
@@ -175,7 +166,6 @@
 
       @if (activeTab === 'tally') {
         <div class="tab-content tally-content">
-          <app-tally-connection-status></app-tally-connection-status>
           <app-tally-nav></app-tally-nav>
           <router-outlet></router-outlet>
         </div>

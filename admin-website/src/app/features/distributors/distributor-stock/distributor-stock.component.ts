@@ -22,14 +22,19 @@ interface StockItem {
   editValue?: number;
 }
 
-interface ClaimItem {
-  id: number;
-  billNo: string;
-  returnDate: string;
+interface ClaimProduct {
   productName: string;
   reason: string;
   quantity: number;
   unit: string;
+  price: number;
+}
+
+interface ClaimItem {
+  id: number;
+  billNo: string;
+  returnDate: string;
+  products: ClaimProduct[];
   totalAmount: number;
   claimAmount: number;
   claimStatus: 'pending' | 'approved' | 'rejected';
@@ -76,6 +81,8 @@ interface MonthWiseSummaryItem {
   sampleClaims: number | null;
   totalClaim: number;
   clearedDate: string | null;
+  isMonthRow?: boolean; // true if this is a month summary row (e.g., "January 2026")
+  parentMonth?: string; // parent month name if this is a date row
 }
 
 @Component({
@@ -94,6 +101,8 @@ export class DistributorStockComponent implements OnInit {
   hoveredSampleItem: SampleItem | null = null;
   hoverPosition = { x: 0, y: 0 };
   isDmsMode = false;
+  selectedClaim: ClaimItem | null = null;
+  showClaimSidebar = false;
 
   stockItems: StockItem[] = [
     {
@@ -211,22 +220,46 @@ export class DistributorStockComponent implements OnInit {
       id: 1,
       billNo: '#BILL-45821',
       returnDate: '12 Sep 2025',
-      productName: 'Ensure Gold Nutrition Powder 400gm',
-      reason: 'Damaged Packaging',
-      quantity: 4,
-      unit: 'Units',
-      totalAmount: 1560,
-      claimAmount: 1560,
+      products: [
+        {
+          productName: 'Ensure Gold Nutrition Powder 400gm',
+          reason: 'Damaged Packaging',
+          quantity: 4,
+          unit: 'Units',
+          price: 1560
+        },
+        {
+          productName: 'Paracetamol 500mg',
+          reason: 'Expired Product',
+          quantity: 6,
+          unit: 'Units',
+          price: 1200
+        },
+        {
+          productName: 'Amoxicillin 250mg',
+          reason: 'Wrong Product',
+          quantity: 3,
+          unit: 'Units',
+          price: 900
+        }
+      ],
+      totalAmount: 3660,
+      claimAmount: 3660,
       claimStatus: 'pending'
     },
     {
       id: 2,
       billNo: '#BILL-45822',
       returnDate: '15 Sep 2025',
-      productName: 'Paracetamol 500mg',
-      reason: 'Expired Product',
-      quantity: 6,
-      unit: 'Units',
+      products: [
+        {
+          productName: 'Paracetamol 500mg',
+          reason: 'Expired Product',
+          quantity: 6,
+          unit: 'Units',
+          price: 1200
+        }
+      ],
       totalAmount: 1200,
       claimAmount: 1200,
       claimStatus: 'approved'
@@ -235,10 +268,15 @@ export class DistributorStockComponent implements OnInit {
       id: 3,
       billNo: '#BILL-45823',
       returnDate: '18 Sep 2025',
-      productName: 'Amoxicillin 250mg',
-      reason: 'Wrong Product',
-      quantity: 3,
-      unit: 'Units',
+      products: [
+        {
+          productName: 'Amoxicillin 250mg',
+          reason: 'Wrong Product',
+          quantity: 3,
+          unit: 'Units',
+          price: 900
+        }
+      ],
       totalAmount: 900,
       claimAmount: 0,
       claimStatus: 'rejected'
@@ -247,10 +285,15 @@ export class DistributorStockComponent implements OnInit {
       id: 4,
       billNo: '#BILL-45824',
       returnDate: '20 Sep 2025',
-      productName: 'Vitamin C Tablets',
-      reason: 'Damaged Packaging',
-      quantity: 5,
-      unit: 'Units',
+      products: [
+        {
+          productName: 'Vitamin C Tablets',
+          reason: 'Damaged Packaging',
+          quantity: 5,
+          unit: 'Units',
+          price: 1250
+        }
+      ],
       totalAmount: 1250,
       claimAmount: 1250,
       claimStatus: 'pending'
@@ -259,10 +302,15 @@ export class DistributorStockComponent implements OnInit {
       id: 5,
       billNo: '#BILL-45825',
       returnDate: '22 Sep 2025',
-      productName: 'Cough Syrup 100ml',
-      reason: 'Expired Product',
-      quantity: 2,
-      unit: 'Bottles',
+      products: [
+        {
+          productName: 'Cough Syrup 100ml',
+          reason: 'Expired Product',
+          quantity: 2,
+          unit: 'Bottles',
+          price: 800
+        }
+      ],
       totalAmount: 800,
       claimAmount: 800,
       claimStatus: 'approved'
@@ -271,10 +319,15 @@ export class DistributorStockComponent implements OnInit {
       id: 6,
       billNo: '#BILL-45826',
       returnDate: '25 Sep 2025',
-      productName: 'Ibuprofen 400mg',
-      reason: 'Damaged Packaging',
-      quantity: 8,
-      unit: 'Units',
+      products: [
+        {
+          productName: 'Ibuprofen 400mg',
+          reason: 'Damaged Packaging',
+          quantity: 8,
+          unit: 'Units',
+          price: 1600
+        }
+      ],
       totalAmount: 1600,
       claimAmount: 1600,
       claimStatus: 'pending'
@@ -283,10 +336,15 @@ export class DistributorStockComponent implements OnInit {
       id: 7,
       billNo: '#BILL-45827',
       returnDate: '28 Sep 2025',
-      productName: 'Metformin 500mg',
-      reason: 'Wrong Product',
-      quantity: 4,
-      unit: 'Strips',
+      products: [
+        {
+          productName: 'Metformin 500mg',
+          reason: 'Wrong Product',
+          quantity: 4,
+          unit: 'Strips',
+          price: 1000
+        }
+      ],
       totalAmount: 1000,
       claimAmount: 0,
       claimStatus: 'rejected'
@@ -295,10 +353,15 @@ export class DistributorStockComponent implements OnInit {
       id: 8,
       billNo: '#BILL-45828',
       returnDate: '01 Oct 2025',
-      productName: 'Atorvastatin 10mg',
-      reason: 'Expired Product',
-      quantity: 7,
-      unit: 'Units',
+      products: [
+        {
+          productName: 'Atorvastatin 10mg',
+          reason: 'Expired Product',
+          quantity: 7,
+          unit: 'Units',
+          price: 1400
+        }
+      ],
       totalAmount: 1400,
       claimAmount: 1400,
       claimStatus: 'approved'
@@ -307,10 +370,15 @@ export class DistributorStockComponent implements OnInit {
       id: 9,
       billNo: '#BILL-45829',
       returnDate: '03 Oct 2025',
-      productName: 'Omeprazole 20mg',
-      reason: 'Damaged Packaging',
-      quantity: 6,
-      unit: 'Units',
+      products: [
+        {
+          productName: 'Omeprazole 20mg',
+          reason: 'Damaged Packaging',
+          quantity: 6,
+          unit: 'Units',
+          price: 1200
+        }
+      ],
       totalAmount: 1200,
       claimAmount: 1200,
       claimStatus: 'pending'
@@ -801,6 +869,8 @@ export class DistributorStockComponent implements OnInit {
   pendingClaims: number = 23000;
   clearedClaim: number = 302000;
 
+  expandedMonths: Set<string> = new Set();
+  
   monthWiseSummary: MonthWiseSummaryItem[] = [
     {
       id: 1,
@@ -809,7 +879,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 4800,
       sampleClaims: 6500,
       totalClaim: 20500,
-      clearedDate: '15 Feb 2026'
+      clearedDate: '15 Feb 2026',
+      isMonthRow: true
     },
     {
       id: 2,
@@ -818,7 +889,9 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 4800,
       sampleClaims: null,
       totalClaim: 6400,
-      clearedDate: null
+      clearedDate: null,
+      isMonthRow: false,
+      parentMonth: 'January 2026'
     },
     {
       id: 3,
@@ -827,7 +900,9 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: null,
       sampleClaims: 5000,
       totalClaim: 5000,
-      clearedDate: null
+      clearedDate: null,
+      isMonthRow: false,
+      parentMonth: 'January 2026'
     },
     {
       id: 4,
@@ -836,7 +911,9 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: null,
       sampleClaims: 1500,
       totalClaim: 9100,
-      clearedDate: null
+      clearedDate: null,
+      isMonthRow: false,
+      parentMonth: 'January 2026'
     },
     {
       id: 5,
@@ -845,7 +922,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 4300,
       sampleClaims: 1100,
       totalClaim: 14000,
-      clearedDate: '12 Mar 2026'
+      clearedDate: '12 Mar 2026',
+      isMonthRow: true
     },
     {
       id: 6,
@@ -854,7 +932,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 5600,
       sampleClaims: 2000,
       totalClaim: 18000,
-      clearedDate: 'Pending'
+      clearedDate: 'Pending',
+      isMonthRow: true
     },
     {
       id: 7,
@@ -863,7 +942,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 5700,
       sampleClaims: 2500,
       totalClaim: 20000,
-      clearedDate: '18 May 2026'
+      clearedDate: '18 May 2026',
+      isMonthRow: true
     },
     {
       id: 8,
@@ -872,7 +952,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 6200,
       sampleClaims: 2500,
       totalClaim: 21000,
-      clearedDate: 'Pending'
+      clearedDate: 'Pending',
+      isMonthRow: true
     },
     {
       id: 9,
@@ -881,7 +962,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 5100,
       sampleClaims: 1700,
       totalClaim: 17500,
-      clearedDate: '20 Jul 2026'
+      clearedDate: '20 Jul 2026',
+      isMonthRow: true
     },
     {
       id: 10,
@@ -890,7 +972,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 8000,
       sampleClaims: 3400,
       totalClaim: 25000,
-      clearedDate: '16 Aug 2026'
+      clearedDate: '16 Aug 2026',
+      isMonthRow: true
     },
     {
       id: 11,
@@ -899,7 +982,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 6400,
       sampleClaims: 2400,
       totalClaim: 20000,
-      clearedDate: 'Pending'
+      clearedDate: 'Pending',
+      isMonthRow: true
     },
     {
       id: 12,
@@ -908,7 +992,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 7500,
       sampleClaims: 4500,
       totalClaim: 27000,
-      clearedDate: '22 Oct 2026'
+      clearedDate: '22 Oct 2026',
+      isMonthRow: true
     },
     {
       id: 13,
@@ -917,7 +1002,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 4900,
       sampleClaims: 1500,
       totalClaim: 16000,
-      clearedDate: 'Pending'
+      clearedDate: 'Pending',
+      isMonthRow: true
     },
     {
       id: 14,
@@ -926,7 +1012,8 @@ export class DistributorStockComponent implements OnInit {
       schemeClaims: 6100,
       sampleClaims: 2000,
       totalClaim: 20000,
-      clearedDate: '12 Dec 2026'
+      clearedDate: '12 Dec 2026',
+      isMonthRow: true
     }
   ];
 
@@ -940,7 +1027,9 @@ export class DistributorStockComponent implements OnInit {
     if (this.selectedReturnsType === 'Schemes') {
       return this.schemeClaimItems.reduce((sum, item) => sum + item.quantity, 0);
     }
-    return this.claimItems.reduce((sum, item) => sum + item.quantity, 0);
+    return this.claimItems.reduce((sum, item) => 
+      sum + item.products.reduce((productSum, product) => productSum + product.quantity, 0), 0
+    );
   }
 
   get toBeClaimValue(): number {
@@ -976,5 +1065,61 @@ export class DistributorStockComponent implements OnInit {
         y: rect.top + rect.height 
       };
     }
+  }
+
+  // Month expansion methods
+  isMonthRow(item: MonthWiseSummaryItem): boolean {
+    return item.isMonthRow === true;
+  }
+
+  isDateRow(item: MonthWiseSummaryItem): boolean {
+    return item.isMonthRow === false && !!item.parentMonth;
+  }
+
+  isMonthExpanded(monthName: string): boolean {
+    return this.expandedMonths.has(monthName);
+  }
+
+  toggleMonth(monthName: string): void {
+    if (this.expandedMonths.has(monthName)) {
+      this.expandedMonths.delete(monthName);
+    } else {
+      this.expandedMonths.add(monthName);
+    }
+  }
+
+  shouldShowDateRow(item: MonthWiseSummaryItem): boolean {
+    if (!this.isDateRow(item) || !item.parentMonth) {
+      return true; // Show month rows and rows without parent
+    }
+    return this.isMonthExpanded(item.parentMonth);
+  }
+
+  getMonthRows(): MonthWiseSummaryItem[] {
+    return this.monthWiseSummary.filter(item => this.isMonthRow(item));
+  }
+
+  getDateRowsForMonth(monthName: string): MonthWiseSummaryItem[] {
+    return this.monthWiseSummary.filter(item => 
+      item.parentMonth === monthName
+    );
+  }
+
+  onClaimRowClick(claim: ClaimItem): void {
+    this.selectedClaim = claim;
+    this.showClaimSidebar = true;
+  }
+
+  closeClaimSidebar(): void {
+    this.showClaimSidebar = false;
+    this.selectedClaim = null;
+  }
+
+  getTotalQuantity(claim: ClaimItem): number {
+    return claim.products.reduce((sum, p) => sum + p.quantity, 0);
+  }
+
+  getFirstUnit(claim: ClaimItem): string {
+    return claim.products[0]?.unit || '';
   }
 }

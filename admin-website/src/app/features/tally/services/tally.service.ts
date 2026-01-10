@@ -75,6 +75,23 @@ export class TallyService {
     );
   }
 
+  // Get detailed voucher by VCHKEY
+  getVoucherDetails(vchkey: string): Observable<any> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/vouchers/${encodeURIComponent(vchkey)}`).pipe(
+      map(response => response.data!),
+      catchError(this.handleError)
+    );
+  }
+
+  // Generate PDF for a voucher
+  generateVoucherPDF(vchkey: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/vouchers/${encodeURIComponent(vchkey)}/pdf`, {
+      responseType: 'blob'
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   // Stock
   getAllStockItems(): Observable<StockItem[]> {
     return this.http.get<ApiResponse<StockItem[]>>(`${this.apiUrl}/stock`).pipe(
@@ -104,6 +121,23 @@ export class TallyService {
   getTrialBalance(): Observable<any[]> {
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/reports/trial-balance`).pipe(
       map(response => response.data || []),
+      catchError(this.handleError)
+    );
+  }
+
+  // Create Sales Order in Tally
+  createSalesOrder(orderData: {
+    orderId: string;
+    partyName: string;
+    orderDate: string;
+    orderTotal: number;
+    lineItems: Array<{
+      productName: string;
+      quantity: number;
+      unitPrice: number;
+    }>;
+  }): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/sales-orders`, orderData).pipe(
       catchError(this.handleError)
     );
   }

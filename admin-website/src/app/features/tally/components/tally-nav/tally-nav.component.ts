@@ -19,10 +19,11 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styles: [`
     .tally-nav {
       display: flex;
-      gap: 8px;
+      gap: 0;
       margin-bottom: 24px;
       border-bottom: 2px solid #e8e5e1;
       padding-bottom: 0;
+      position: relative;
     }
     
     .tally-nav a {
@@ -34,6 +35,16 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       margin-bottom: -2px;
       transition: all 0.2s ease;
       font-size: 15px;
+      position: relative;
+      border-right: 1px solid #e8e5e1;
+    }
+    
+    .tally-nav a:first-child {
+      border-left: none;
+    }
+    
+    .tally-nav a:last-child {
+      border-right: none;
     }
     
     .tally-nav a:hover {
@@ -44,6 +55,18 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
     .tally-nav a.active {
       color: #664423;
       border-bottom-color: #664423;
+      background: rgba(102, 68, 35, 0.05);
+    }
+    
+    .tally-nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #664423;
+      z-index: 1;
     }
   `]
 })

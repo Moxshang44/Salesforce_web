@@ -573,6 +573,12 @@
 .reason-text {
   font-size: 13px;
   color: #666;
+
+  .more-indicator {
+    color: #664423;
+    font-weight: 600;
+    margin-left: 4px;
+  }
 }
 
 .qty-info {
@@ -858,6 +864,62 @@
 .month-info {
   text-align: center;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &.date-indent {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+.month-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(102, 68, 35, 0.05);
+  }
+
+  &.expanded {
+    background-color: rgba(102, 68, 35, 0.08);
+  }
+}
+
+.date-row {
+  background-color: rgba(102, 68, 35, 0.02);
+  
+  &:hover {
+    background-color: rgba(102, 68, 35, 0.05);
+  }
+}
+
+.expand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+  color: #664423;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
+}
+
+.date-indent {
+  padding-left: 24px;
+  text-align: left;
+  font-weight: 400;
+  color: #666;
 }
 
 .claim-amount {
@@ -1696,6 +1758,336 @@
   .add-product-btn {
     width: 100%;
     margin-top: 8px;
+  }
+}
+
+// Claim Sidebar Styles
+.claim-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.claim-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 450px;
+  height: 100vh;
+  background: white;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.3s ease;
+  overflow-y: auto;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.claim-sidebar-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.claim-sidebar-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.claim-sidebar-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.2s ease;
+  border-radius: 4px;
+
+  &:hover {
+    color: #1a1a1a;
+    background: #e0e0e0;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.claim-sidebar-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.claim-section {
+  margin-bottom: 32px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.claim-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #664423;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #664423;
+}
+
+.claim-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.claim-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.claim-detail-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.claim-detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+
+  &.highlight {
+    font-size: 16px;
+    font-weight: 600;
+    color: #664423;
+  }
+
+  &.status-badge-inline {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    &.approved {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    &.rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+  }
+}
+
+// Clickable row styles
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  &.selected {
+    background-color: #e8f4f8;
+  }
+}
+
+// Financial Table Styles
+.financial-table-wrapper {
+  margin-top: 8px;
+}
+
+.financial-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  thead {
+    background: #f5f5f5;
+    
+    tr {
+      th {
+        padding: 10px 12px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: #1a1a1a;
+        border-bottom: 1px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+
+        &:last-child {
+          border-right: none;
+        }
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.2s ease;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background-color: #fafafa;
+      }
+
+      td {
+        padding: 10px 12px;
+        font-size: 12px;
+        color: #333;
+        border-right: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-right: none;
+        }
+
+        &.product-name-cell {
+          font-size: 12px;
+          max-width: 150px;
+          word-wrap: break-word;
+        }
+
+        &.reason-cell {
+          font-size: 11px;
+          color: #666;
+          max-width: 120px;
+          word-wrap: break-word;
+        }
+
+        &.quantity-cell {
+          font-size: 12px;
+          text-align: center;
+        }
+
+        &.price-cell {
+          font-size: 12px;
+          text-align: right;
+
+          &.highlight-amount {
+            font-weight: 600;
+            color: #664423;
+          }
+        }
+      }
+    }
+  }
+
+  tfoot {
+    tr.total-row {
+      background: #f8f9fa;
+      border-top: 2px solid #e0e0e0;
+      font-weight: 600;
+
+      td {
+        padding: 12px 12px;
+        font-size: 13px;
+        border-right: 1px solid #e0e0e0;
+
+        &:last-child {
+          border-right: none;
+        }
+
+        &.total-label {
+          font-weight: 600;
+          color: #1a1a1a;
+          text-align: right;
+        }
+
+        &.total-quantity {
+          text-align: center;
+          font-weight: 600;
+          color: #1a1a1a;
+        }
+
+        &.total-amount {
+          text-align: right;
+          font-weight: 600;
+          color: #664423;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive styles for sidebar
+@media (max-width: 768px) {
+  .claim-sidebar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .claim-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .financial-table {
+    font-size: 13px;
+
+    thead tr th,
+    tbody tr td {
+      padding: 10px 12px;
+    }
   }
 }
 

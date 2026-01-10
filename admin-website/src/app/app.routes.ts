@@ -157,11 +157,6 @@ export const routes: Routes = [
     canActivate: [dmsAuthGuard]
   },
   {
-    path: 'dms/place-orders',
-    loadComponent: () => import('./features/dms/place-orders/place-orders.component').then(m => m.PlaceOrdersComponent),
-    canActivate: [dmsAuthGuard]
-  },
-  {
     path: 'dms/credit-checks',
     loadComponent: () => import('./features/dms/credit-checks/credit-checks.component').then(m => m.CreditChecksComponent),
     canActivate: [dmsAuthGuard]
@@ -181,6 +176,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/tally/tally.routes').then(m => m.tallyRoutes)
       }
     ]
+  },
+  {
+    path: 'dms/ai-chatbot',
+    loadComponent: () => import('./features/dms/ai-chatbot/ai-chatbot.component').then(m => m.AiChatbotComponent),
+    canActivate: [dmsAuthGuard]
   },
   {
     path: '**',

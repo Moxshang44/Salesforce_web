@@ -27,6 +27,14 @@ interface POItem {
   totalPrice: number;
 }
 
+interface LineItem {
+  id: number;
+  sku: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+}
+
 @Component({
   selector: 'app-purchase-orders',
   standalone: true,
@@ -46,6 +54,16 @@ export class PurchaseOrdersComponent implements OnInit {
   dateRangeFilter = 'Last 30 days';
   selectedPO: PurchaseOrder | null = null;
   showSidebar = false;
+  showPlaceOrderModal = false;
+  
+  // Place Order Form Properties
+  selectedSuperStockist = '';
+  expectedDeliveryDate = '';
+  deliveryNote = '';
+  selectedSku = '';
+  newItemQuantity = 10;
+  lineItems: LineItem[] = [];
+  taxRate = 0.05; // 5%
 
   purchaseOrders: PurchaseOrder[] = [
     {
@@ -103,8 +121,51 @@ export class PurchaseOrdersComponent implements OnInit {
   filteredPurchaseOrders: PurchaseOrder[] = [];
   poItems: POItem[] = [];
 
+  superStockists = [
+    'Prime Distributors Ltd',
+    'Global Supply Chain',
+    'Mega Wholesale Corp',
+    'Elite Trading Co',
+    'Premium Distributors'
+  ];
+
+  skuOptions = [
+    { value: 'SKU-1001', label: 'SKU-1001 - Premium Coffee Beans 1kg' },
+    { value: 'SKU-1002', label: 'SKU-1002 - Premium Coffee Beans 2kg' },
+    { value: 'SKU-1003', label: 'SKU-1003 - Premium Coffee 1kg' },
+    { value: 'SKU-1004', label: 'SKU-1004 - Organic Tea Selection Box' },
+    { value: 'SKU-1005', label: 'SKU-1005 - Gourmet Chocolate Bar' }
+  ];
+
+  skuDescriptions: { [key: string]: string } = {
+    'SKU-1001': 'Premium Coffee Beans 1kg',
+    'SKU-1002': 'Premium Coffee Beans 2kg',
+    'SKU-1003': 'Premium Coffee 1kg',
+    'SKU-1004': 'Organic Tea Selection Box',
+    'SKU-1005': 'Gourmet Chocolate Bar'
+  };
+
+  skuPrices: { [key: string]: number } = {
+    'SKU-1001': 15.00,
+    'SKU-1002': 15.00,
+    'SKU-1003': 10.00,
+    'SKU-1004': 25.00,
+    'SKU-1005': 8.00
+  };
+
   ngOnInit() {
     this.filteredPurchaseOrders = this.purchaseOrders;
+    // Set default delivery date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.expectedDeliveryDate = this.formatDateInput(tomorrow);
+  }
+
+  formatDateInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   onSearch(): void {
@@ -202,8 +263,87 @@ export class PurchaseOrdersComponent implements OnInit {
   }
 
   onCreatePO(): void {
-    console.log('Create PO');
-    // Handle create PO logic
+    this.showPlaceOrderModal = true;
+    this.resetPlaceOrderForm();
+  }
+
+  closePlaceOrderModal(): void {
+    this.showPlaceOrderModal = false;
+    this.resetPlaceOrderForm();
+  }
+
+  resetPlaceOrderForm(): void {
+    this.selectedSuperStockist = '';
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.expectedDeliveryDate = this.formatDateInput(tomorrow);
+    this.deliveryNote = '';
+    this.selectedSku = '';
+    this.newItemQuantity = 10;
+    this.lineItems = [];
+  }
+
+  onAddLineItem(): void {
+    if (!this.selectedSku) {
+      return;
+    }
+
+    const existingItem = this.lineItems.find(item => item.sku === this.selectedSku);
+    if (existingItem) {
+      existingItem.quantity += this.newItemQuantity;
+    } else {
+      const newItem: LineItem = {
+        id: Date.now(),
+        sku: this.selectedSku,
+        description: this.skuDescriptions[this.selectedSku] || '',
+        quantity: this.newItemQuantity,
+        unitPrice: this.skuPrices[this.selectedSku] || 0
+      };
+      this.lineItems.push(newItem);
+    }
+
+    // Reset form
+    this.selectedSku = '';
+    this.newItemQuantity = 10;
+  }
+
+  onRemoveLineItem(itemId: number): void {
+    this.lineItems = this.lineItems.filter(item => item.id !== itemId);
+  }
+
+  getSubtotal(): number {
+    return this.lineItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+  }
+
+  getTax(): number {
+    return this.getSubtotal() * this.taxRate;
+  }
+
+  getTotal(): number {
+    return this.getSubtotal() + this.getTax();
+  }
+
+  onPlaceOrder(): void {
+    console.log('Place Order', {
+      superStockist: this.selectedSuperStockist,
+      deliveryDate: this.expectedDeliveryDate,
+      deliveryNote: this.deliveryNote,
+      lineItems: this.lineItems,
+      total: this.getTotal()
+    });
+    // Handle place order logic
+    this.closePlaceOrderModal();
+  }
+
+  onSaveDraft(): void {
+    console.log('Save Draft', {
+      superStockist: this.selectedSuperStockist,
+      deliveryDate: this.expectedDeliveryDate,
+      deliveryNote: this.deliveryNote,
+      lineItems: this.lineItems
+    });
+    // Handle save draft logic
+    this.closePlaceOrderModal();
   }
 
   onMarkReceived(): void {

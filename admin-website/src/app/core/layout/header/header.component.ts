@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ChatWidgetService } from '../../../shared/services/chat-widget.service';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,8 @@ export class HeaderComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private chatWidgetService: ChatWidgetService
   ) {}
 
   onSearch(event: Event) {
@@ -32,7 +34,7 @@ export class HeaderComponent {
   }
 
   onAiClick() {
-    console.log('Talk to AI clicked');
+    this.chatWidgetService.toggle();
   }
 
   onProfileClick() {

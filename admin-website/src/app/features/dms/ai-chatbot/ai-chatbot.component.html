@@ -1,0 +1,97 @@
+<div class="ai-chatbot-layout">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Chatbot Content -->
+    <div class="chatbot-content">
+      <!-- Page Title -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">AI Chatbot</h1>
+          <p class="page-subtitle">Ask me anything about your DMS system</p>
+        </div>
+      </div>
+
+      <!-- Chatbot Container -->
+      <div class="chatbot-container">
+        <div class="chat-messages" #chatMessagesContainer>
+          @for (message of chatMessages; track message.id) {
+            <div class="message-wrapper" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+              <div class="message-avatar">
+                @if (message.role === 'user') {
+                  <div class="avatar user-avatar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                } @else {
+                  <div class="avatar assistant-avatar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                }
+              </div>
+              <div class="message-content">
+                <div class="message-text">{{ message.content }}</div>
+              </div>
+            </div>
+          }
+          @if (isTyping) {
+            <div class="message-wrapper assistant">
+              <div class="message-avatar">
+                <div class="avatar assistant-avatar">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="message-content">
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="chat-input-container">
+          <div class="chat-input-wrapper">
+            <textarea
+              class="chat-input"
+              [(ngModel)]="chatInput"
+              (keydown)="onChatInputKeyPress($event)"
+              (input)="onChatInputChange($event)"
+              placeholder="Message AI assistant..."
+              rows="1"
+            ></textarea>
+            <button 
+              class="send-button"
+              (click)="sendMessage()"
+              [disabled]="!chatInput.trim() || isTyping"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="chat-footer">
+            <span class="chat-hint">AI can make mistakes. Check important info.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
