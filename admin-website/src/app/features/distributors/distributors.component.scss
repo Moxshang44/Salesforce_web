@@ -284,23 +284,23 @@
 }
 
 .col-action {
-  width: 120px;
+  width: auto;
 }
 
 .col-distributor-store {
-  width: 25%;
+  width: auto;
 }
 
 .col-contact {
-  width: 20%;
+  width: auto;
 }
 
 .col-area-address {
-  width: 25%;
+  width: auto;
 }
 
 .col-routes-cover {
-  width: 20%;
+  width: auto;
 }
 
 .action-buttons {
@@ -347,6 +347,8 @@
 .distributor-store-info {
   display: flex;
   flex-direction: column;
+  padding-left: 45px;
+  text-align: left;
   gap: 4px;
   align-items: center;
 }
@@ -371,11 +373,15 @@
 .contact-name {
   font-weight: 500;
   color: #1a1a1a;
+  text-align: justify;
+  text-align-last: left;
 }
 
 .contact-phone {
   font-size: 13px;
+  text-align: left;
   color: #666;
+  text-align-last: left;
 }
 
 .area-address-info {

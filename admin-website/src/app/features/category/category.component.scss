@@ -229,23 +229,23 @@
 }
 
 .col-actions {
-  width: 120px;
+  width: auto;
 }
 
 .col-active {
-  width: 80px;
+  width: auto;
 }
 
 .col-name {
-  width: 25%;
+  width: auto;
 }
 
 .col-count {
-  width: 150px;
+  width: auto;
 }
 
 .col-created {
-  width: 150px;
+  width: auto;
 }
 
 .action-buttons {
@@ -321,12 +321,16 @@
 
 .category-name {
   font-weight: 600;
+  padding-left: 165px;
   color: #000000;
+  text-align: left;
   font-size: 14px;
 }
 
 .category-code {
+  padding-left: 165px;
   color: #7f8c8d;
+  text-align: left;
   font-size: 13px;
 }
 

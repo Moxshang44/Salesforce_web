@@ -220,11 +220,19 @@
 }
 
 .col-action {
-  width: 120px;
+  width: auto;
 }
 
 .col-active {
-  width: 100px;
+  width: auto;
+}
+
+.col-brand {
+  width: auto;
+}
+
+.col-name {
+  width: auto;
 }
 
 .action-buttons {
@@ -299,23 +307,17 @@
   }
 }
 
-.product-info {
-  .product-name {
-    font-weight: 500;
-    color: #333;
-  }
-
-  .product-category {
-    font-size: 12px;
-    color: #999;
-    margin-top: 4px;
-  }
+.brand-name {
+  padding-left: 55px;
+  font-weight: 600;
+  text-align: left;
+  color: #1a1a1a;
 }
 
-.table-footer {
-  padding: 16px;
-  border-top: 1px solid #eee;
-  text-align: center;
+.type-code {
+  font-size: 13px;
+  padding-left: 55px;
+  text-align: left;
   color: #666;
   font-size: 14px;
 }

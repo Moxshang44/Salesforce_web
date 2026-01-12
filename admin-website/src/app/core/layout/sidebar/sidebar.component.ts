@@ -25,8 +25,10 @@ interface NavItem {
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
+
 export class SidebarComponent implements OnInit {
   companyName = 'Company Name';
+
   currentRoute = '';
   isCollapsed = false;
   
