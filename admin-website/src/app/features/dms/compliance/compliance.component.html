@@ -1,0 +1,187 @@
+<div class="compliance-layout" [class.sidebar-open]="showSidebar">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Compliance Content -->
+    <div class="compliance-content">
+      <!-- Page Title -->
+      <h1 class="page-title">E-way Compliance</h1>
+
+      <!-- Filters and Search Section -->
+      <div class="filters-section">
+        <div class="search-bar-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input 
+            type="text" 
+            class="search-input"
+            placeholder="Search invoice, retailer..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+          />
+        </div>
+
+        <select class="filter-dropdown" [(ngModel)]="ewbStatusFilter" (change)="onStatusFilterChange()">
+          <option value="All">All</option>
+          <option value="NotGenerated">NotGenerated</option>
+          <option value="Generated">Generated</option>
+          <option value="Failed">Failed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+
+        <div class="date-range-picker">
+          <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span class="date-range-text">{{ dateRange }}</span>
+        </div>
+      </div>
+
+      <!-- Invoice Table -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-invoice-no">Invoice No</th>
+                <th class="col-retailer">Retailer</th>
+                <th class="col-date">Invoice Date</th>
+                <th class="col-amount">Total Amount</th>
+                <th class="col-status">EWB Status</th>
+                <th class="col-ewb-no">EWB No</th>
+                <th class="col-generated">Generated At</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (invoice of filteredInvoices; track invoice.id) {
+                <tr>
+                  <td class="col-invoice-no">
+                    <div class="invoice-no">{{ invoice.invoiceNo }}</div>
+                  </td>
+                  <td class="col-retailer">
+                    <div class="retailer-name">{{ invoice.retailer }}</div>
+                  </td>
+                  <td class="col-date">
+                    <div class="invoice-date">{{ invoice.invoiceDate }}</div>
+                  </td>
+                  <td class="col-amount">
+                    <div class="amount-value">{{ formatCurrency(invoice.totalAmount) }}</div>
+                  </td>
+                  <td class="col-status">
+                    <span class="status-badge" [class]="getStatusClass(invoice.ewbStatus)">
+                      {{ invoice.ewbStatus }}
+                    </span>
+                  </td>
+                  <td class="col-ewb-no">
+                    <div class="ewb-number">{{ invoice.ewbNo || '-' }}</div>
+                  </td>
+                  <td class="col-generated">
+                    <div class="generated-time">{{ invoice.generatedAt || '-' }}</div>
+                  </td>
+                  <td class="col-action">
+                    <button class="action-link" (click)="onOpenInvoice(invoice)">
+                      Open invoice
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (filteredInvoices.length === 0) {
+          <div class="empty-state">
+            <p>No invoices found matching your filters.</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Details Sidebar -->
+  @if (showSidebar && selectedInvoice) {
+    <div class="invoice-sidebar">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">Invoice #{{ selectedInvoice.invoiceNo }} Details</h3>
+        <button class="sidebar-close" (click)="closeSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- Invoice Summary -->
+        <div class="sidebar-section">
+          <h4 class="section-title">Invoice Summary</h4>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Retailer</span>
+              <span class="summary-value">{{ selectedInvoice.retailer }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Date</span>
+              <span class="summary-value">{{ selectedInvoice.invoiceDate }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Total Amount</span>
+              <span class="summary-value">{{ formatCurrency(selectedInvoice.totalAmount) }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Items</span>
+              <span class="summary-value">{{ getInvoiceItemsCount() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- E-way Section -->
+        <div class="sidebar-section">
+          <h4 class="section-title">E-way</h4>
+          @if (!selectedInvoice.ewbNo) {
+            <app-button variant="primary" size="md" (click)="onGenerateEway()" [fullWidth]="true">
+              Generate E-way
+            </app-button>
+          } @else {
+            <div class="ewb-details">
+              <div class="ewb-info-row">
+                <span class="ewb-label">EWB Number:</span>
+                <span class="ewb-value">{{ selectedInvoice.ewbNo }}</span>
+              </div>
+              <div class="ewb-info-row">
+                <span class="ewb-label">Status:</span>
+                <span class="status-badge" [class]="getStatusClass(selectedInvoice.ewbStatus)">
+                  {{ selectedInvoice.ewbStatus }}
+                </span>
+              </div>
+              <button class="ewb-download-btn" (click)="onDownloadEwb()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                EWB_{{ selectedInvoice.ewbNo }}.pdf
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Vehicle Details Section -->
+        <div class="sidebar-section">
+          <h4 class="section-title">Vehicle Details</h4>
+          <div class="vehicle-placeholder">
+            <p>Vehicle ipsum dolor sit amet</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

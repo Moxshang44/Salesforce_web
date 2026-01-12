@@ -25,10 +25,36 @@
 
       <div class="table-controls">
         <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1"><<</button>
-          <button class="page-number active">1</button>
-          <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">>></button>
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 1 || isLoadingEmployees"
+            (click)="goToPage(1)"
+          ><<</button>
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 1 || isLoadingEmployees"
+            (click)="goToPage(currentPage - 1)"
+          ><</button>
+          @for (pageNum of getPageNumbers(); track pageNum) {
+            <button 
+              class="page-number"
+              [class.active]="pageNum === currentPage"
+              [disabled]="isLoadingEmployees"
+              (click)="goToPage(pageNum)"
+            >
+              {{ pageNum }}
+            </button>
+          }
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === totalPages || isLoadingEmployees"
+            (click)="goToPage(currentPage + 1)"
+          >></button>
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === totalPages || isLoadingEmployees"
+            (click)="goToPage(totalPages)"
+          >>></button>
         </div>
         
         <div class="right-controls">
@@ -46,18 +72,32 @@
       </div>
 
       <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="col-actions">Action</th>
-              <th class="col-active">Active</th>
-              <th class="col-employee">Employee Name / Code</th>
-              <th class="col-role">Role / Reporting To</th>
-              <th class="col-area">Assigned Area</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (employee of employees; track employee.id) {
+        @if (isLoadingEmployees) {
+          <div class="loading-state">
+            <p>Loading employees...</p>
+          </div>
+        } @else if (employeesError) {
+          <div class="error-state">
+            <p class="error-text">{{ employeesError }}</p>
+            <button class="retry-btn" (click)="loadEmployees(currentPage)">Retry</button>
+          </div>
+        } @else if (employees.length === 0) {
+          <div class="empty-state">
+            <p>No employees found. Click "Add" to create your first employee.</p>
+          </div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-actions">Action</th>
+                <th class="col-active">Active</th>
+                <th class="col-employee">Employee Name / Code</th>
+                <th class="col-role">Role / Reporting To</th>
+                <th class="col-area">Assigned Area</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (employee of employees; track employee.id) {
               <tr class="table-row">
                 <td class="col-actions">
                   <div class="action-buttons">
@@ -86,27 +126,27 @@
                 <td class="col-active">
                   <span 
                     class="status-badge" 
-                    [class.active]="employee.isActive"
-                    [class.inactive]="!employee.isActive"
+                    [class.active]="employee.isActive || employee.is_active"
+                    [class.inactive]="!(employee.isActive || employee.is_active)"
                   >
-                    {{ employee.isActive ? 'Yes' : 'No' }}
+                    {{ (employee.isActive || employee.is_active) ? 'Yes' : 'No' }}
                   </span>
                 </td>
                 <td class="col-employee">
                   <div class="employee-info">
                     <div class="employee-name">{{ employee.name }}</div>
-                    <div class="employee-code">{{ employee.code }}</div>
+                    <div class="employee-code">{{ employee.code || employee.username || 'N/A' }}</div>
                   </div>
                 </td>
                 <td class="col-role">
                   <div class="role-info">
-                    <div class="role-title">{{ employee.role }}</div>
-                    <div class="reporting-to">Reporting to: {{ employee.reportingTo }}</div>
+                    <div class="role-title">{{ employee.role || 'N/A' }}</div>
+                    <div class="reporting-to">Reporting to: {{ employee.reportingTo || '-' }}</div>
                   </div>
                 </td>
                 <td class="col-area">
                   <div class="area-info">
-                    <div class="area-text">{{ employee.assignedArea }}</div>
+                    <div class="area-text">{{ employee.assignedArea || employee.area_name || 'N/A' }}</div>
                     <div class="routes-count">{{ employee.routesCount || 0 }} Routes</div>
                   </div>
                 </td>
@@ -114,6 +154,7 @@
             }
           </tbody>
         </table>
+        }
       </div>
 
       <div class="table-footer">
@@ -126,7 +167,13 @@
       </div>
 
       <div class="pagination-bottom">
-        <span class="pagination-text">Showing 1 to 10 of 15 entries</span>
+        <span class="pagination-text">
+          @if (isLoadingEmployees) {
+            Loading...
+          } @else {
+            Showing {{ ((currentPage - 1) * recordsPerPage) + 1 }} to {{ Math.min(currentPage * recordsPerPage, totalCount) }} of {{ totalCount }} entries
+          }
+        </span>
       </div>
     </div>
 
@@ -140,9 +187,215 @@
     >
       @if (currentStep === 1) {
         <app-employee-form-step1
+          [selectedCompanyId]="selectedCompanyId"
+          [employeeData]="employeeDataForEdit"
+          [isEditMode]="isEditMode"
           (save)="onSaveStep1($event)"
           (cancel)="closeAddModal()"
         ></app-employee-form-step1>
+      }
+    </app-modal>
+
+    <!-- View Employee Modal -->
+    <app-modal
+      [isOpen]="isViewModalOpen"
+      title="Employee Details"
+      width="1000px"
+      (close)="closeViewModal()"
+    >
+      @if (isLoadingView) {
+        <div class="loading-state">
+          <p>Loading employee details...</p>
+        </div>
+      } @else if (viewErrorMessage) {
+        <div class="alert alert-error">
+          <strong>Error:</strong>
+          <pre class="error-pre">{{ viewErrorMessage }}</pre>
+        </div>
+        <div class="form-actions">
+          <app-button
+            type="button"
+            variant="primary"
+            (click)="closeViewModal()"
+          >
+            Close
+          </app-button>
+        </div>
+      } @else if (viewingEmployee) {
+        <div class="view-employee-details">
+          <!-- Basic Information -->
+          <div class="detail-section">
+            <h3 class="section-title">Basic Information</h3>
+            
+            <div class="detail-row">
+              <div class="detail-label">Employee ID:</div>
+              <div class="detail-value">{{ viewingEmployee.id || 'N/A' }}</div>
+            </div>
+            
+            <div class="detail-row">
+              <div class="detail-label">Name:</div>
+              <div class="detail-value">{{ viewingEmployee.name || 'N/A' }}</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Username:</div>
+              <div class="detail-value">{{ viewingEmployee.username || 'N/A' }}</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Contact Number:</div>
+              <div class="detail-value">{{ viewingEmployee.contact_no || 'N/A' }}</div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Role:</div>
+              <div class="detail-value">{{ viewingEmployee.role || 'N/A' }}</div>
+            </div>
+          </div>
+
+          <!-- Company Information -->
+          <div class="detail-section">
+            <h3 class="section-title">Company Information</h3>
+            
+            @if (viewingEmployee.company_id) {
+              <div class="detail-row">
+                <div class="detail-label">Company ID:</div>
+                <div class="detail-value">{{ viewingEmployee.company_id }}</div>
+              </div>
+            }
+
+            @if (viewingEmployee.company_name) {
+              <div class="detail-row">
+                <div class="detail-label">Company Name:</div>
+                <div class="detail-value">{{ viewingEmployee.company_name }}</div>
+              </div>
+            }
+          </div>
+
+          <!-- Area Information -->
+          @if (viewingEmployee.area_id || viewingEmployee.area_name) {
+            <div class="detail-section">
+              <h3 class="section-title">Area Information</h3>
+              
+              @if (viewingEmployee.area_id) {
+                <div class="detail-row">
+                  <div class="detail-label">Area ID:</div>
+                  <div class="detail-value">{{ viewingEmployee.area_id }}</div>
+                </div>
+              }
+
+              @if (viewingEmployee.area_name) {
+                <div class="detail-row">
+                  <div class="detail-label">Area Name:</div>
+                  <div class="detail-value">{{ viewingEmployee.area_name }}</div>
+                </div>
+              }
+
+              @if (viewingEmployee.area_type) {
+                <div class="detail-row">
+                  <div class="detail-label">Area Type:</div>
+                  <div class="detail-value">{{ viewingEmployee.area_type }}</div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Bank Details -->
+          @if (viewingEmployee.bank_details) {
+            <div class="detail-section">
+              <h3 class="section-title">Bank Details</h3>
+              
+              @if (viewingEmployee.bank_details.account_number) {
+                <div class="detail-row">
+                  <div class="detail-label">Account Number:</div>
+                  <div class="detail-value">{{ viewingEmployee.bank_details.account_number }}</div>
+                </div>
+              }
+
+              @if (viewingEmployee.bank_details.account_name) {
+                <div class="detail-row">
+                  <div class="detail-label">Account Name:</div>
+                  <div class="detail-value">{{ viewingEmployee.bank_details.account_name }}</div>
+                </div>
+              }
+
+              @if (viewingEmployee.bank_details.bank_name) {
+                <div class="detail-row">
+                  <div class="detail-label">Bank Name:</div>
+                  <div class="detail-value">{{ viewingEmployee.bank_details.bank_name }}</div>
+                </div>
+              }
+
+              @if (viewingEmployee.bank_details.bank_branch) {
+                <div class="detail-row">
+                  <div class="detail-label">Bank Branch:</div>
+                  <div class="detail-value">{{ viewingEmployee.bank_details.bank_branch }}</div>
+                </div>
+              }
+
+              @if (viewingEmployee.bank_details.account_type) {
+                <div class="detail-row">
+                  <div class="detail-label">Account Type:</div>
+                  <div class="detail-value">{{ viewingEmployee.bank_details.account_type }}</div>
+                </div>
+              }
+
+              @if (viewingEmployee.bank_details.ifsc_code) {
+                <div class="detail-row">
+                  <div class="detail-label">IFSC Code:</div>
+                  <div class="detail-value">{{ viewingEmployee.bank_details.ifsc_code }}</div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Status & Dates -->
+          <div class="detail-section">
+            <h3 class="section-title">Status & Dates</h3>
+            
+            <div class="detail-row">
+              <div class="detail-label">Is Super Admin:</div>
+              <div class="detail-value">
+                <span [class.active]="viewingEmployee.is_super_admin" [class.inactive]="!viewingEmployee.is_super_admin">
+                  {{ viewingEmployee.is_super_admin ? 'Yes' : 'No' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <div class="detail-label">Is Active:</div>
+              <div class="detail-value">
+                <span [class.active]="viewingEmployee.is_active" [class.inactive]="!viewingEmployee.is_active">
+                  {{ viewingEmployee.is_active ? 'Yes' : 'No' }}
+                </span>
+              </div>
+            </div>
+
+            @if (viewingEmployee.created_at) {
+              <div class="detail-row">
+                <div class="detail-label">Created At:</div>
+                <div class="detail-value">{{ viewingEmployee.created_at | date:'medium' }}</div>
+              </div>
+            }
+
+            @if (viewingEmployee.updated_at) {
+              <div class="detail-row">
+                <div class="detail-label">Updated At:</div>
+                <div class="detail-value">{{ viewingEmployee.updated_at | date:'medium' }}</div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 24px;">
+          <app-button
+            type="button"
+            variant="primary"
+            (click)="closeViewModal()"
+          >
+            Close
+          </app-button>
+        </div>
       }
     </app-modal>
   </div>

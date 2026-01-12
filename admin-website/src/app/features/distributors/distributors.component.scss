@@ -350,6 +350,7 @@
   padding-left: 45px;
   text-align: left;
   gap: 4px;
+  align-items: center;
 }
 
 .distributor-name {
@@ -366,6 +367,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  align-items: center;
 }
 
 .contact-name {
@@ -470,4 +472,64 @@
   .search-box {
     width: 100%;
   }
+}
+
+// Company Selection Container
+.company-selection-container {
+  padding: 24px;
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #664423;
+      box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+    }
+  }
+
+  .required {
+    color: #dc3545;
+    font-weight: 600;
+  }
+
+  .error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+}
+
+.error-alert {
+  margin-top: 20px;
+  padding: 12px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  color: #c33;
+}
+
+.success-alert {
+  margin-top: 20px;
+  padding: 12px;
+  background: #efe;
+  border: 1px solid #cfc;
+  border-radius: 4px;
+  color: #3c3;
 }

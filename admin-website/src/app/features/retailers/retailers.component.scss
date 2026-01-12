@@ -428,7 +428,8 @@
 .retailer-store-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;;
+  gap: 4px;
+  align-items: center;
 }
 
 .retailer-name {
@@ -448,7 +449,8 @@
 .contact-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;;
+  gap: 4px;
+  align-items: center;
 }
 
 .contact-name {
@@ -468,7 +470,8 @@
 .route-address-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;;
+  gap: 4px;
+  align-items: center;
 }
 
 .route-name {

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../services/auth.service';
 
 interface SubMenuItem {
   label: string;
@@ -24,50 +25,48 @@ interface NavItem {
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
-export class SidebarComponent {
-  companyName = 'Gaa-Tha';
+
+export class SidebarComponent implements OnInit {
+  companyName = 'Company Name';
+
   currentRoute = '';
   isCollapsed = false;
   
   navItems: NavItem[] = [
-    { label: 'Dashboard', route: '/dashboard', iconImage: 'assets/images/dashboard.png' },
+    { label: 'Dashboard', route: '/admin/dashboard', iconImage: 'assets/images/dashboard.png' },
     { 
       label: 'Product Master', 
-      route: '/products', 
+      route: '/admin/products', 
       iconImage: 'assets/images/productmastericonadmin.png',
       isExpanded: false,
       subItems: [
-        { label: 'Brand', route: '/brand' },
-        { label: 'Category', route: '/category' },
-        { label: 'Product', route: '/products' },
-        { label: 'Scheme', route: '/scheme' },
-        { label: 'Focus Product', route: '/focusproducts' },
-        { label: 'Incentives', route: '/incentives' }
+        { label: 'Brand', route: '/admin/brand' },
+        { label: 'Category', route: '/admin/category' },
+        { label: 'Product', route: '/admin/products' },
+        { label: 'Scheme', route: '/admin/scheme' },
+        { label: 'Focus Product', route: '/admin/focusproducts' },
+        { label: 'Incentives', route: '/admin/incentives' }
       ]
     },
-    { 
-      label: 'Routes', 
-      route: '/routes', 
-      iconImage: 'assets/images/routes.png',
-      isExpanded: false,
-      subItems: [
-        { label: 'Add Routes', route: '/routes' },
-        { label: 'Assign Routes', route: '/routes/assign' }
-      ]
-    },
-    { label: 'Super Stockist', route: '/super-stockist', iconImage: 'assets/images/superstockist.png' },
-    { label: 'Distributors', route: '/distributors', iconImage: 'assets/images/Distributor.png' },
-    { label: 'Retailers', route: '/retailer', iconImage: 'assets/images/finance.png' },
-    { label: 'Employee Master', route: '/employees', iconImage: 'assets/images/employees.png' },
-    { label: 'Finance', route: '/finance', iconImage: 'assets/images/finance.png' },
-    { label: 'Marketing', route: '/marketing', iconImage: 'assets/images/marketing.png' },
-    { label: 'Assign Task', route: '/tasks', iconImage: 'assets/images/assigntask.png' },
-    { label: 'AI chat bot', route: '/ai-chat', iconImage: 'assets/images/aichatbot.png' },
-    { label: 'Assets', route: '/assets', iconImage: 'assets/images/assets.png' },
-    { label: 'Settings', route: '/settings', iconImage: 'assets/images/settings.png' },
+    { label: 'Routes', route: '/admin/routes', iconImage: 'assets/images/routes.png' },
+    { label: 'Super Stockist', route: '/admin/super-stockist', iconImage: 'assets/images/superstockist.png' },
+    { label: 'Distributors', route: '/admin/distributors', iconImage: 'assets/images/Distributor.png' },
+    { label: 'Retailers', route: '/admin/retailer', iconImage: 'assets/images/finance.png' },
+    { label: 'Employee Master', route: '/admin/employees', iconImage: 'assets/images/employees.png' },
+    { label: 'Finance', route: '/admin/finance', iconImage: 'assets/images/finance.png' },
+    { label: 'Marketing', route: '/admin/marketing', iconImage: 'assets/images/marketing.png' },
+    { label: 'Assign Task', route: '/admin/tasks', iconImage: 'assets/images/assigntask.png' },
+    { label: 'AI chat bot', route: '/admin/ai-chat', iconImage: 'assets/images/aichatbot.png' },
+    { label: 'Assets', route: '/admin/assets', iconImage: 'assets/images/assets.png' },
+    { label: 'Sales', route: '/admin/sales', iconImage: 'assets/images/finance.png' },
+    { label: 'Live View', route: '/admin/live-view', iconImage: 'assets/images/dashboard.png' },
+    { label: 'Settings', route: '/admin/settings', iconImage: 'assets/images/settings.png' },
   ];
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.currentRoute = this.router.url;
     // Initialize CSS variable
     document.documentElement.style.setProperty('--sidebar-width', '220px');
@@ -84,6 +83,11 @@ export class SidebarComponent {
           }
         });
       });
+  }
+
+  ngOnInit(): void {
+    // Load company name from auth service
+    this.companyName = this.authService.getCompanyName();
   }
 
   isParentRouteActive(item: NavItem): boolean {

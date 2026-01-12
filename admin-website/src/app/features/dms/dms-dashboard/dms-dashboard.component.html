@@ -1,0 +1,201 @@
+<div class="dashboard-layout">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+      @if (currentRoute === '/dms/dashboard') {
+        <!-- Warning Banner -->
+        @if (showWarningBanner()) {
+          <div class="warning-banner">
+            <div class="warning-content">
+              <span class="warning-icon">⚠️</span>
+              <span class="warning-text">
+                <strong>Tally Mode Active:</strong> {{ summary?.unmapped_products_count }} products are unmapped. 
+                Please map them to ensure accurate billing.
+              </span>
+              <app-button variant="primary" size="sm" (click)="onKpiCardClick('/dms/billing-mode', { tab: 'mapping' })">
+                Map Products
+              </app-button>
+            </div>
+          </div>
+        }
+
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="header-left">
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">
+              {{ distributorName }}
+              <span class="mode-pill" [class.tally]="summary?.billing_mode === 'TALLY'">
+                {{ summary?.billing_mode || 'NATIVE' }}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        @if (isLoading) {
+          <!-- Loading Skeletons -->
+          <div class="skeleton-container">
+            <div class="kpi-cards-row">
+              @for (item of [1,2,3,4,5,6]; track item) {
+                <div class="kpi-card skeleton">
+                  <div class="skeleton-line short"></div>
+                  <div class="skeleton-line long"></div>
+                </div>
+              }
+            </div>
+            <div class="cards-row">
+              <div class="wide-card skeleton">
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line short"></div>
+              </div>
+              <div class="wide-card skeleton">
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line short"></div>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <!-- KPI Cards Row -->
+          <div class="kpi-cards-row">
+            <div class="kpi-card clickable" (click)="onKpiCardClick('/dms/orders', { billing: 'PENDING' })">
+              <div class="kpi-value">{{ summary?.totals?.unbilled_orders || 0 }}</div>
+              <div class="kpi-label">Unbilled Orders</div>
+            </div>
+            
+            <div class="kpi-card clickable" (click)="onKpiCardClick('/dms/invoices', { match: 'UNMATCHED' })">
+              <div class="kpi-value">{{ summary?.totals?.unmatched_invoices || 0 }}</div>
+              <div class="kpi-label">Unmatched Invoices</div>
+            </div>
+            
+            <div class="kpi-card clickable" (click)="onKpiCardClick('/dms/orders', { billing: 'PARTIAL' })">
+              <div class="kpi-value">{{ summary?.totals?.partially_billed_orders || 0 }}</div>
+              <div class="kpi-label">Partially Billed Orders</div>
+            </div>
+            
+            <div class="kpi-card clickable" (click)="onKpiCardClick('/dms/stock', { filter: 'LOW' })">
+              <div class="kpi-value">{{ summary?.totals?.stock_low_skus || 0 }}</div>
+              <div class="kpi-label">Stock Low SKUs</div>
+            </div>
+            
+            <div class="kpi-card clickable" (click)="onKpiCardClick('/dms/claims', { status: 'UNDER_REVIEW' })">
+              <div class="kpi-value">{{ summary?.totals?.claims_pending || 0 }}</div>
+              <div class="kpi-label">Claims Pending</div>
+            </div>
+            
+            <div class="kpi-card clickable">
+              <div class="kpi-value">{{ formatCurrency(summary?.totals?.overdue_outstanding || 0) }}</div>
+              <div class="kpi-label">Overdue Outstanding</div>
+            </div>
+          </div>
+
+          <!-- Orders Today Split -->
+          <div class="orders-today-row">
+            <div class="orders-card">
+              <div class="orders-header">Orders Today</div>
+              <div class="orders-split">
+                <div class="orders-item">
+                  <span class="orders-label">SFA</span>
+                  <span class="orders-value">{{ summary?.totals?.orders_today_sfa || 0 }}</span>
+                </div>
+                <div class="orders-divider"></div>
+                <div class="orders-item">
+                  <span class="orders-label">Retailer App</span>
+                  <span class="orders-value">{{ summary?.totals?.orders_today_retailer || 0 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Second Row: Exceptions & Activity -->
+          <div class="cards-row">
+            <!-- Exceptions Snapshot -->
+            <div class="wide-card">
+              <div class="card-header">
+                <h3 class="card-title">Exceptions Snapshot</h3>
+              </div>
+              <div class="card-body">
+                @if (exceptions.length > 0) {
+                  <div class="exceptions-list">
+                    @for (exception of exceptions; track exception.id) {
+                      <div class="exception-item">
+                        <div class="exception-icon">{{ getExceptionIcon(exception.type) }}</div>
+                        <div class="exception-content">
+                          <div class="exception-description">{{ exception.description }}</div>
+                          <div class="exception-count">{{ exception.count }} items</div>
+                        </div>
+                        <app-button 
+                          variant="outline" 
+                          size="sm" 
+                          (click)="onExceptionView(exception)">
+                          View
+                        </app-button>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-state">
+                    <p>No exceptions found</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="wide-card">
+              <div class="card-header">
+                <h3 class="card-title">Recent Activity</h3>
+              </div>
+              <div class="card-body">
+                @if (recentActivity.length > 0) {
+                  <div class="activity-list">
+                    @for (activity of recentActivity; track activity.id) {
+                      <div class="activity-item">
+                        <div class="activity-icon" [class.success]="activity.status === 'success'" 
+                             [class.error]="activity.status === 'error'"
+                             [class.warning]="activity.status === 'warning'">
+                          @if (activity.type === 'sync') {
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M1 4v6h6M23 20v-6h-6M3.51 9a9 9 0 0114.85-3.36M20.49 15a9 9 0 01-14.85 3.36" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          } @else {
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          }
+                        </div>
+                        <div class="activity-content">
+                          <div class="activity-description">{{ activity.description }}</div>
+                          <div class="activity-time">{{ formatTimeAgo(activity.timestamp) }}</div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-state">
+                    <p>No recent activity</p>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      } @else {
+        <!-- Other Pages Content -->
+        <h1 class="page-title">{{ getPageTitle() }}</h1>
+        <div class="content-placeholder">
+          <p>{{ getPageTitle() }} - Content coming soon</p>
+          <p>This section is under development.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

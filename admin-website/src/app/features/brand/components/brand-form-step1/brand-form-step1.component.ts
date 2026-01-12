@@ -1,68 +1,118 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
-interface BrandFormData {
-  brandName: string;
-  brandCode: string;
-  availableInAllRegions: boolean;
-  limitedLaunch: boolean;
-  selectedCountries: string[];
-  selectedRegions: string[];
-  selectedZones: string[];
-  selectedAreas: string[];
-  channelVisibility: {
-    generalTrade: boolean;
-    modernTrade: boolean;
-    horecaTrade: boolean;
-  };
-  brandLogo: File | null;
-  brandLogoPreview: string | null;
+export interface LogoFile {
+  id: string;
+  name: string;
+  mime_type: string;
+  extra_info: { [key: string]: any };
+}
+
+export interface LogoData {
+  files: LogoFile[];
+}
+
+export interface BrandFormStep1Data {
+  name: string;
+  code: string;
+  for_general: boolean;
+  for_modern: boolean;
+  for_horeca: boolean;
+  logo: LogoData | null;
+  area_id: number[] | null;
+  is_active?: boolean; // Optional, only used in edit mode
 }
 
 @Component({
   selector: 'app-brand-form-step1',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ButtonComponent],
   templateUrl: './brand-form-step1.component.html',
   styleUrl: './brand-form-step1.component.scss'
 })
-export class BrandFormStep1Component {
-  @Output() save = new EventEmitter<BrandFormData>();
+export class BrandFormStep1Component implements OnInit, OnChanges {
+  @Input() selectedCompanyId: string = '';
+  @Input() brandData: any = null; // Brand data for editing
+  @Input() brandId: number | null = null; // Brand ID for editing
+  @Input() isEditMode: boolean = false; // Flag to indicate edit mode
+  @Output() save = new EventEmitter<BrandFormStep1Data>();
   @Output() cancel = new EventEmitter<void>();
 
-  formData: BrandFormData = {
-    brandName: '',
-    brandCode: '',
-    availableInAllRegions: false,
-    limitedLaunch: false,
-    selectedCountries: [],
-    selectedRegions: [],
-    selectedZones: [],
-    selectedAreas: [],
-    channelVisibility: {
-      generalTrade: false,
-      modernTrade: false,
-      horecaTrade: false
-    },
-    brandLogo: null,
-    brandLogoPreview: null
+  formData: BrandFormStep1Data = {
+    name: '',
+    code: '',
+    for_general: false,
+    for_modern: false,
+    for_horeca: false,
+    logo: null,
+    area_id: null,
+    is_active: true
   };
 
+  logoFile: File | null = null;
+  logoPreview: string | null = null;
   isDragging = false;
 
-  // Dropdown options
-  countryOptions = ['India', 'USA', 'UK', 'Germany', 'Japan', 'China', 'Australia', 'Canada'];
-  regionOptions = ['North', 'South', 'East', 'West', 'Central', 'North-East'];
-  zoneOptions = ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5'];
-  areaOptions = ['Area A', 'Area B', 'Area C', 'Area D', 'Area E'];
+  // These should ideally come from API - using placeholder for now
+  areas: Array<{id: number, name: string}> = [
+    { id: 1, name: 'Area 1' },
+    { id: 2, name: 'Area 2' },
+    { id: 3, name: 'Area 3' }
+  ];
 
-  // Auto-generate brand code
+  selectedAreaIds: number[] = [];
+
+  errors: { [key: string]: string } = {};
+
+  ngOnInit(): void {
+    // If in edit mode and brand data is provided, populate the form
+    if (this.isEditMode && this.brandData) {
+      this.populateFormForEdit();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Watch for brand data changes (when editing)
+    if (changes['brandData'] && this.isEditMode && this.brandData) {
+      this.populateFormForEdit();
+    }
+  }
+
+  // Populate form with brand data for editing
+  populateFormForEdit(): void {
+    if (!this.brandData) return;
+    
+    this.formData.name = this.brandData.name || '';
+    this.formData.code = this.brandData.code || '';
+    this.formData.for_general = this.brandData.for_general || false;
+    this.formData.for_modern = this.brandData.for_modern || false;
+    this.formData.for_horeca = this.brandData.for_horeca || false;
+    this.formData.is_active = this.brandData.is_active !== undefined ? this.brandData.is_active : true;
+    
+    // Handle logo
+    if (this.brandData.logo && this.brandData.logo.files && this.brandData.logo.files.length > 0) {
+      this.formData.logo = this.brandData.logo;
+      // If logo has an id, it's an existing logo (not a file upload)
+      // For existing logos, we might want to show a preview URL if available
+      // For now, we'll just keep the logo data structure
+    }
+    
+    // Handle area_id - convert area array to area_id array
+    if (this.brandData.area && Array.isArray(this.brandData.area)) {
+      this.selectedAreaIds = this.brandData.area.map((area: any) => area.id).filter((id: any) => id !== undefined);
+      this.formData.area_id = this.selectedAreaIds.length > 0 ? [...this.selectedAreaIds] : null;
+    }
+  }
+
+  // Auto-generate brand code (only in add mode)
   generateBrandCode(): void {
-    if (this.formData.brandName) {
-      const prefix = this.formData.brandName.substring(0, 4).toUpperCase();
+    if (this.isEditMode) return; // Don't auto-generate in edit mode
+    if (this.formData.name) {
+      const prefix = this.formData.name.substring(0, 4).toUpperCase().replace(/\s/g, '');
       const randomNum = Math.floor(1000 + Math.random() * 9000);
-      this.formData.brandCode = `${prefix}${randomNum}`;
+      this.formData.code = `${prefix}${randomNum}`;
     }
   }
 
@@ -98,11 +148,21 @@ export class BrandFormStep1Component {
 
   private handleFile(file: File): void {
     if (file.type.startsWith('image/')) {
-      this.formData.brandLogo = file;
+      this.logoFile = file;
       
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
-        this.formData.brandLogoPreview = e.target?.result as string;
+        this.logoPreview = e.target?.result as string;
+        
+        // Create logo data structure for API
+        this.formData.logo = {
+          files: [{
+            id: '',
+            name: file.name,
+            mime_type: file.type,
+            extra_info: {}
+          }]
+        };
       };
       reader.readAsDataURL(file);
     } else {
@@ -111,116 +171,36 @@ export class BrandFormStep1Component {
   }
 
   removeLogo(): void {
-    this.formData.brandLogo = null;
-    this.formData.brandLogoPreview = null;
+    this.logoFile = null;
+    this.logoPreview = null;
+    this.formData.logo = null;
   }
 
-  // Multi-select handlers
-  toggleCountry(country: string): void {
-    const index = this.formData.selectedCountries.indexOf(country);
+  toggleArea(areaId: number): void {
+    const index = this.selectedAreaIds.indexOf(areaId);
     if (index > -1) {
-      this.formData.selectedCountries.splice(index, 1);
+      this.selectedAreaIds.splice(index, 1);
     } else {
-      this.formData.selectedCountries.push(country);
+      this.selectedAreaIds.push(areaId);
     }
+    this.formData.area_id = this.selectedAreaIds.length > 0 ? [...this.selectedAreaIds] : null;
   }
 
-  toggleRegion(region: string): void {
-    const index = this.formData.selectedRegions.indexOf(region);
-    if (index > -1) {
-      this.formData.selectedRegions.splice(index, 1);
-    } else {
-      this.formData.selectedRegions.push(region);
-    }
+  isAreaSelected(areaId: number): boolean {
+    return this.selectedAreaIds.includes(areaId);
   }
-
-  toggleZone(zone: string): void {
-    const index = this.formData.selectedZones.indexOf(zone);
-    if (index > -1) {
-      this.formData.selectedZones.splice(index, 1);
-    } else {
-      this.formData.selectedZones.push(zone);
-    }
-  }
-
-  toggleArea(area: string): void {
-    const index = this.formData.selectedAreas.indexOf(area);
-    if (index > -1) {
-      this.formData.selectedAreas.splice(index, 1);
-    } else {
-      this.formData.selectedAreas.push(area);
-    }
-  }
-
-  isCountrySelected(country: string): boolean {
-    return this.formData.selectedCountries.includes(country);
-  }
-
-  isRegionSelected(region: string): boolean {
-    return this.formData.selectedRegions.includes(region);
-  }
-
-  isZoneSelected(zone: string): boolean {
-    return this.formData.selectedZones.includes(zone);
-  }
-
-  isAreaSelected(area: string): boolean {
-    return this.formData.selectedAreas.includes(area);
-  }
-
-  getSelectedCountriesText(): string {
-    if (this.formData.selectedCountries.length === 0) {
-      return 'Select Countries';
-    } else if (this.formData.selectedCountries.length === this.countryOptions.length) {
-      return 'All Selected';
-    } else {
-      return `${this.formData.selectedCountries.length} selected`;
-    }
-  }
-
-  getSelectedRegionsText(): string {
-    if (this.formData.selectedRegions.length === 0) {
-      return 'Select Regions';
-    } else if (this.formData.selectedRegions.length === this.regionOptions.length) {
-      return 'All Selected';
-    } else {
-      return `${this.formData.selectedRegions.length} selected`;
-    }
-  }
-
-  getSelectedZonesText(): string {
-    if (this.formData.selectedZones.length === 0) {
-      return 'Select Zones';
-    } else if (this.formData.selectedZones.length === this.zoneOptions.length) {
-      return 'All Selected';
-    } else {
-      return `${this.formData.selectedZones.length} selected`;
-    }
-  }
-
-  getSelectedAreasText(): string {
-    if (this.formData.selectedAreas.length === 0) {
-      return 'Select Areas';
-    } else if (this.formData.selectedAreas.length === this.areaOptions.length) {
-      return 'All Selected';
-    } else {
-      return `${this.formData.selectedAreas.length} selected`;
-    }
-  }
-
-  errors: { [key: string]: string } = {};
 
   onSaveAndNext(): void {
     this.errors = {};
     let hasErrors = false;
 
     // Basic validation
-    if (!this.formData.brandName) {
-      this.errors['brandName'] = 'Please enter brand name';
+    if (!this.formData.name || this.formData.name.trim() === '') {
+      this.errors['name'] = 'Brand name is required';
       hasErrors = true;
     }
-    if (!this.formData.brandCode) {
-      this.errors['brandCode'] = 'Please enter brand code';
+    if (!this.formData.code || this.formData.code.trim() === '') {
+      this.errors['code'] = 'Brand code is required';
       hasErrors = true;
     }
 
@@ -248,4 +228,3 @@ export class BrandFormStep1Component {
     this.cancel.emit();
   }
 }
-

@@ -6,7 +6,7 @@
     
     <div class="content-area">
       <div class="page-header">
-        <h1 class="page-title">Products list</h1>
+        <h1 class="page-title">Brands List</h1>
         <div class="header-actions">
           <app-button variant="primary" size="sm" (click)="onBulkUpload()">
             <img src="assets/images/bulkupload.png" alt="Bulk Upload" class="button-icon">
@@ -25,10 +25,30 @@
 
       <div class="table-controls">
         <div class="pagination-controls">
-          <button class="page-btn" [disabled]="currentPage === 1"><<</button>
-          <button class="page-number active">1</button>
-          <button class="page-number">2</button>
-          <button class="page-btn" [disabled]="currentPage === totalPages">>></button>
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 1 || isLoadingBrands"
+            (click)="goToPage(currentPage - 1)"
+          >
+            &lt;&lt;
+          </button>
+          @for (pageNum of getPageNumbers(); track pageNum) {
+            <button 
+              class="page-number"
+              [class.active]="pageNum === currentPage"
+              [disabled]="isLoadingBrands"
+              (click)="goToPage(pageNum)"
+            >
+              {{ pageNum }}
+            </button>
+          }
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === totalPages || isLoadingBrands"
+            (click)="goToPage(currentPage + 1)"
+          >
+            &gt;&gt;
+          </button>
         </div>
         
         <div class="right-controls">
@@ -46,74 +66,89 @@
       </div>
 
       <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="col-actions">Actions</th>
-              <th class="col-active">Active</th>
-              <th class="col-brand">Brand / code</th>
-              <th class="col-category">Category / products</th>
-              <th class="col-date">Created on</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (brand of brands; track brand.id) {
-              <tr class="table-row">
-                <td class="col-actions">
-                  <div class="action-buttons">
-                    <button class="action-icon edit-icon" (click)="onEdit(brand)" title="Edit">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button class="action-icon view-icon" (click)="onView(brand)" title="View">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button class="action-icon delete-icon" (click)="onDelete(brand)" title="Delete">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-                <td class="col-active">
-                  <span 
-                    class="status-badge" 
-                    [class.active]="brand.isActive"
-                    [class.inactive]="!brand.isActive"
-                  >
-                    {{ brand.isActive ? 'Yes' : 'No' }}
-                  </span>
-                </td>
-                <td class="col-brand">
-                  <div class="brand-info">
-                    <div class="brand-name">{{ brand.brandName }}</div>
-                    <div class="brand-code">{{ brand.brandCode }}</div>
-                  </div>
-                </td>
-                <td class="col-category">
-                  <div class="category-products-info">
-                    <div class="categories-count">{{ brand.categoriesCount }} Categories</div>
-                    <div class="products-count">{{ brand.productsCount }} Products</div>
-                  </div>
-                </td>
-                <td class="col-date">
-                  <div class="created-info">
-                    <div class="created-date">{{ brand.createdDate }}</div>
-                    <div class="created-ago">{{ brand.createdAgo }}</div>
-                  </div>
-                </td>
+        @if (isLoadingBrands) {
+          <div class="loading-state-container">
+            <p>Loading brands...</p>
+          </div>
+        } @else if (brandsError) {
+          <div class="error-state-container">
+            <p class="error-text">{{ brandsError }}</p>
+            <button class="retry-btn" (click)="retryLoadBrands()">Retry</button>
+          </div>
+        } @else if (brands.length === 0) {
+          <div class="empty-state-container">
+            <p>No brands found. Click "Add" to create a new brand.</p>
+          </div>
+        } @else {
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-actions">Actions</th>
+                <th class="col-active">Active</th>
+                <th class="col-brand">Brand | code</th>
+                <th class="col-category">Category | products</th>
+                <th class="col-date">Created on</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (brand of brands; track brand.id) {
+                <tr class="table-row">
+                  <td class="col-actions">
+                    <div class="action-buttons">
+                      <button class="action-icon edit-icon" (click)="onEdit(brand)" title="Edit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <button class="action-icon view-icon" (click)="onView(brand)" title="View">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <button class="action-icon delete-icon" (click)="onDelete(brand)" title="Delete">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="col-active">
+                    <span 
+                      class="status-badge" 
+                      [class.active]="brand.isActive"
+                      [class.inactive]="!brand.isActive"
+                    >
+                      {{ brand.isActive ? 'Yes' : 'No' }}
+                    </span>
+                  </td>
+                  <td class="col-brand">
+                    <div class="brand-info">
+                      <div class="brand-name">{{ brand.brandName }}</div>
+                      <div class="brand-code">{{ brand.brandCode }}</div>
+                    </div>
+                  </td>
+                  <td class="col-category">
+                    <div class="category-products-info">
+                      <div class="categories-count">{{ brand.categoriesCount }} Categories</div>
+                      <div class="products-count">{{ brand.productsCount }} Products</div>
+                    </div>
+                  </td>
+                  <td class="col-date">
+                    <div class="created-info">
+                      <div class="created-date">{{ brand.createdDate }}</div>
+                      <div class="created-ago">{{ brand.createdAgo }}</div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       </div>
 
       <div class="table-footer">
@@ -126,7 +161,13 @@
       </div>
 
       <div class="pagination-bottom">
-        <span class="pagination-text">Showing 1 to 10 of 15 entries</span>
+        <span class="pagination-text">
+          @if (totalCount > 0) {
+            Showing {{ getStartRecord() }} to {{ getEndRecord() }} of {{ totalCount }} entries
+          } @else {
+            No entries
+          }
+        </span>
       </div>
     </div>
 
@@ -134,7 +175,7 @@
     <app-modal
       [isOpen]="isAddModalOpen"
       [title]="getModalTitle()"
-      [stepIndicator]="'Step ' + currentStep + ' of 2'"
+      [stepIndicator]="currentStep > 0 ? 'Step ' + currentStep + ' of 2' : ''"
       width="1400px"
       (close)="closeAddModal()"
     >
@@ -151,6 +192,157 @@
         ></app-brand-form-step2>
       }
     </app-modal>
+
+    <!-- Edit Brand Modal -->
+    <app-modal
+      [isOpen]="isEditModalOpen"
+      title="Edit Brand"
+      width="1400px"
+      (close)="closeEditModal()"
+    >
+      @if (currentStep === 1 && brandDataForEdit) {
+        <app-brand-form-step1
+          [selectedCompanyId]="selectedCompanyId"
+          [isEditMode]="true"
+          [brandId]="editingBrandId"
+          [brandData]="brandDataForEdit"
+          (save)="onSaveStep1($event)"
+          (cancel)="closeEditModal()"
+        ></app-brand-form-step1>
+      }
+    </app-modal>
+
+    <!-- View Brand Modal -->
+    <app-modal
+      [isOpen]="isViewModalOpen"
+      title="Brand Details"
+      width="800px"
+      (close)="closeViewModal()"
+    >
+      @if (isLoadingView) {
+        <div class="loading-state">
+          <p>Loading brand details...</p>
+        </div>
+      } @else if (viewErrorMessage) {
+        <div class="alert alert-error">
+          <strong>Error:</strong>
+          <pre class="error-pre">{{ viewErrorMessage }}</pre>
+        </div>
+        <div class="form-actions">
+          <app-button
+            type="button"
+            variant="primary"
+            (click)="closeViewModal()"
+          >
+            Close
+          </app-button>
+        </div>
+      } @else if (viewingBrand) {
+        <div class="view-brand-details">
+          <div class="detail-row">
+            <div class="detail-label">Brand ID:</div>
+            <div class="detail-value">{{ viewingBrand.id }}</div>
+          </div>
+          
+          <div class="detail-row">
+            <div class="detail-label">Brand Name:</div>
+            <div class="detail-value">{{ viewingBrand.name || 'N/A' }}</div>
+          </div>
+
+          @if (viewingBrand.code) {
+            <div class="detail-row">
+              <div class="detail-label">Brand Code:</div>
+              <div class="detail-value">{{ viewingBrand.code }}</div>
+            </div>
+          }
+
+          <div class="detail-row">
+            <div class="detail-label">Channel Types:</div>
+            <div class="detail-value">
+              <div class="channel-badges">
+                @if (viewingBrand.for_general) {
+                  <span class="channel-badge">General</span>
+                }
+                @if (viewingBrand.for_modern) {
+                  <span class="channel-badge">Modern</span>
+                }
+                @if (viewingBrand.for_horeca) {
+                  <span class="channel-badge">Horeca</span>
+                }
+                @if (!viewingBrand.for_general && !viewingBrand.for_modern && !viewingBrand.for_horeca) {
+                  <span class="channel-badge none">None</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          @if (viewingBrand.area && viewingBrand.area.length > 0) {
+            <div class="detail-row">
+              <div class="detail-label">Areas:</div>
+              <div class="detail-value">
+                <div class="area-list">
+                  @for (area of viewingBrand.area; track area.id) {
+                    <span class="area-badge">{{ area.name }} ({{ area.type }})</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (viewingBrand.margins && viewingBrand.margins.length > 0) {
+            <div class="detail-row">
+              <div class="detail-label">Margins:</div>
+              <div class="detail-value">
+                <div class="margins-list">
+                  @for (margin of viewingBrand.margins; track margin.id) {
+                    <div class="margin-item">
+                      <strong>{{ margin.name }}</strong> (Area ID: {{ margin.area_id }})
+                      <div class="margin-details">
+                        <div>Super Stockist: {{ margin.margins.super_stockist.type }} - {{ margin.margins.super_stockist.value }}</div>
+                        <div>Distributor: {{ margin.margins.distributor.type }} - {{ margin.margins.distributor.value }}</div>
+                        <div>Retailer: {{ margin.margins.retailer.type }} - {{ margin.margins.retailer.value }}</div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="detail-row">
+            <div class="detail-label">Is Active:</div>
+            <div class="detail-value">
+              <span [class.active]="viewingBrand.is_active" [class.inactive]="!viewingBrand.is_active">
+                {{ viewingBrand.is_active ? 'Yes' : 'No' }}
+              </span>
+            </div>
+          </div>
+
+          @if (viewingBrand.created_at) {
+            <div class="detail-row">
+              <div class="detail-label">Created At:</div>
+              <div class="detail-value">{{ viewingBrand.created_at | date:'medium' }}</div>
+            </div>
+          }
+
+          @if (viewingBrand.updated_at) {
+            <div class="detail-row">
+              <div class="detail-label">Updated At:</div>
+              <div class="detail-value">{{ viewingBrand.updated_at | date:'medium' }}</div>
+            </div>
+          }
+        </div>
+
+        <div class="form-actions" style="margin-top: 24px;">
+          <app-button
+            type="button"
+            variant="primary"
+            (click)="closeViewModal()"
+          >
+            Close
+          </app-button>
+        </div>
+      }
+    </app-modal>
   </div>
 </div>
-

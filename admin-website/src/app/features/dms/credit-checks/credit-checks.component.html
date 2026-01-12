@@ -1,0 +1,712 @@
+<div class="credit-checks-layout" [class.sidebar-open]="showSidebar">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Credit Checks Content -->
+    <div class="credit-content">
+      @if (!isDetailView) {
+        <!-- List View -->
+        <!-- Page Title -->
+        <h1 class="page-title">Credit Checks</h1>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="search-bar-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input 
+            type="text" 
+            class="search-input"
+            placeholder="Search retailer"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+          />
+        </div>
+
+        <select class="filter-dropdown" [(ngModel)]="riskFilter" (change)="onRiskFilterChange()">
+          <option value="All">Risk</option>
+          <option value="Safe">Safe</option>
+          <option value="Warning">Warning</option>
+          <option value="Blocked">Blocked</option>
+        </select>
+
+        <select class="filter-dropdown" [(ngModel)]="overdueFilter" (change)="onOverdueFilterChange()">
+          <option value="All">Overdue</option>
+          <option value="0-15">0-15</option>
+          <option value="16-30">16-30</option>
+          <option value="30+">30+</option>
+        </select>
+
+        <app-button variant="primary" size="sm" (click)="onExcel()">
+          <img src="assets/images/export.png" alt="Export" class="button-icon">
+          Excel
+        </app-button>
+      </div>
+
+      <!-- Retailer Table -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-retailer">Retailer</th>
+                <th class="col-credit-limit">Credit Limit</th>
+                <th class="col-outstanding">Outstanding</th>
+                <th class="col-available">Available Credit</th>
+                <th class="col-overdue">Overdue Days</th>
+                <th class="col-risk">Risk</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (retailer of filteredRetailers; track retailer.id) {
+                <tr [class.selected]="selectedRetailer?.id === retailer.id" (click)="onRowClick(retailer)" class="clickable-row">
+                  <td class="col-retailer">
+                    <div class="retailer-name">{{ retailer.name }}</div>
+                  </td>
+                  <td class="col-credit-limit">
+                    <div class="amount-value">{{ formatCurrency(retailer.creditLimit) }}</div>
+                  </td>
+                  <td class="col-outstanding">
+                    <div class="amount-value">{{ formatCurrency(retailer.outstanding) }}</div>
+                  </td>
+                  <td class="col-available">
+                    <div class="amount-value" [class.negative]="retailer.availableCredit < 0">
+                      {{ formatCurrency(retailer.availableCredit) }}
+                    </div>
+                  </td>
+                  <td class="col-overdue">
+                    <div class="overdue-days">{{ retailer.overdueDays }}</div>
+                  </td>
+                  <td class="col-risk">
+                    <span class="risk-pill" [class]="getRiskClass(retailer.risk)">
+                      {{ retailer.risk }}
+                    </span>
+                  </td>
+                  <td class="col-action" (click)="$event.stopPropagation()">
+                    <button class="view-btn" (click)="onViewRetailer(retailer)">
+                      View
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (filteredRetailers.length === 0) {
+          <div class="empty-state">
+            <p>No retailers found matching your filters.</p>
+          </div>
+        }
+      </div>
+      } @else {
+        <!-- Detail View -->
+        @if (selectedRetailer) {
+          <!-- Breadcrumb -->
+          <div class="breadcrumb">
+            <span class="breadcrumb-item" (click)="goBackToList()">Credit Checks</span>
+            <span class="breadcrumb-separator">></span>
+            <span class="breadcrumb-item active">{{ selectedRetailer.name }}</span>
+          </div>
+
+          <!-- Page Header -->
+          <div class="detail-header">
+            <div class="header-left">
+              <h1 class="page-title">{{ selectedRetailer.name }}</h1>
+              <div class="header-tags">
+                @if (selectedRetailer.route) {
+                  <span class="tag">Route: {{ selectedRetailer.route }}</span>
+                }
+                @if (selectedRetailer.type) {
+                  <span class="tag">Type: {{ selectedRetailer.type }}</span>
+                }
+              </div>
+            </div>
+            <div class="header-right">
+              <div class="tally-mode-info">
+                <span class="tally-mode-badge">Tally Mode</span>
+                <span class="sync-info">• Last Sync: {{ lastSyncTime }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="summary-cards">
+            <div class="summary-card">
+              <div class="card-label">Credit Limit</div>
+              <div class="card-value">{{ formatCurrency(selectedRetailer.creditLimit) }}</div>
+              <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="summary-card outstanding">
+              <div class="card-label">Outstanding</div>
+              <div class="card-value">{{ formatCurrency(selectedRetailer.outstanding) }}</div>
+              <div class="card-trend">+8% vs Last Month</div>
+              <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 17l9.2-9.2M16 7v10H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="summary-card">
+              <div class="card-label">Available Credit</div>
+              <div class="card-value">{{ formatCurrency(selectedRetailer.availableCredit) }}</div>
+            </div>
+            <div class="summary-card overdue">
+              <div class="card-label">Overdue Amount + Oldest</div>
+              <div class="card-value">{{ formatCurrency(selectedRetailer.overdueAmount || 0) }}</div>
+              <div class="overdue-info">
+                <svg class="warning-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Oldest overdue: {{ selectedRetailer.oldestOverdueDays || 0 }} days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons-row">
+            <app-button variant="primary" size="md" (click)="onRecordPayment()">
+              Record Payment
+            </app-button>
+            <app-button variant="outline" size="md" (click)="onSendReminder()">
+              Send Reminder
+            </app-button>
+            <app-button variant="outline" size="md" (click)="onDownloadLedger()">
+              <img src="assets/images/download.png" alt="Download" class="button-icon">
+              Download Ledger
+            </app-button>
+            <app-button variant="outline" size="md" (click)="onExcel()">
+              <img src="assets/images/export.png" alt="Export" class="button-icon">
+              Excel
+            </app-button>
+          </div>
+
+          <!-- Two Column Layout: Bills and Payments -->
+          <div class="detail-tables-layout">
+            <!-- Bills (Debits) Section -->
+            <div class="table-section bills-section">
+              <div class="section-header">
+                <h2 class="section-title">Bills (Debits)</h2>
+                <div class="section-filters">
+                  <select class="filter-select" [(ngModel)]="billStatusFilter">
+                    <option value="All">Status</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Partial">Partial</option>
+                    <option value="Overdue">Overdue</option>
+                  </select>
+                  <div class="date-range-inputs">
+                    <input type="date" class="date-input" [(ngModel)]="billDateRangeStart">
+                    <span class="date-separator">-</span>
+                    <input type="date" class="date-input" [(ngModel)]="billDateRangeEnd">
+                  </div>
+                  <div class="search-box-small">
+                    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" class="search-input-small" placeholder="Search invoice" [(ngModel)]="billSearchQuery">
+                  </div>
+                </div>
+              </div>
+              <div class="table-card">
+                <div class="table-wrapper">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th class="col-checkbox">
+                          <input type="checkbox">
+                        </th>
+                        <th class="col-bill-no">Bill No</th>
+                        <th class="col-bill-date">Bill Date</th>
+                        <th class="col-due-date">Due Date</th>
+                        <th class="col-total">Total</th>
+                        <th class="col-paid">Paid</th>
+                        <th class="col-balance">Balance</th>
+                        <th class="col-status">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (bill of bills; track bill.id) {
+                        <tr>
+                          <td class="col-checkbox">
+                            <input type="checkbox">
+                          </td>
+                          <td class="col-bill-no">{{ bill.billNo }}</td>
+                          <td class="col-bill-date">{{ formatDate(bill.billDate) }}</td>
+                          <td class="col-due-date">{{ formatDate(bill.dueDate) }}</td>
+                          <td class="col-total">{{ formatCurrency(bill.total) }}</td>
+                          <td class="col-paid">{{ formatCurrency(bill.paid) }}</td>
+                          <td class="col-balance">{{ formatCurrency(bill.balance) }}</td>
+                          <td class="col-status">
+                            <span class="status-badge" [class]="getBillStatusClass(bill.status)">
+                              {{ bill.status }}
+                            </span>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+                <div class="table-footer-small">
+                  <span>Total Debits: {{ formatCurrency(getTotalDebits()) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payments (Credits) Section -->
+            <div class="table-section payments-section">
+              <div class="section-header">
+                <h2 class="section-title">Payments (Credits)</h2>
+                <div class="section-filters">
+                  <select class="filter-select" [(ngModel)]="paymentModeFilter">
+                    <option value="All">Mode</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Cheque">Cheque</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="UPI">UPI</option>
+                  </select>
+                  <div class="date-range-inputs">
+                    <input type="date" class="date-input" [(ngModel)]="paymentDateRangeStart">
+                    <span class="date-separator">-</span>
+                    <input type="date" class="date-input" [(ngModel)]="paymentDateRangeEnd">
+                  </div>
+                  <div class="search-box-small">
+                    <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" class="search-input-small" placeholder="Search reference" [(ngModel)]="paymentSearchQuery">
+                  </div>
+                </div>
+              </div>
+              <div class="table-card">
+                <div class="table-wrapper">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th class="col-receipt-ref">Receipt/Ref</th>
+                        <th class="col-date">Date</th>
+                        <th class="col-amount">Amount</th>
+                        <th class="col-mode">Mode</th>
+                        <th class="col-allocated">Allocated To</th>
+                        <th class="col-attachment">Attachment</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (payment of payments; track payment.id) {
+                        <tr>
+                          <td class="col-receipt-ref">{{ payment.receiptRef }}</td>
+                          <td class="col-date">{{ formatDate(payment.date) }}</td>
+                          <td class="col-amount">{{ formatCurrency(payment.amount) }}</td>
+                          <td class="col-mode">{{ payment.mode }}</td>
+                          <td class="col-allocated">{{ payment.allocatedTo }}</td>
+                          <td class="col-attachment">
+                            @if (payment.hasAttachment) {
+                              <svg class="attachment-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+                <div class="table-footer-small">
+                  <div class="footer-stats">
+                    <span>Total Credits: {{ formatCurrency(getTotalCredits()) }}</span>
+                    <span>Pending Amount: {{ formatCurrency(getPendingAmount()) }}</span>
+                    <span>Overdue Amount: {{ formatCurrency(getOverdueAmount()) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Credit Details Sidebar (Keep for backward compatibility, but hidden in detail view) -->
+  @if (showSidebar && selectedRetailer && !isDetailView) {
+    <div class="credit-sidebar">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">{{ selectedRetailer.name }} - Credit Details</h3>
+        <button class="sidebar-close" (click)="closeSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- Retailer Summary Card -->
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Credit Limit</span>
+            <span class="summary-value">{{ formatCurrency(selectedRetailer.creditLimit) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Outstanding</span>
+            <span class="summary-value">{{ formatCurrency(selectedRetailer.outstanding) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Risk</span>
+            <span class="risk-pill" [class]="getRiskClass(selectedRetailer.risk)">
+              {{ selectedRetailer.risk }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Overdue</span>
+            <span class="summary-value">{{ selectedRetailer.overdueDays }} days</span>
+          </div>
+        </div>
+
+        <!-- Outstanding Invoices -->
+        <div class="sidebar-section">
+          <h4 class="section-title">Outstanding Invoices</h4>
+          @if (outstandingInvoices.length > 0) {
+            <div class="invoices-table">
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (invoice of outstandingInvoices; track invoice.id) {
+                    <tr>
+                      <td>{{ invoice.invoiceNo }}</td>
+                      <td>{{ invoice.date }}</td>
+                      <td>{{ formatCurrency(invoice.amount) }}</td>
+                      <td>
+                        <span class="status-badge" [class]="getStatusClass(invoice.status)">
+                          {{ invoice.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="empty-state-small">
+              <p>No outstanding invoices</p>
+            </div>
+          }
+        </div>
+
+        <!-- Payment History -->
+        <div class="sidebar-section">
+          <h4 class="section-title">Payment History</h4>
+          @if (paymentHistory.length > 0) {
+            <div class="payments-table">
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>Payment</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (payment of paymentHistory; track payment.id) {
+                    <tr>
+                      <td>{{ payment.payment }}</td>
+                      <td>{{ formatCurrency(payment.amount) }}</td>
+                      <td>
+                        <span class="status-badge" [class]="getStatusClass(payment.status)">
+                          {{ payment.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="empty-state-small">
+              <p>No payment history</p>
+            </div>
+          }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="sidebar-actions">
+          <app-button variant="primary" size="md" (click)="onRecordCollection()" [fullWidth]="true">
+            Record Collection
+          </app-button>
+          <div class="tooltip-wrapper">
+            <app-button 
+              variant="outline" 
+              size="md" 
+              [disabled]="true" 
+              [fullWidth]="true"
+              title="Disabled for non-admin. Contact administrator for adjustments."
+            >
+              Adjust Credit Limit
+            </app-button>
+            <div class="tooltip">
+              Disabled for non-admin. Contact administrator for adjustments.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Record Payment Modal -->
+<app-modal
+  [isOpen]="showRecordPaymentModal"
+  [title]="currentStep === 1 ? 'Record Payment' : 'Allocate Payment'"
+  [stepIndicator]="currentStep === 1 ? 'Step 1 of 2 • Payment Details' : 'Step 2 of 2 • Allocation'"
+  width="900px"
+  (close)="closeRecordPaymentModal()"
+>
+  @if (currentStep === 1) {
+    <!-- Step 1: Payment Details -->
+    <div class="payment-form">
+      <!-- Progress Bar -->
+      <div class="progress-bar-container">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="50"></div>
+        </div>
+      </div>
+
+      <!-- Payment Date -->
+      <div class="form-group">
+        <label class="form-label">Payment Date</label>
+        <div class="date-input-wrapper">
+          <input
+            type="date"
+            class="form-input"
+            [(ngModel)]="paymentFormData.paymentDate"
+            name="paymentDate"
+          />
+          <svg class="calendar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="form-group">
+        <label class="form-label">Amount</label>
+        <div class="amount-input-wrapper">
+          <span class="currency-prefix">₹</span>
+          <input
+            type="number"
+            class="form-input amount-input"
+            placeholder="Enter amount"
+            [(ngModel)]="paymentFormData.amount"
+            name="amount"
+            step="0.01"
+            min="0"
+          />
+        </div>
+      </div>
+
+      <!-- Mode -->
+      <div class="form-group">
+        <label class="form-label">Mode</label>
+        <select
+          class="form-select"
+          [(ngModel)]="paymentFormData.mode"
+          name="mode"
+        >
+          <option value="" disabled selected>Select Mode</option>
+          @for (mode of getPaymentModeOptions(); track mode) {
+            <option [value]="mode">{{ mode }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Reference/UTR -->
+      <div class="form-group">
+        <label class="form-label">
+          Reference/UTR
+          <span class="required-indicator">*</span>
+          <span class="field-hint">(required for electronic payments)</span>
+        </label>
+        <input
+          type="text"
+          class="form-input"
+          placeholder="Enter reference number"
+          [(ngModel)]="paymentFormData.reference"
+          name="reference"
+        />
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea
+          class="form-textarea"
+          placeholder="Add optional notes here..."
+          [(ngModel)]="paymentFormData.notes"
+          name="notes"
+          rows="4"
+        ></textarea>
+      </div>
+
+      <!-- Attachment -->
+      <div class="form-group">
+        <label class="form-label">Attachment</label>
+        <div class="file-upload-area" (click)="fileInput.click()">
+          <input
+            #fileInput
+            type="file"
+            class="file-input-hidden"
+            (change)="onFileSelect($event)"
+            accept=".pdf,.jpg,.jpeg,.png"
+          />
+          <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="upload-text">Drag & drop files here or click to browse</p>
+          @if (paymentFormData.attachment) {
+            <p class="file-name">{{ paymentFormData.attachment.name }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="modal-actions">
+        <app-button variant="outline" size="md" (click)="closeRecordPaymentModal()">
+          Cancel
+        </app-button>
+        <app-button variant="primary" size="md" (click)="onNextStep()">
+          Next: Allocate >
+        </app-button>
+      </div>
+    </div>
+  } @else {
+    <!-- Step 2: Allocate Payment -->
+    <div class="allocation-form">
+      <!-- Progress Bar -->
+      <div class="progress-bar-container">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="100"></div>
+        </div>
+      </div>
+
+      <!-- Payment Amount Display -->
+      <div class="payment-amount-display">
+        <span class="amount-label">Payment Amount:</span>
+        <span class="amount-value">₹{{ getPaymentAmountDisplay() }}</span>
+      </div>
+
+      <!-- Auto Allocate Toggle -->
+      <div class="auto-allocate-section">
+        <div class="toggle-wrapper">
+          <label class="toggle-label">
+            <input
+              type="checkbox"
+              class="toggle-checkbox"
+              [(ngModel)]="autoAllocate"
+              (change)="onToggleAutoAllocate()"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-text">Auto Allocate (oldest overdue first)</span>
+        </div>
+        @if (autoAllocate) {
+          <button type="button" class="switch-manual-link" (click)="onToggleAutoAllocate()">
+            Switch to Manual
+          </button>
+        }
+      </div>
+
+      <!-- Invoice Allocation Table -->
+      <div class="allocation-table-wrapper">
+        <table class="allocation-table">
+          <thead>
+            <tr>
+              <th class="col-checkbox">
+                <input type="checkbox" (change)="onToggleAll($event)" [checked]="areAllSelected()">
+              </th>
+              <th class="col-invoice-no">Invoice No</th>
+              <th class="col-due-date">Due Date</th>
+              <th class="col-balance">Balance</th>
+              <th class="col-allocate">Allocate Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (invoice of invoiceAllocations; track invoice.id) {
+              <tr>
+                <td class="col-checkbox">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="invoice.isSelected"
+                    (change)="onInvoiceCheckboxChange(invoice)"
+                  />
+                </td>
+                <td class="col-invoice-no">{{ invoice.invoiceNo }}</td>
+                <td class="col-due-date">
+                  <span class="due-date-pill" [class]="getDueDateClass(invoice.status)">
+                    {{ invoice.status === 'Overdue' ? 'Overdue' : invoice.status === 'Due Soon' ? 'Due Soon' : formatDate(invoice.dueDate) }}
+                  </span>
+                </td>
+                <td class="col-balance">{{ formatCurrency(invoice.balance) }}</td>
+                <td class="col-allocate">
+                  <input
+                    type="number"
+                    class="allocate-input"
+                    [(ngModel)]="invoice.allocatedAmount"
+                    (change)="onAllocationAmountChange(invoice)"
+                    [disabled]="!invoice.isSelected"
+                    [max]="invoice.balance"
+                    min="0"
+                    step="0.01"
+                  />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Unallocated Amount Option -->
+      <div class="unallocated-option">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [(ngModel)]="keepUnallocated"
+            name="keepUnallocated"
+          />
+          <span>Keep remaining as Unallocated (Advance)</span>
+        </label>
+        @if (getRemainingAmount() > 0) {
+          <span class="remaining-amount">Remaining: {{ formatCurrency(getRemainingAmount()) }}</span>
+        }
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="modal-actions">
+        <app-button variant="outline" size="md" (click)="onBackStep()">
+          Back
+        </app-button>
+        <app-button variant="primary" size="md" (click)="onSavePayment()">
+          Save Payment
+        </app-button>
+      </div>
+    </div>
+  }
+</app-modal>
+

@@ -1,0 +1,160 @@
+<div class="form-container">
+  <form class="category-form">
+    <div class="margins-section">
+      <div class="margins-header">
+        <h3 class="section-title">
+          Margins Configuration
+          <span class="optional">(Optional)</span>
+        </h3>
+        <button 
+          type="button" 
+          class="add-margin-btn"
+          (click)="addMargin()"
+        >
+          + Add Margin
+        </button>
+      </div>
+
+      @if (formData.margins.length === 0) {
+        <div class="empty-state">
+          No margins added. Click "Add Margin" to add margin configurations for different areas.
+        </div>
+      } @else {
+        @for (margin of formData.margins; track $index; let i = $index) {
+          <div class="margin-card">
+            <div class="margin-card-header">
+              <h4>Margin Configuration #{{ i + 1 }}</h4>
+              <button 
+                type="button" 
+                class="remove-margin-btn"
+                (click)="removeMargin(i)"
+              >
+                Remove
+              </button>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">
+                  Area
+                  <span class="required">*</span>
+                </label>
+                <select 
+                  class="form-select"
+                  [class.error]="errors['area_id_' + i]"
+                  [(ngModel)]="margin.area_id"
+                  name="area_id_{{ i }}"
+                  (change)="clearError('area_id_' + i)"
+                >
+                  <option [ngValue]="null">Select Area</option>
+                  @for (area of areas; track area.id) {
+                    <option [ngValue]="area.id">{{ area.name }}</option>
+                  }
+                </select>
+                @if (errors['area_id_' + i]) {
+                  <span class="error-message">{{ errors['area_id_' + i] }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="margin-details-grid">
+              <!-- Super Stockist -->
+              <div class="margin-level-group">
+                <h5 class="margin-level-title">Super Stockist</h5>
+                <div class="margin-input-group">
+                  <select 
+                    class="margin-type-select"
+                    [(ngModel)]="margin.margins.super_stockist.type"
+                    name="super_stockist_type_{{ i }}"
+                  >
+                    @for (type of marginTypes; track type) {
+                      <option [value]="type">{{ type }}</option>
+                    }
+                  </select>
+                  <input 
+                    type="number" 
+                    class="margin-value-input"
+                    placeholder="Value"
+                    [(ngModel)]="margin.margins.super_stockist.value"
+                    name="super_stockist_value_{{ i }}"
+                    min="0"
+                    step="0.01"
+                  >
+                </div>
+              </div>
+
+              <!-- Distributor -->
+              <div class="margin-level-group">
+                <h5 class="margin-level-title">Distributor</h5>
+                <div class="margin-input-group">
+                  <select 
+                    class="margin-type-select"
+                    [(ngModel)]="margin.margins.distributor.type"
+                    name="distributor_type_{{ i }}"
+                  >
+                    @for (type of marginTypes; track type) {
+                      <option [value]="type">{{ type }}</option>
+                    }
+                  </select>
+                  <input 
+                    type="number" 
+                    class="margin-value-input"
+                    placeholder="Value"
+                    [(ngModel)]="margin.margins.distributor.value"
+                    name="distributor_value_{{ i }}"
+                    min="0"
+                    step="0.01"
+                  >
+                </div>
+              </div>
+
+              <!-- Retailer -->
+              <div class="margin-level-group">
+                <h5 class="margin-level-title">Retailer</h5>
+                <div class="margin-input-group">
+                  <select 
+                    class="margin-type-select"
+                    [(ngModel)]="margin.margins.retailer.type"
+                    name="retailer_type_{{ i }}"
+                  >
+                    @for (type of marginTypes; track type) {
+                      <option [value]="type">{{ type }}</option>
+                    }
+                  </select>
+                  <input 
+                    type="number" 
+                    class="margin-value-input"
+                    placeholder="Value"
+                    [(ngModel)]="margin.margins.retailer.value"
+                    name="retailer_value_{{ i }}"
+                    min="0"
+                    step="0.01"
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </form>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <app-button 
+      variant="outline" 
+      type="button"
+      (click)="onPrevious()"
+    >
+      Previous
+    </app-button>
+    <app-button 
+      variant="primary" 
+      type="button"
+      (click)="onSaveAndFinish()"
+    >
+      Save & Finish
+    </app-button>
+  </div>
+</div>
+
