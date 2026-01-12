@@ -347,23 +347,23 @@
 }
 
 .col-action {
-  width: 120px;
+  width: auto;
 }
 
 .col-details {
-  width: 150px;
+  width: auto;
 }
 
 .col-retailer-store {
-  width: 25%;
+  width: auto;
 }
 
 .col-contact {
-  width: 20%;
+  width: auto;
 }
 
 .col-route-address {
-  width: 25%;
+  width: auto;
 }
 
 .action-buttons {
@@ -434,11 +434,15 @@
 
 .retailer-name {
   font-weight: 600;
+  padding-left: 55px;
+  text-align: left;
   color: #1a1a1a;
 }
 
 .retailer-code {
   font-size: 13px;
+  padding-left: 55px;
+  text-align: left;
   color: #666;
 }
 
@@ -450,11 +454,15 @@
 }
 
 .contact-name {
+  padding-left: 55px;
+  text-align: left;
   font-weight: 500;
   color: #1a1a1a;
 }
 
 .contact-phone {
+  padding-left: 55px;
+  text-align: left;
   font-size: 13px;
   color: #666;
 }
@@ -468,10 +476,14 @@
 
 .route-name {
   font-weight: 500;
+  padding-left: 55px;
+  text-align: left;
   color: #1a1a1a;
 }
 
 .route-address {
+  padding-left: 55px;
+  text-align: left;
   font-size: 13px;
   color: #666;
 }

@@ -217,7 +217,7 @@
     }
 
     td {
-      padding: 16px;
+      padding: 12px;
       font-size: 14px;
       color: #495057;
       vertical-align: middle;
@@ -227,23 +227,24 @@
 }
 
 .col-actions {
-  width: 90px;
+  width: auto;
 }
 
 .col-active {
-  width: 80px;
+  width: auto;
 }
 
 .col-brand {
-  width: 25%;
+  width: auto;
 }
 
 .col-category {
-  width: 22%;
+  width: auto;
+  text-align: center;
 }
 
 .col-date {
-  width: 18%;
+  width: auto;
 }
 
 .action-buttons {
@@ -318,13 +319,17 @@
 
 .brand-name {
   font-size: 14px;
+  padding-left: 180px;
+  text-align: left;
   font-weight: 600;
   color: #000000;
 }
 
 .brand-code {
   font-size: 13px;
+  padding-left: 180px;
   color: #7f8c8d;
+  text-align: left;
 }
 
 .category-products-info {
@@ -343,6 +348,7 @@
   font-size: 13px;
   color: #495057;
   font-weight: 400;
+  text-align: left;
 }
 
 .created-info {
