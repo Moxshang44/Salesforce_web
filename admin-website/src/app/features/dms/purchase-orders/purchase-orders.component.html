@@ -1,0 +1,385 @@
+<div class="purchase-orders-layout" [class.sidebar-open]="showSidebar">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Purchase Orders Content -->
+    <div class="po-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Place orders</h1>
+        <app-button variant="primary" size="sm" (click)="onCreatePO()">
+          <img src="assets/images/add.png" alt="Add" class="button-icon">
+          + Create PO
+        </app-button>
+      </div>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="search-bar-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input 
+            type="text" 
+            class="search-input"
+            placeholder="Search PO no/supplier..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+          />
+        </div>
+
+        <select class="filter-dropdown" [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+          <option value="All Statuses">All Statuses</option>
+          <option value="Draft">Draft</option>
+          <option value="Sent">Sent</option>
+          <option value="Partially Received">Partially Received</option>
+          <option value="Received">Received</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+
+        <div class="date-range-wrapper">
+          <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <select class="date-range-select" [(ngModel)]="dateRangeFilter" (change)="onDateRangeChange()">
+            <option value="Last 30 days">Last 30 days</option>
+            <option value="Last 7 days">Last 7 days</option>
+            <option value="Last 90 days">Last 90 days</option>
+            <option value="All time">All time</option>
+          </select>
+        </div>
+
+        <app-button variant="primary" size="sm" (click)="onExcel()">
+          <img src="assets/images/export.png" alt="Export" class="button-icon">
+          Export to Excel
+        </app-button>
+      </div>
+
+      <!-- Purchase Orders Table -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-actions">Actions</th>
+                <th class="col-po-no">PO No</th>
+                <th class="col-supplier">Supplier</th>
+                <th class="col-total-qty">Total Qty</th>
+                <th class="col-total-value">Total Value</th>
+                <th class="col-status">Status</th>
+                <th class="col-created-date">Created Date</th>
+                <th class="col-expected-date">Expected Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (po of filteredPurchaseOrders; track po.id) {
+                <tr [class.selected]="selectedPO?.id === po.id" (click)="onViewPO(po)">
+                  <td class="col-actions" (click)="$event.stopPropagation()">
+                    <div class="action-buttons">
+                      <button class="action-icon edit-icon" (click)="onEditPO(po)" title="Edit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <button class="action-icon view-icon" (click)="onViewPO(po)" title="View">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <button class="action-icon delete-icon" (click)="onDeletePO(po)" title="Delete">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="col-po-no">
+                    <div class="po-number">{{ po.poNo }}</div>
+                  </td>
+                  <td class="col-supplier">
+                    <div class="supplier-name">{{ po.supplier }}</div>
+                  </td>
+                  <td class="col-total-qty">
+                    <div class="quantity-value">{{ po.totalQty }}</div>
+                  </td>
+                  <td class="col-total-value">
+                    <div class="value-amount">{{ formatCurrency(po.totalValue) }}</div>
+                  </td>
+                  <td class="col-status">
+                    <span class="status-pill" [class]="getStatusClass(po.status)">
+                      {{ po.status }}
+                    </span>
+                  </td>
+                  <td class="col-created-date">
+                    <div class="date-value">{{ formatDate(po.createdDate) }}</div>
+                  </td>
+                  <td class="col-expected-date">
+                    <div class="date-value">{{ formatDate(po.expectedDate) }}</div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (filteredPurchaseOrders.length === 0) {
+          <div class="empty-state">
+            <p>No purchase orders found matching your filters.</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- PO Details Sidebar -->
+  @if (showSidebar && selectedPO) {
+    <div class="po-sidebar">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">{{ selectedPO.poNo }} Details</h3>
+        <button class="sidebar-close" (click)="closeSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- Summary Information -->
+        <div class="summary-section">
+          <div class="summary-item">
+            <span class="summary-label">Supplier:</span>
+            <span class="summary-value">{{ selectedPO.supplier }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Status:</span>
+            <span class="status-pill" [class]="getStatusClass(selectedPO.status)">
+              {{ selectedPO.status }}
+            </span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Created:</span>
+            <span class="summary-value">{{ formatDate(selectedPO.createdDate) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Expected:</span>
+            <span class="summary-value">{{ formatDate(selectedPO.expectedDate) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Total Qty:</span>
+            <span class="summary-value">{{ selectedPO.totalQty }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Total Value:</span>
+            <span class="summary-value">{{ formatCurrency(selectedPO.totalValue) }}</span>
+          </div>
+        </div>
+
+        <!-- Item Details -->
+        <div class="items-section">
+          <h4 class="section-title">Item Details</h4>
+          @if (poItems.length > 0) {
+            <div class="items-table-wrapper">
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th>Item No</th>
+                    <th>Description</th>
+                    <th>Total Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of poItems; track item.id) {
+                    <tr>
+                      <td>{{ item.itemNo }}</td>
+                      <td>{{ item.description }}</td>
+                      <td>{{ formatCurrency(item.totalPrice) }}</td>
+                    </tr>
+                    @if (item.receivedQty < item.orderedQty) {
+                      <tr class="qty-detail-row">
+                        <td colspan="3" class="qty-detail-cell">
+                          <div class="qty-details">
+                            <div class="qty-info">
+                              <span class="qty-label">Ordered Qty:</span>
+                              <span class="qty-value">{{ item.orderedQty }}</span>
+                            </div>
+                            <div class="qty-info">
+                              <span class="qty-label">Received Qty:</span>
+                              <span class="qty-value">{{ item.receivedQty }}</span>
+                            </div>
+                            <div class="qty-info">
+                              <span class="qty-label">Pending Qty:</span>
+                              <span class="qty-value">{{ item.pendingQty }}</span>
+                            </div>
+                            <div class="qty-warning">Received < Ordered</div>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <div class="empty-state-small">
+              <p>No items available</p>
+            </div>
+          }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="sidebar-actions">
+          <app-button variant="primary" size="md" (click)="onMarkReceived()" [fullWidth]="true">
+            Mark Received
+          </app-button>
+          <app-button variant="outline" size="md" (click)="onCancelPO()" [fullWidth]="true">
+            Cancel PO
+          </app-button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Place Order Modal -->
+  @if (showPlaceOrderModal) {
+    <div class="add-modal-backdrop" (click)="closePlaceOrderModal()">
+      <div class="add-modal" (click)="$event.stopPropagation()">
+        <div class="add-modal-header">
+          <button class="back-btn" (click)="closePlaceOrderModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5M5 12l6-6m-6 6l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h3 class="add-modal-title">Place Order</h3>
+        </div>
+
+        <div class="add-modal-body">
+          <form class="add-claim-form" (ngSubmit)="onPlaceOrder()">
+            <!-- Super Stockist -->
+            <div class="form-group">
+              <label class="form-label">Super Stockist *</label>
+              <select class="form-select" [(ngModel)]="selectedSuperStockist" name="superStockist" required>
+                <option value="">Select Super Stockist</option>
+                @for (stockist of superStockists; track stockist) {
+                  <option [value]="stockist">{{ stockist }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Expected Delivery Date -->
+            <div class="form-group">
+              <label class="form-label">Expected Delivery Date *</label>
+              <input 
+                type="date" 
+                class="form-input" 
+                [(ngModel)]="expectedDeliveryDate" 
+                name="deliveryDate"
+                required>
+            </div>
+
+            <!-- Delivery Note -->
+            <div class="form-group">
+              <label class="form-label optional">Delivery Note</label>
+              <textarea 
+                class="form-textarea" 
+                [(ngModel)]="deliveryNote" 
+                name="deliveryNote"
+                placeholder="Comment note (optional)"
+                rows="3">
+              </textarea>
+            </div>
+
+            <!-- Line Items Section -->
+            <div class="form-group">
+              <label class="form-label">Line Items *</label>
+              
+              <!-- Add Line Item Row -->
+              <div class="product-quantity-row">
+                <select class="form-select product-select-row" [(ngModel)]="selectedSku" name="sku">
+                  <option value="">Select SKU</option>
+                  @for (sku of skuOptions; track sku.value) {
+                    <option [value]="sku.value">{{ sku.label }}</option>
+                  }
+                </select>
+                <input 
+                  type="number" 
+                  class="form-input quantity-input-small" 
+                  [(ngModel)]="newItemQuantity" 
+                  name="quantity"
+                  min="1"
+                  placeholder="Qty">
+                <button type="button" class="add-product-btn" (click)="onAddLineItem()">
+                  + Add Line
+                </button>
+              </div>
+
+              <!-- Line Items Table -->
+              @if (lineItems.length > 0) {
+                <div class="line-items-table-wrapper">
+                  <table class="line-items-table">
+                    <thead>
+                      <tr>
+                        <th>SKU</th>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of lineItems; track item.id) {
+                        <tr>
+                          <td>{{ item.sku }}</td>
+                          <td>{{ item.description }}</td>
+                          <td>{{ item.quantity }}</td>
+                          <td>{{ formatCurrency(item.unitPrice) }}</td>
+                          <td>
+                            <button type="button" class="remove-product-btn-small" (click)="onRemoveLineItem(item.id)">×</button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="2" class="summary-label">Subtotal:</td>
+                        <td colspan="2" class="summary-value">{{ formatCurrency(getSubtotal()) }}</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" class="summary-label">Tax ({{ (taxRate * 100).toFixed(0) }}%):</td>
+                        <td colspan="2" class="summary-value">{{ formatCurrency(getTax()) }}</td>
+                        <td></td>
+                      </tr>
+                      <tr class="total-row">
+                        <td colspan="2" class="summary-label total-label">Total:</td>
+                        <td colspan="2" class="summary-value total-value">{{ formatCurrency(getTotal()) }}</td>
+                        <td></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              }
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button type="button" class="cancel-btn-modal" (click)="closePlaceOrderModal()">Cancel</button>
+              <button type="button" class="save-draft-btn-modal" (click)="onSaveDraft()">Save Draft</button>
+              <button type="submit" class="submit-btn-modal">Place Order</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

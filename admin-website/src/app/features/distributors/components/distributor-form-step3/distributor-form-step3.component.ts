@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,12 +9,7 @@ interface Route {
 }
 
 interface DistributorFormStep3Data {
-  selectedCountry: string;
-  selectedZone: string;
-  selectedRegion: string;
-  selectedArea: string;
-  selectedDivision: string;
-  assignedRoutes: number[];
+  route_ids: string[];
 }
 
 @Component({
@@ -25,51 +20,38 @@ interface DistributorFormStep3Data {
   styleUrl: './distributor-form-step3.component.scss'
 })
 export class DistributorFormStep3Component {
+  @Input() step1Data: any = null;
+  @Input() step2Data: any = null;
   @Output() save = new EventEmitter<DistributorFormStep3Data>();
   @Output() previous = new EventEmitter<void>();
 
   formData: DistributorFormStep3Data = {
-    selectedCountry: 'India',
-    selectedZone: '1 Selected',
-    selectedRegion: '1 Selected',
-    selectedArea: 'India',
-    selectedDivision: '1 Selected',
-    assignedRoutes: [1, 2, 3, 4, 5]
+    route_ids: []
   };
 
-  countryOptions = ['India', 'USA', 'UK', 'Germany', 'Japan'];
-  zoneOptions = ['1 Selected', 'Zone 1', 'Zone 2', 'Zone 3'];
-  regionOptions = ['1 Selected', 'Region 1', 'Region 2', 'Region 3'];
-  areaOptions = ['India', 'Area 1', 'Area 2', 'Area 3'];
-  divisionOptions = ['1 Selected', 'Division 1', 'Division 2', 'Division 3'];
-
-  assignedRoutes: Route[] = [
-    { id: 1, name: 'Andheri Route', isAssigned: true },
-    { id: 2, name: 'Lower Parel Route', isAssigned: true },
-    { id: 3, name: 'Bandra Route', isAssigned: true },
-    { id: 4, name: 'Goregaon Route', isAssigned: true },
-    { id: 5, name: 'Kandivali Route', isAssigned: true }
-  ];
-
+  assignedRoutes: Route[] = [];
   availableRoutes: Route[] = [
-    { id: 6, name: 'Andheri Route', isAssigned: false },
-    { id: 7, name: 'Lower Parel Route', isAssigned: false },
-    { id: 8, name: 'Bandra Route', isAssigned: false },
-    { id: 9, name: 'Goregaon Route', isAssigned: false },
-    { id: 10, name: 'Kandivali Route', isAssigned: false }
+    { id: 1, name: 'Andheri Route', isAssigned: false },
+    { id: 2, name: 'Lower Parel Route', isAssigned: false },
+    { id: 3, name: 'Bandra Route', isAssigned: false },
+    { id: 4, name: 'Goregaon Route', isAssigned: false },
+    { id: 5, name: 'Kandivali Route', isAssigned: false },
+    { id: 6, name: 'Malad Route', isAssigned: false },
+    { id: 7, name: 'Borivali Route', isAssigned: false },
+    { id: 8, name: 'Dadar Route', isAssigned: false }
   ];
 
   assignedCurrentPage = 1;
-  assignedTotalPages = 2;
+  assignedTotalPages = 1;
   availableCurrentPage = 1;
-  availableTotalPages = 2;
+  availableTotalPages = 1;
 
   unassignRoute(route: Route): void {
     const index = this.assignedRoutes.findIndex(r => r.id === route.id);
     if (index > -1) {
       this.assignedRoutes.splice(index, 1);
       this.availableRoutes.push({ ...route, isAssigned: false });
-      this.formData.assignedRoutes = this.assignedRoutes.map(r => r.id);
+      this.updateRouteIds();
     }
   }
 
@@ -78,11 +60,17 @@ export class DistributorFormStep3Component {
     if (index > -1) {
       this.availableRoutes.splice(index, 1);
       this.assignedRoutes.push({ ...route, isAssigned: true });
-      this.formData.assignedRoutes = this.assignedRoutes.map(r => r.id);
+      this.updateRouteIds();
     }
   }
 
+  private updateRouteIds(): void {
+    this.formData.route_ids = this.assignedRoutes.map(r => r.id.toString());
+  }
+
   onSave(): void {
+    // Route IDs are optional, can be empty array
+    this.updateRouteIds();
     this.save.emit(this.formData);
   }
 

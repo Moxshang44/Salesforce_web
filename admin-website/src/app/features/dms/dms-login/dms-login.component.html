@@ -1,0 +1,103 @@
+<div class="login-container">
+  <div class="demo-credentials">
+    <div class="credentials-text">
+      <span>Admin: <strong>9876543210 / 123456</strong> (Admin Panel)</span>
+      <span class="separator">|</span>
+      <span>DMS: <strong>9999999999 / 123456</strong> (DMS Panel)</span>
+    </div>
+  </div>
+  <div class="login-card">
+    <div class="login-header">
+      <p class="welcome-text">Welcome to</p>
+      <div class="header-top">
+        <img src="assets/images/company-logo.svg" alt="Company Logo" class="company-logo">
+        <h1 class="login-title">DMS</h1>
+      </div>
+      <p class="login-subtitle">Document Management System</p>
+    </div>
+
+    <form class="login-form" (ngSubmit)="onSubmit()">
+      @if (errorMessage) {
+        <div class="error-message">
+          <span class="error-icon">⚠️</span>
+          {{ errorMessage }}
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="mobileNumber" class="form-label">
+          Mobile Number
+        </label>
+        <div class="mobile-input-wrapper">
+          <span class="country-code">+91</span>
+          <input
+            type="tel"
+            id="mobileNumber"
+            class="form-input mobile-input"
+            [(ngModel)]="mobileNumber"
+            (input)="onMobileNumberChange()"
+            (keypress)="onMobileNumberKeyPress($event)"
+            name="mobileNumber"
+            placeholder="Enter your 10-digit mobile number"
+            autocomplete="tel"
+            maxlength="10"
+            [disabled]="otpSent && !errorMessage"
+          />
+        </div>
+      </div>
+
+      @if (otpSent) {
+        <div class="form-group">
+          <label for="otp" class="form-label">
+            OTP
+          </label>
+          <input
+            type="text"
+            id="otp"
+            class="form-input otp-input"
+            [(ngModel)]="otp"
+            name="otp"
+            placeholder="Enter 6-digit OTP"
+            autocomplete="one-time-code"
+            maxlength="6"
+            pattern="[0-9]*"
+            inputmode="numeric"
+          />
+          <div class="otp-footer">
+            <span class="otp-info">OTP sent to +91 {{ mobileNumber }}</span>
+            <button
+              type="button"
+              class="resend-otp"
+              (click)="onResendOtp()"
+              [disabled]="resendCooldown > 0 || isSendingOtp"
+            >
+              @if (resendCooldown > 0) {
+                Resend OTP ({{ resendCooldown }}s)
+              } @else {
+                Resend OTP
+              }
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (!otpSent) {
+        <button type="button" class="login-button" (click)="onSendOtp()" [disabled]="isSendingOtp">
+          <span class="button-text">{{ isSendingOtp ? 'Sending OTP...' : 'Send OTP' }}</span>
+          <span class="button-icon">→</span>
+        </button>
+      } @else {
+        <button type="submit" class="login-button" [disabled]="isSubmitting">
+          <span class="button-text">{{ isSubmitting ? 'Verifying...' : 'Verify & Sign In' }}</span>
+          <span class="button-icon">→</span>
+        </button>
+      }
+    </form>
+
+  </div>
+
+  <div class="login-background">
+    
+  </div>
+</div>
+

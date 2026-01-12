@@ -1,34 +1,40 @@
 <div class="stock-layout" [class.blurred]="showViewOptionsModal">
-  <app-sidebar></app-sidebar>
+  @if (isDmsMode) {
+    <app-dms-sidebar></app-dms-sidebar>
+  } @else {
+    <app-sidebar></app-sidebar>
+  }
   
   <div class="main-content">
     <app-header></app-header>
     
     <div class="stock-content">
       <!-- Tabs Section -->
-      <div class="tabs-section">
-        <button 
-          class="tab-btn"
-          [class.active]="activeTab === 'stocks'"
-          (click)="setActiveTab('stocks')"
-        >
-          Stocks
-        </button>
-        <button 
-          class="tab-btn"
-          [class.active]="activeTab === 'claims'"
-          (click)="setActiveTab('claims')"
-        >
-          Claims
-        </button>
-        <button 
-          class="tab-btn"
-          [class.active]="activeTab === 'orders'"
-          (click)="setActiveTab('orders')"
-        >
-          Orders/Bills
-        </button>
-      </div>
+      @if (!isDmsMode) {
+        <div class="tabs-section">
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'stocks'"
+            (click)="setActiveTab('stocks')"
+          >
+            Stocks
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'claims'"
+            (click)="setActiveTab('claims')"
+          >
+            Claims
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'orders'"
+            (click)="setActiveTab('orders')"
+          >
+            Orders/Bills
+          </button>
+        </div>
+      }
 
       <!-- Page Header -->
       <div class="page-header">
@@ -65,6 +71,12 @@
             <img src="assets/images/export.png" alt="Export" class="button-icon">
             Excel
           </app-button>
+          @if (isDmsMode && selectedReturnsType !== 'All Claims Summary') {
+            <app-button variant="primary" size="sm" (click)="onAdd()">
+              <img src="assets/images/add.png" alt="Add" class="button-icon">
+              Add
+            </app-button>
+          }
         </div>
       </div>
 
@@ -241,6 +253,7 @@
             <table class="stock-table">
               <thead>
                 <tr>
+                  <th class="col-actions">Actions</th>
                   <th class="col-bill-no">
                     <div class="sortable-header">
                       Bill No.
@@ -322,7 +335,31 @@
               </thead>
               <tbody>
                 @for (claim of claimItems; track claim.id) {
-                  <tr>
+                  <tr (click)="onClaimRowClick(claim)" [class.selected]="selectedClaim?.id === claim.id" class="clickable-row">
+                    <td class="col-actions" (click)="$event.stopPropagation()">
+                      <div class="action-buttons">
+                        <button class="action-icon edit-icon" (click)="onEditClaim(claim)" title="Edit">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                        <button class="action-icon view-icon" (click)="onViewClaim(claim)" title="View">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                        <button class="action-icon delete-icon" (click)="onDeleteClaim(claim)" title="Delete">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
                     <td class="col-bill-no">
                       <div class="bill-no">{{ claim.billNo }}</div>
                     </td>
@@ -331,12 +368,19 @@
                     </td>
                     <td class="col-product-reason">
                       <div class="product-reason-info">
-                        <div class="product-name">{{ claim.productName }}</div>
-                        <div class="reason-text">Reason: {{ claim.reason }}</div>
+                        <div class="product-name">{{ claim.products[0].productName }}</div>
+                        <div class="reason-text">
+                          Reason: {{ claim.products[0].reason }}
+                          @if (claim.products.length > 1) {
+                            <span class="more-indicator">({{ claim.products.length - 1 }}+ more)</span>
+                          }
+                        </div>
                       </div>
                     </td>
                     <td class="col-qty">
-                      <div class="qty-info">{{ claim.quantity }} {{ claim.unit }}</div>
+                      <div class="qty-info">
+                        {{ getTotalQuantity(claim) }} {{ getFirstUnit(claim) }}
+                      </div>
                     </td>
                     <td class="col-total-amount">
                       <div class="amount-info">₹{{ claim.totalAmount | number }}</div>
@@ -382,6 +426,7 @@
             <table class="stock-table">
               <thead>
                 <tr>
+                  <th class="col-actions">Actions</th>
                   <th class="col-salesman">
                     <div class="sortable-header">
                       Salesman Name / Route
@@ -442,6 +487,30 @@
               <tbody>
                 @for (sample of sampleItems; track sample.id) {
                   <tr>
+                    <td class="col-actions">
+                      <div class="action-buttons">
+                        <button class="action-icon edit-icon" (click)="onEditSample(sample)" title="Edit">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                        <button class="action-icon view-icon" (click)="onViewSample(sample)" title="View">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                        <button class="action-icon delete-icon" (click)="onDeleteSample(sample)" title="Delete">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
                     <td class="col-salesman">
                       <div class="salesman-info">
                         <div class="salesman-name">{{ sample.salesmanName }}</div>
@@ -605,50 +674,205 @@
                 </thead>
                 <tbody>
                   @for (item of monthWiseSummary; track item.id) {
-                    <tr>
-                      <td class="col-month">
-                        <div class="month-info">{{ item.month }}</div>
-                      </td>
-                      <td class="col-return-claims">
-                        <div class="claim-amount">
-                          @if (item.returnClaims !== null) {
-                            ₹{{ item.returnClaims | number }}
-                          } @else {
-                            -
+                    @if (isMonthRow(item)) {
+                      <!-- Month Row -->
+                      @if (getDateRowsForMonth(item.month).length > 0) {
+                        <!-- Month Row with Date Children (Expandable) -->
+                        <tr class="month-row" (click)="toggleMonth(item.month)" [class.expanded]="isMonthExpanded(item.month)">
+                          <td class="col-month">
+                            <div class="month-info">
+                              <span class="expand-icon" [class.expanded]="isMonthExpanded(item.month)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                              {{ item.month }}
+                            </div>
+                          </td>
+                          <td class="col-return-claims">
+                            <div class="claim-amount">
+                              @if (item.returnClaims !== null) {
+                                ₹{{ item.returnClaims | number }}
+                              } @else {
+                                -
+                              }
+                            </div>
+                          </td>
+                          <td class="col-scheme-claims">
+                            <div class="claim-amount">
+                              @if (item.schemeClaims !== null) {
+                                ₹{{ item.schemeClaims | number }}
+                              } @else {
+                                -
+                              }
+                            </div>
+                          </td>
+                          <td class="col-sample-claims">
+                            <div class="claim-amount">
+                              @if (item.sampleClaims !== null) {
+                                ₹{{ item.sampleClaims | number }}
+                              } @else {
+                                -
+                              }
+                            </div>
+                          </td>
+                          <td class="col-total-claim">
+                            <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
+                          </td>
+                          <td class="col-cleared-date">
+                            <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
+                              @if (item.clearedDate) {
+                                {{ item.clearedDate }}
+                              } @else {
+                                -
+                              }
+                            </div>
+                          </td>
+                        </tr>
+                        <!-- Date Rows for this Month -->
+                        @if (isMonthExpanded(item.month)) {
+                          @for (dateItem of getDateRowsForMonth(item.month); track dateItem.id) {
+                            <tr class="date-row">
+                              <td class="col-month">
+                                <div class="month-info date-indent">{{ dateItem.month }}</div>
+                              </td>
+                              <td class="col-return-claims">
+                                <div class="claim-amount">
+                                  @if (dateItem.returnClaims !== null) {
+                                    ₹{{ dateItem.returnClaims | number }}
+                                  } @else {
+                                    -
+                                  }
+                                </div>
+                              </td>
+                              <td class="col-scheme-claims">
+                                <div class="claim-amount">
+                                  @if (dateItem.schemeClaims !== null) {
+                                    ₹{{ dateItem.schemeClaims | number }}
+                                  } @else {
+                                    -
+                                  }
+                                </div>
+                              </td>
+                              <td class="col-sample-claims">
+                                <div class="claim-amount">
+                                  @if (dateItem.sampleClaims !== null) {
+                                    ₹{{ dateItem.sampleClaims | number }}
+                                  } @else {
+                                    -
+                                  }
+                                </div>
+                              </td>
+                              <td class="col-total-claim">
+                                <div class="claim-amount">₹{{ dateItem.totalClaim | number }}</div>
+                              </td>
+                              <td class="col-cleared-date">
+                                <div class="cleared-date-info" [class.pending]="dateItem.clearedDate === 'Pending'" [class.cleared]="dateItem.clearedDate && dateItem.clearedDate !== 'Pending'">
+                                  @if (dateItem.clearedDate) {
+                                    {{ dateItem.clearedDate }}
+                                  } @else {
+                                    -
+                                  }
+                                </div>
+                              </td>
+                            </tr>
                           }
-                        </div>
-                      </td>
-                      <td class="col-scheme-claims">
-                        <div class="claim-amount">
-                          @if (item.schemeClaims !== null) {
-                            ₹{{ item.schemeClaims | number }}
-                          } @else {
-                            -
-                          }
-                        </div>
-                      </td>
-                      <td class="col-sample-claims">
-                        <div class="claim-amount">
-                          @if (item.sampleClaims !== null) {
-                            ₹{{ item.sampleClaims | number }}
-                          } @else {
-                            -
-                          }
-                        </div>
-                      </td>
-                      <td class="col-total-claim">
-                        <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
-                      </td>
-                      <td class="col-cleared-date">
-                        <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
-                          @if (item.clearedDate) {
-                            {{ item.clearedDate }}
-                          } @else {
-                            -
-                          }
-                        </div>
-                      </td>
-                    </tr>
+                        }
+                      } @else {
+                        <!-- Month Row without Date Children (Non-expandable) -->
+                        <tr>
+                          <td class="col-month">
+                            <div class="month-info">{{ item.month }}</div>
+                          </td>
+                        <td class="col-return-claims">
+                          <div class="claim-amount">
+                            @if (item.returnClaims !== null) {
+                              ₹{{ item.returnClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-scheme-claims">
+                          <div class="claim-amount">
+                            @if (item.schemeClaims !== null) {
+                              ₹{{ item.schemeClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-sample-claims">
+                          <div class="claim-amount">
+                            @if (item.sampleClaims !== null) {
+                              ₹{{ item.sampleClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-total-claim">
+                          <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
+                        </td>
+                        <td class="col-cleared-date">
+                          <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
+                            @if (item.clearedDate) {
+                              {{ item.clearedDate }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                      }
+                    } @else if (!item.parentMonth) {
+                      <!-- Other month rows (February, March, etc.) without date children -->
+                      <!-- Skip date rows (items with parentMonth) as they are rendered when parent month is expanded -->
+                      <tr>
+                        <td class="col-month">
+                          <div class="month-info">{{ item.month }}</div>
+                        </td>
+                        <td class="col-return-claims">
+                          <div class="claim-amount">
+                            @if (item.returnClaims !== null) {
+                              ₹{{ item.returnClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-scheme-claims">
+                          <div class="claim-amount">
+                            @if (item.schemeClaims !== null) {
+                              ₹{{ item.schemeClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-sample-claims">
+                          <div class="claim-amount">
+                            @if (item.sampleClaims !== null) {
+                              ₹{{ item.sampleClaims | number }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                        <td class="col-total-claim">
+                          <div class="claim-amount">₹{{ item.totalClaim | number }}</div>
+                        </td>
+                        <td class="col-cleared-date">
+                          <div class="cleared-date-info" [class.pending]="item.clearedDate === 'Pending'" [class.cleared]="item.clearedDate && item.clearedDate !== 'Pending'">
+                            @if (item.clearedDate) {
+                              {{ item.clearedDate }}
+                            } @else {
+                              -
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    }
                   }
                 </tbody>
               </table>
@@ -664,6 +888,7 @@
             <table class="stock-table">
               <thead>
                 <tr>
+                  <th class="col-actions">Actions</th>
                   <th class="col-scheme-bill-no">
                     <div class="sortable-header">
                       Bill No.
@@ -713,6 +938,30 @@
               <tbody>
                 @for (scheme of schemeClaimItems; track scheme.id) {
                   <tr>
+                    <td class="col-actions">
+                      <div class="action-buttons">
+                        <button class="action-icon edit-icon" (click)="onEditScheme(scheme)" title="Edit">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                        <button class="action-icon view-icon" (click)="onViewScheme(scheme)" title="View">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                        <button class="action-icon delete-icon" (click)="onDeleteScheme(scheme)" title="Delete">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
                     <td class="col-scheme-bill-no">
                       <div class="bill-no">{{ scheme.billNo }}</div>
                     </td>
@@ -910,6 +1159,240 @@
         <div class="view-options-body">
           <button class="view-option-btn" (click)="onViewBill()">View Bill</button>
           <button class="view-option-btn" (click)="onViewPurchase()">View Purchase</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add Claim Modal -->
+  @if (showAddModal) {
+    <div class="add-modal-backdrop" (click)="closeAddModal()">
+      <div class="add-modal" (click)="$event.stopPropagation()">
+        <div class="add-modal-header">
+          <button class="back-btn" (click)="closeAddModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5M5 12l6-6m-6 6l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h3 class="add-modal-title">Add {{ selectedReturnsType }}</h3>
+        </div>
+
+        <div class="add-modal-body">
+          @if (addFormType === 'sample') {
+            <!-- Sample Form -->
+            <form class="add-claim-form" (ngSubmit)="onSubmitAddForm()">
+              <div class="form-group">
+                <label class="form-label">Retailer Type *</label>
+                <select class="form-select" [(ngModel)]="sampleRetailerType" name="retailerType" required>
+                  <option value="">Select Retailer Type</option>
+                  <option value="New Retailer">New Retailer</option>
+                  <option value="Existing Retailer">Existing Retailer</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Route Name *</label>
+                <select class="form-select" [(ngModel)]="sampleRouteName" name="routeName" required>
+                  <option value="">Select Route</option>
+                  <option value="CG Road Route">CG Road Route</option>
+                  <option value="Satellite Route">Satellite Route</option>
+                  <option value="Maninagar Route">Maninagar Route</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Product Name *</label>
+                <div class="product-quantity-row">
+                  <select class="form-select product-select-row" [(ngModel)]="selectedSampleProduct" name="productName">
+                    <option value="">Select Product</option>
+                    <option value="Ensure Gold Nutrition Powder">Ensure Gold Nutrition Powder</option>
+                    <option value="Horlicks Health Drink">Horlicks Health Drink</option>
+                    <option value="Complan Nutrition Mix">Complan Nutrition Mix</option>
+                    <option value="Boost Energy Drink">Boost Energy Drink</option>
+                    <option value="Bournvita Pro Health">Bournvita Pro Health</option>
+                  </select>
+                  <div class="quantity-controls-inline">
+                    <button type="button" class="quantity-btn minus" (click)="decrementQuantity()">-</button>
+                    <input type="number" class="quantity-input" [(ngModel)]="sampleQuantity" name="quantity" min="1" readonly>
+                    <button type="button" class="quantity-btn plus" (click)="incrementQuantity()">+</button>
+                  </div>
+                  <button type="button" class="add-product-btn" (click)="addSampleProduct()">
+                    + Add Product
+                  </button>
+                </div>
+              </div>
+
+              @if (sampleProducts.length > 0) {
+                <div class="added-products">
+                  @for (product of sampleProducts; track $index) {
+                    <div class="added-product-item">
+                      <span class="product-name">{{ product.productName }}</span>
+                      <span class="product-quantity">Qty: {{ product.quantity }}</span>
+                      <button type="button" class="remove-product-btn" (click)="removeSampleProduct($index)">×</button>
+                    </div>
+                  }
+                </div>
+              }
+
+              <div class="form-group">
+                <label class="form-label optional">Optional Remarks</label>
+                <textarea 
+                  class="form-textarea" 
+                  [(ngModel)]="sampleRemarks" 
+                  name="remarks"
+                  placeholder="Add notes about Anything...">
+                </textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="cancel-btn-modal" (click)="closeAddModal()">Cancel</button>
+                <button type="submit" class="submit-btn-modal">Submit</button>
+              </div>
+            </form>
+          } @else {
+            <!-- Schemes Form -->
+            <form class="add-claim-form" (ngSubmit)="onSubmitAddForm()">
+              <div class="form-group">
+                <label class="form-label">Bill No *</label>
+                <input 
+                  type="text" 
+                  class="form-input" 
+                  [(ngModel)]="schemeBillNo" 
+                  name="billNo"
+                  placeholder="Enter Bill No"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Total Amount *</label>
+                <input 
+                  type="number" 
+                  class="form-input" 
+                  [(ngModel)]="schemeTotalAmount" 
+                  name="totalAmount"
+                  placeholder="Enter Total Amount"
+                  min="0"
+                  step="0.01"
+                  required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Products *</label>
+                @for (product of schemeProducts; track $index) {
+                  <div class="product-row">
+                    <select 
+                      class="form-select product-select" 
+                      [(ngModel)]="product.productName" 
+                      [name]="'productName' + $index"
+                      required>
+                      <option value="">Select Product</option>
+                      <option value="Ensure Gold Nutrition Powder">Ensure Gold Nutrition Powder</option>
+                      <option value="Horlicks Health Drink">Horlicks Health Drink</option>
+                      <option value="Complan Nutrition Mix">Complan Nutrition Mix</option>
+                    </select>
+                    <input 
+                      type="number" 
+                      class="form-input quantity-input-small" 
+                      [(ngModel)]="product.quantity" 
+                      [name]="'quantity' + $index"
+                      placeholder="Qty"
+                      min="1"
+                      required>
+                    @if (schemeProducts.length > 1) {
+                      <button type="button" class="remove-product-btn-small" (click)="removeSchemeProduct($index)">×</button>
+                    }
+                  </div>
+                }
+                <button type="button" class="add-product-row-btn" (click)="addSchemeProduct()">
+                  + Add Product
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Quantity *</label>
+                <input 
+                  type="number" 
+                  class="form-input" 
+                  [value]="getSchemeTotalQuantity()" 
+                  readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Upload Bill *</label>
+                <div class="file-upload-wrapper">
+                  <input 
+                    type="file" 
+                    class="file-input" 
+                    id="uploadBill"
+                    (change)="onFileSelected($event)"
+                    accept="image/*,.pdf">
+                  <label for="uploadBill" class="file-upload-label">
+                    @if (schemeUploadBill) {
+                      <span>{{ schemeUploadBill.name }}</span>
+                    } @else {
+                      <span>Choose file to upload</span>
+                    }
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="cancel-btn-modal" (click)="closeAddModal()">Cancel</button>
+                <button type="submit" class="submit-btn-modal">Submit</button>
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Claim Details Right Sidebar -->
+  @if (showClaimSidebar && selectedClaim) {
+    <div class="claim-sidebar-overlay" (click)="closeClaimSidebar()"></div>
+    <div class="claim-sidebar" (click)="$event.stopPropagation()">
+      <div class="claim-sidebar-header">
+        <h2 class="claim-sidebar-title">Return Claim Details</h2>
+        <button class="claim-sidebar-close" (click)="closeClaimSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="claim-sidebar-content">
+        <!-- Financial Details -->
+        <div class="claim-section">
+          <h3 class="claim-section-title">Financial Details</h3>
+          <div class="financial-table-wrapper">
+            <table class="financial-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Reason</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (product of selectedClaim.products; track $index) {
+                  <tr>
+                    <td class="product-name-cell">{{ product.productName }}</td>
+                    <td class="reason-cell">{{ product.reason }}</td>
+                    <td class="quantity-cell">{{ product.quantity }} {{ product.unit }}</td>
+                    <td class="price-cell highlight-amount">₹{{ product.price | number }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="2" class="total-label">Total</td>
+                  <td class="total-quantity">{{ getTotalQuantity(selectedClaim) }} {{ getFirstUnit(selectedClaim) }}</td>
+                  <td class="total-amount highlight-amount">₹{{ selectedClaim.claimAmount | number }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </div>
     </div>

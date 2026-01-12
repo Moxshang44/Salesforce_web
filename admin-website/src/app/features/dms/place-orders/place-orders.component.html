@@ -1,0 +1,194 @@
+<div class="place-orders-layout">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Place Orders Content -->
+    <div class="place-orders-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Place Orders</h1>
+          <p class="page-subtitle">Order to Super Stockist</p>
+        </div>
+      </div>
+
+      <!-- Two Column Layout -->
+      <div class="content-grid">
+        <!-- Left Column: Create PO Form -->
+        <div class="create-po-section">
+          <div class="form-card">
+            <h2 class="card-title">Create PO</h2>
+
+            <form class="po-form">
+              <!-- Super Stockist -->
+              <div class="form-group">
+                <label class="form-label">Super stockist</label>
+                <select class="form-select" [(ngModel)]="selectedSuperStockist" name="superStockist">
+                  <option value="">Select Super Stockist</option>
+                  @for (stockist of superStockists; track stockist) {
+                    <option [value]="stockist">{{ stockist }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Expected Delivery Date -->
+              <div class="form-group">
+                <label class="form-label">Expected delivery date</label>
+                <div class="date-input-wrapper">
+                  <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <input 
+                    type="date" 
+                    class="form-input date-input"
+                    [(ngModel)]="expectedDeliveryDate"
+                    name="deliveryDate"
+                  />
+                </div>
+              </div>
+
+              <!-- Delivery Note -->
+              <div class="form-group">
+                <label class="form-label">Delivery note</label>
+                <textarea 
+                  class="form-textarea"
+                  placeholder="Comment note (optional)"
+                  [(ngModel)]="deliveryNote"
+                  name="deliveryNote"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <!-- Line Items Section -->
+              <div class="line-items-section">
+                <label class="form-label">Line Items</label>
+                
+                <!-- Add Line Item Row -->
+                <div class="add-line-item-row">
+                  <select class="form-select sku-select" [(ngModel)]="selectedSku" name="sku">
+                    <option value="">Select SKU</option>
+                    @for (sku of skuOptions; track sku.value) {
+                      <option [value]="sku.value">{{ sku.label }}</option>
+                    }
+                  </select>
+                  <input 
+                    type="number" 
+                    class="form-input qty-input"
+                    [(ngModel)]="newItemQuantity"
+                    name="quantity"
+                    min="1"
+                  />
+                  <app-button variant="primary" size="sm" (click)="onAddLineItem()">
+                    Add Line +
+                  </app-button>
+                </div>
+
+                <!-- Line Items Table -->
+                @if (lineItems.length > 0) {
+                  <div class="line-items-table">
+                    <table class="items-table">
+                      <thead>
+                        <tr>
+                          <th>SKU</th>
+                          <th>Description</th>
+                          <th>Qty</th>
+                          <th>Unit Price</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (item of lineItems; track item.id) {
+                          <tr>
+                            <td>{{ item.sku }}</td>
+                            <td>{{ item.description }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ formatCurrency(item.unitPrice) }}</td>
+                            <td>
+                              <button type="button" class="remove-btn" (click)="onRemoveLineItem(item.id)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="2" class="summary-label">Subtotal:</td>
+                          <td colspan="2" class="summary-value">{{ formatCurrency(getSubtotal()) }}</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td colspan="2" class="summary-label">Tax ({{ (taxRate * 100).toFixed(0) }}%):</td>
+                          <td colspan="2" class="summary-value">{{ formatCurrency(getTax()) }}</td>
+                          <td></td>
+                        </tr>
+                        <tr class="total-row">
+                          <td colspan="2" class="summary-label total-label">Total:</td>
+                          <td colspan="2" class="summary-value total-value">{{ formatCurrency(getTotal()) }}</td>
+                          <td></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                }
+              </div>
+
+              <!-- Form Actions -->
+              <div class="form-actions">
+                <app-button variant="outline" size="md" (click)="onSaveDraft()">
+                  Save Draft
+                </app-button>
+                <app-button variant="primary" size="md" (click)="onPlaceOrder()">
+                  Place Order
+                </app-button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right Column: Recent POs -->
+        <div class="recent-pos-section">
+          <div class="form-card">
+            <h2 class="card-title">Recent POs</h2>
+
+            <div class="recent-pos-table">
+              <table class="pos-table">
+                <thead>
+                  <tr>
+                    <th>PO No</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (po of recentPOs; track po.id) {
+                    <tr>
+                      <td>{{ po.poNo }}</td>
+                      <td>{{ po.date }}</td>
+                      <td>
+                        <span class="status-pill" [class]="getStatusClass(po.status)">
+                          {{ po.status }}
+                        </span>
+                      </td>
+                      <td>
+                        <button class="view-link" (click)="onViewPO(po)">View</button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ChatWidgetService } from '../../../shared/services/chat-widget.service';
 
 @Component({
   selector: 'app-header',
@@ -15,7 +17,11 @@ export class HeaderComponent {
   searchQuery = '';
   showProfileMenu = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private chatWidgetService: ChatWidgetService
+  ) {}
 
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -28,7 +34,7 @@ export class HeaderComponent {
   }
 
   onAiClick() {
-    console.log('Talk to AI clicked');
+    this.chatWidgetService.toggle();
   }
 
   onProfileClick() {
@@ -37,6 +43,13 @@ export class HeaderComponent {
 
   onLogout() {
     this.showProfileMenu = false;
-    this.authService.logout();
+    // Check if we're in super admin context
+    if (this.router.url.startsWith('/super-admin')) {
+      this.authService.superAdminLogout();
+    } else if (this.router.url.startsWith('/dms')) {
+      this.authService.dmsLogout();
+    } else {
+      this.authService.logout();
+    }
   }
 }

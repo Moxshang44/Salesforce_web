@@ -3,33 +3,32 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
-interface PricingLevel {
-  level: string;
-  priceType: string;
-  margin: string;
-  purchasePrice: string;
-  sellingPrice: string;
+export interface Margin {
+  type: string;
+  value: number;
 }
 
-interface RegionPricing {
-  id: string;
-  labelRuleName: string;
-  mrp: string;
-  stockistPercent: string;
-  distributorPercent: string;
-  retailerPercent: string;
+export interface Margins {
+  super_stockist: Margin;
+  distributor: Margin;
+  retailer: Margin;
 }
 
-interface Step3FormData {
-  mrp: string;
-  gstPercent: string;
-  gstCategory: string;
-  pricingLevels: PricingLevel[];
-  superStockistMOQ: string;
-  distributorMOQ: string;
-  retailerMOQ: string;
-  enableRegionPricing: boolean;
-  regionPricings: RegionPricing[];
+export interface MinOrderQuantity {
+  super_stockist: number;
+  distributor: number;
+  retailer: number;
+}
+
+export interface ProductPrice {
+  area_id: number | null;
+  mrp: number;
+  margins: Margins | null;
+  min_order_quantity: MinOrderQuantity | null;
+}
+
+export interface ProductFormStep3Data {
+  prices: ProductPrice[];
 }
 
 @Component({
@@ -40,55 +39,115 @@ interface Step3FormData {
   styleUrl: './product-form-step3.component.scss'
 })
 export class ProductFormStep3Component {
-  @Input() formData: Step3FormData = {
-    mrp: '1000',
-    gstPercent: '18%',
-    gstCategory: 'Food',
-    pricingLevels: [
-      { level: 'Super Stockiest', priceType: 'Markdown', margin: '0', purchasePrice: '650', sellingPrice: '850' },
-      { level: 'Distributor', priceType: 'Markdown', margin: '0', purchasePrice: '850', sellingPrice: '750' },
-      { level: 'Retailer', priceType: 'Markup', margin: '15', purchasePrice: '750', sellingPrice: '1000' }
-    ],
-    superStockistMOQ: '1000',
-    distributorMOQ: '500',
-    retailerMOQ: '100',
-    enableRegionPricing: true,
-    regionPricings: [
+  @Input() step1Data: any = null;
+  @Input() step2Data: any = null;
+  @Output() save = new EventEmitter<ProductFormStep3Data>();
+  @Output() previous = new EventEmitter<void>();
+
+  formData: ProductFormStep3Data = {
+    prices: [
       {
-        id: '1',
-        labelRuleName: 'North Zone Pricing',
-        mrp: '10,000',
-        stockistPercent: '8%',
-        distributorPercent: '12%',
-        retailerPercent: '16%'
+        area_id: null,
+        mrp: 0,
+        margins: {
+          super_stockist: {
+            type: 'MARKUP',
+            value: 0
+          },
+          distributor: {
+            type: 'MARKUP',
+            value: 0
+          },
+          retailer: {
+            type: 'MARKUP',
+            value: 0
+          }
+        },
+        min_order_quantity: {
+          super_stockist: 0,
+          distributor: 0,
+          retailer: 0
+        }
       }
     ]
   };
 
-  @Output() save = new EventEmitter<Step3FormData>();
-  @Output() previous = new EventEmitter<void>();
+  // These should ideally come from API - using placeholder for now
+  areas: Array<{id: number, name: string}> = [
+    { id: 1, name: 'Area 1' },
+    { id: 2, name: 'Area 2' },
+    { id: 3, name: 'Area 3' }
+  ];
 
-  gstPercentages = ['0%', '5%', '12%', '18%', '28%'];
-  gstCategories = ['Food', 'Beverages', 'Pharmaceuticals', 'Consumer Goods', 'Electronics'];
-  priceTypes = ['Markdown', 'Markup'];
+  marginTypes = ['MARKUP', 'MARKDOWN'];
+  
+  errors: { [key: string]: string } = {};
 
-  addRegionPricing() {
-    this.formData.regionPricings.push({
-      id: Date.now().toString(),
-      labelRuleName: '',
-      mrp: '',
-      stockistPercent: '',
-      distributorPercent: '',
-      retailerPercent: ''
+  addPrice() {
+    this.formData.prices.push({
+      area_id: null,
+      mrp: 0,
+      margins: {
+        super_stockist: {
+          type: 'MARKUP',
+          value: 0
+        },
+        distributor: {
+          type: 'MARKUP',
+          value: 0
+        },
+        retailer: {
+          type: 'MARKUP',
+          value: 0
+        }
+      },
+      min_order_quantity: {
+        super_stockist: 0,
+        distributor: 0,
+        retailer: 0
+      }
     });
   }
 
-  removeRegionPricing(index: number) {
-    this.formData.regionPricings.splice(index, 1);
+  removePrice(index: number) {
+    this.formData.prices.splice(index, 1);
   }
 
   onSave() {
+    this.errors = {};
+    let hasErrors = false;
+
+    // Validate required fields
+    if (!this.formData.prices || this.formData.prices.length === 0) {
+      this.errors['prices'] = 'At least one price entry is required';
+      hasErrors = true;
+    } else {
+      // Validate each price entry
+      this.formData.prices.forEach((price, index) => {
+        if (price.mrp === null || price.mrp === undefined || price.mrp <= 0) {
+          this.errors[`price_${index}_mrp`] = 'MRP is required and must be greater than 0';
+          hasErrors = true;
+        }
+      });
+    }
+
+    if (hasErrors) {
+      setTimeout(() => {
+        const firstError = document.querySelector('.error-message, .error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return;
+    }
+
     this.save.emit(this.formData);
+  }
+
+  clearError(fieldName: string): void {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
+    }
   }
 
   onPrevious() {

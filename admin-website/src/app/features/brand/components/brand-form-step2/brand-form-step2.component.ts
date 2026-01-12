@@ -1,58 +1,88 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
-interface BrandFormStep2Data {
-  status: string;
-  isActive: boolean;
-  visibleToDistributors: boolean;
-  visibleToStockists: boolean;
-  allowOnlineOrders: boolean;
-  minimumOrderQuantity: string;
-  manufacturingCountry: string;
-  certifications: string;
-  tags: string[];
-  notes: string;
+export interface BrandMargin {
+  name: string;
+  area_id: number | null;
+  margins: {
+    super_stockist: {
+      type: string;
+      value: number | null;
+    };
+    distributor: {
+      type: string;
+      value: number | null;
+    };
+    retailer: {
+      type: string;
+      value: number | null;
+    };
+  };
+}
+
+export interface BrandFormStep2Data {
+  margins: BrandMargin[];
 }
 
 @Component({
   selector: 'app-brand-form-step2',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ButtonComponent],
   templateUrl: './brand-form-step2.component.html',
   styleUrl: './brand-form-step2.component.scss'
 })
 export class BrandFormStep2Component {
+  @Input() step1Data: any = null;
   @Output() save = new EventEmitter<BrandFormStep2Data>();
   @Output() previous = new EventEmitter<void>();
 
   formData: BrandFormStep2Data = {
-    status: 'Active',
-    isActive: true,
-    visibleToDistributors: true,
-    visibleToStockists: true,
-    allowOnlineOrders: true,
-    minimumOrderQuantity: '',
-    manufacturingCountry: 'India',
-    certifications: '',
-    tags: [],
-    notes: ''
+    margins: []
   };
 
-  statusOptions = ['Active', 'Inactive', 'Pending', 'Discontinued'];
-  countryOptions = ['India', 'USA', 'UK', 'Germany', 'Japan', 'China', 'Other'];
-  tagInput: string = '';
+  // These should ideally come from API - using placeholder for now
+  areas: Array<{id: number, name: string}> = [
+    { id: 1, name: 'Area 1' },
+    { id: 2, name: 'Area 2' },
+    { id: 3, name: 'Area 3' }
+  ];
 
+  marginTypes = ['MARKUP', 'MARKDOWN'];
+  
   errors: { [key: string]: string } = {};
 
-  onSaveAndFinish(): void {
+  addMargin() {
+    this.formData.margins.push({
+      name: '',
+      area_id: null,
+      margins: {
+        super_stockist: {
+          type: 'MARKUP',
+          value: null
+        },
+        distributor: {
+          type: 'MARKUP',
+          value: null
+        },
+        retailer: {
+          type: 'MARKUP',
+          value: null
+        }
+      }
+    });
+  }
+
+  removeMargin(index: number) {
+    this.formData.margins.splice(index, 1);
+  }
+
+  onSaveAndFinish() {
     this.errors = {};
     let hasErrors = false;
 
-    if (!this.formData.status) {
-      this.errors['status'] = 'Please select status';
-      hasErrors = true;
-    }
+    // Validation can be added here if needed
 
     if (hasErrors) {
       setTimeout(() => {
@@ -67,25 +97,13 @@ export class BrandFormStep2Component {
     this.save.emit(this.formData);
   }
 
-  clearError(field: string): void {
-    if (this.errors[field]) {
-      delete this.errors[field];
+  clearError(fieldName: string): void {
+    if (this.errors[fieldName]) {
+      delete this.errors[fieldName];
     }
   }
 
-  onPrevious(): void {
+  onPrevious() {
     this.previous.emit();
   }
-
-  addTag(): void {
-    if (this.tagInput.trim() && !this.formData.tags.includes(this.tagInput.trim())) {
-      this.formData.tags.push(this.tagInput.trim());
-      this.tagInput = '';
-    }
-  }
-
-  removeTag(tag: string): void {
-    this.formData.tags = this.formData.tags.filter(t => t !== tag);
-  }
 }
-

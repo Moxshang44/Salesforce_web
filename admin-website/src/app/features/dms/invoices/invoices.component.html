@@ -1,0 +1,381 @@
+<div class="invoices-layout" [class.sidebar-open]="showSidebar" [class.modal-open]="showLinkModal">
+  <!-- DMS Sidebar Navigation -->
+  <app-dms-sidebar></app-dms-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Invoices Content -->
+    <div class="invoices-content">
+      <!-- Page Title -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Invoices</h1>
+          <p class="page-subtitle">Orders vs Billing Reconciliation</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="tabs-section">
+        <button 
+          class="tab-btn"
+          [class.active]="activeTab === 'All'"
+          (click)="setActiveTab('All')"
+        >
+          All
+        </button>
+        <button 
+          class="tab-btn"
+          [class.active]="activeTab === 'Exceptions'"
+          (click)="setActiveTab('Exceptions')"
+        >
+          Exceptions
+        </button>
+      </div>
+
+      <!-- Filters Section -->
+      <div class="filters-section">
+        <div class="search-bar-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input 
+            type="text" 
+            class="search-input"
+            placeholder="Search invoice/retailer"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+          />
+        </div>
+
+        <select class="filter-dropdown" [(ngModel)]="matchStatusFilter" (change)="onFilterChange()">
+          <option value="All">Match Status</option>
+          <option value="Matched">Matched</option>
+          <option value="Partial">Partial</option>
+          <option value="Unmatched">Unmatched</option>
+        </select>
+
+        <select class="filter-dropdown" [(ngModel)]="deliveryStatusFilter" (change)="onFilterChange()">
+          <option value="All">Delivery Status</option>
+          <option value="Delivered">Delivered</option>
+          <option value="Pending">Pending</option>
+          <option value="In Transit">In Transit</option>
+        </select>
+
+        <select class="filter-dropdown" [(ngModel)]="sourceFilter" (change)="onFilterChange()">
+          <option value="All">Source</option>
+          <option value="NATIVE">Native</option>
+          <option value="TALLY">Tally</option>
+        </select>
+
+        <div class="date-range-wrapper">
+          <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input 
+            type="date" 
+            class="date-input"
+            [(ngModel)]="dateRangeStart"
+            (change)="onFilterChange()"
+          />
+          <span class="date-separator">-</span>
+          <input 
+            type="date" 
+            class="date-input"
+            [(ngModel)]="dateRangeEnd"
+            (change)="onFilterChange()"
+          />
+        </div>
+
+        <app-button variant="primary" size="sm" (click)="onExcel()">
+          <img src="assets/images/export.png" alt="Export" class="button-icon">
+          Export Excel
+        </app-button>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="summary-card" (click)="onViewSummary('unmatched')">
+          <div class="card-content">
+            <div class="card-label">Unmatched Invoices</div>
+            <div class="card-value">{{ unmatchedCount }}</div>
+          </div>
+          <div class="card-link">View list ></div>
+        </div>
+        <div class="summary-card" (click)="onViewSummary('partial')">
+          <div class="card-content">
+            <div class="card-label">Partial Matches</div>
+            <div class="card-value">{{ partialMatchesCount }}</div>
+          </div>
+          <div class="card-link">View list ></div>
+        </div>
+        <div class="summary-card" (click)="onViewSummary('overbilled')">
+          <div class="card-content">
+            <div class="card-label">Over-billed anomalies</div>
+            <div class="card-value">{{ overBilledCount }}</div>
+          </div>
+          <div class="card-link">View list ></div>
+        </div>
+      </div>
+
+      <!-- Invoices Table -->
+      <div class="table-card">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-invoice-no">Invoice No</th>
+                <th class="col-retailer">Retailer</th>
+                <th class="col-date">Invoice Date</th>
+                <th class="col-total">Total</th>
+                <th class="col-source">Source</th>
+                <th class="col-match-status">Match Status</th>
+                <th class="col-delivery-status">Delivery Status</th>
+                <th class="col-linked-orders">Linked Orders</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (invoice of filteredInvoices; track invoice.id) {
+                <tr 
+                  [class.selected]="selectedInvoice?.id === invoice.id"
+                  (click)="onViewInvoice(invoice)"
+                  class="clickable-row"
+                >
+                  <td class="col-invoice-no">
+                    <div class="invoice-no">{{ invoice.invoiceNo }}</div>
+                  </td>
+                  <td class="col-retailer">
+                    <div class="retailer-name">{{ invoice.retailer }}</div>
+                  </td>
+                  <td class="col-date">
+                    <div class="invoice-date">{{ formatDisplayDate(invoice.invoiceDate) }}</div>
+                  </td>
+                  <td class="col-total">
+                    <div class="invoice-total">{{ formatCurrency(invoice.total) }}</div>
+                  </td>
+                  <td class="col-source">
+                    <span class="source-pill">{{ invoice.source }}</span>
+                  </td>
+                  <td class="col-match-status">
+                    <span class="status-pill" [class]="getMatchStatusClass(invoice.matchStatus)">
+                      {{ invoice.matchStatus }}
+                    </span>
+                  </td>
+                  <td class="col-delivery-status">
+                    <span class="status-pill" [class]="getDeliveryStatusClass(invoice.deliveryStatus)">
+                      {{ invoice.deliveryStatus }}
+                    </span>
+                  </td>
+                  <td class="col-linked-orders">
+                    <div class="linked-orders-cell">
+                      <span class="linked-count">{{ invoice.linkedOrders }}</span>
+                      @if (invoice.linkedOrders > 0) {
+                        <svg class="link-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      }
+                    </div>
+                  </td>
+                  <td class="col-action">
+                    <button class="view-btn" (click)="onViewInvoice(invoice); $event.stopPropagation()">
+                      View
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (filteredInvoices.length === 0) {
+          <div class="empty-state">
+            <p>No invoices found matching your filters.</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Details Sidebar -->
+  @if (showSidebar && selectedInvoice) {
+    <div class="invoice-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title-row">
+          <h3 class="sidebar-title">Invoice #{{ selectedInvoice.invoiceNo }}</h3>
+          <div class="sidebar-badges">
+            <span class="status-badge" [class]="getMatchStatusClass(selectedInvoice.matchStatus)">
+              {{ selectedInvoice.matchStatus.toUpperCase() }}
+            </span>
+            <span class="source-pill">{{ selectedInvoice.source }}</span>
+          </div>
+        </div>
+        <button class="sidebar-close" (click)="closeSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- Invoice Line Items -->
+        <div class="line-items-section">
+          <h4 class="section-title">Invoice Line Items</h4>
+          @if (invoiceLineItems.length > 0) {
+            <div class="line-items-table">
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of invoiceLineItems; track item.id) {
+                    <tr>
+                      <td>{{ item.productName }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>{{ formatCurrency(item.unitPrice) }}</td>
+                      <td>{{ formatCurrency(item.total) }}</td>
+                    </tr>
+                  }
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3" class="total-label">Total</td>
+                    <td class="total-value">{{ formatCurrency(getInvoiceTotal()) }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          } @else {
+            <div class="empty-state-small">
+              <p>No line items available</p>
+            </div>
+          }
+        </div>
+
+        <!-- Linked Orders -->
+        <div class="linked-orders-section">
+          <h4 class="section-title">Linked Orders</h4>
+          @if (selectedInvoice.linkedOrders === 0) {
+            <div class="empty-state-small">
+              <svg class="document-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p>No orders linked yet.</p>
+            </div>
+            <app-button variant="primary" size="md" (click)="onResolveLinkOrders()" [fullWidth]="true">
+              Resolve / Link Orders
+            </app-button>
+          } @else {
+            <div class="linked-orders-list">
+              <p>{{ selectedInvoice.linkedOrders }} order(s) linked</p>
+            </div>
+          }
+        </div>
+
+        <!-- Matching Suggestions -->
+        @if (matchingSuggestions.length > 0) {
+          <div class="matching-suggestions-section">
+            <h4 class="section-title">Matching Suggestions</h4>
+            <p class="suggestion-text">
+              Suggested orders suggested to match {{ formatCurrency(selectedInvoice.total) }} - Oct 24, 2023
+            </p>
+            @for (suggestion of matchingSuggestions; track suggestion.id) {
+              <div class="suggestion-card">
+                <div class="suggestion-info">
+                  <div class="suggestion-order-id">Order #{{ suggestion.orderId }}</div>
+                  <div class="suggestion-details">
+                    {{ suggestion.retailer }} - {{ formatCurrency(suggestion.amount) }} - {{ formatDisplayDate(suggestion.date) }}
+                  </div>
+                </div>
+                <button class="select-btn" (click)="onSelectSuggestion(suggestion)">
+                  Select
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Link to Orders Modal -->
+  @if (showLinkModal) {
+    <div class="modal-backdrop" (click)="closeLinkModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3 class="modal-title">Link to Orders</h3>
+          <button class="modal-close" (click)="closeLinkModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+          <div class="step" [class.active]="linkStep === 1" [class.completed]="linkStep > 1">
+            <div class="step-number">1</div>
+            <div class="step-label">Step 1 Method</div>
+          </div>
+          <div class="step" [class.active]="linkStep === 2" [class.completed]="linkStep > 2">
+            <div class="step-number">2</div>
+            <div class="step-label">Step 2 Select Orders</div>
+          </div>
+          <div class="step" [class.active]="linkStep === 3" [class.completed]="linkStep > 3">
+            <div class="step-number">3</div>
+            <div class="step-label">Step 3 Allocate</div>
+          </div>
+        </div>
+
+        <!-- Step Content -->
+        <div class="modal-body">
+          @if (linkStep === 1) {
+            <div class="method-selection">
+              <div class="method-option" [class.selected]="linkMethod === 'auto'" (click)="onLinkMethodSelect('auto')">
+                <div class="method-header">
+                  <input type="radio" name="linkMethod" [checked]="linkMethod === 'auto'" (change)="onLinkMethodSelect('auto')">
+                  <span class="method-title">Auto-Link (Recommended)</span>
+                </div>
+                <p class="method-description">Automatically link orders based on matching total amount and date.</p>
+              </div>
+              <div class="method-option" [class.selected]="linkMethod === 'manual'" (click)="onLinkMethodSelect('manual')">
+                <div class="method-header">
+                  <input type="radio" name="linkMethod" [checked]="linkMethod === 'manual'" (change)="onLinkMethodSelect('manual')">
+                  <span class="method-title">Manual Link</span>
+                </div>
+                <p class="method-description">Manually select and link orders to this invoice.</p>
+              </div>
+              <div class="method-option" [class.selected]="linkMethod === 'ai'" (click)="onLinkMethodSelect('ai')">
+                <div class="method-header">
+                  <input type="radio" name="linkMethod" [checked]="linkMethod === 'ai'" (change)="onLinkMethodSelect('ai')">
+                  <span class="method-title">AI Suggest</span>
+                </div>
+                <p class="method-description">Use AI to suggest the best matching orders.</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="modal-actions">
+          <app-button variant="outline" size="md" (click)="onLinkCancel()">
+            Cancel
+          </app-button>
+          <app-button variant="primary" size="md" (click)="onLinkNext()">
+            Next
+          </app-button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

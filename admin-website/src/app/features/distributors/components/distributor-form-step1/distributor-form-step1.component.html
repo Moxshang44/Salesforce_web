@@ -1,90 +1,65 @@
 <div class="form-container">
   <form class="distributor-form">
-    <!-- Row 1: Company Name, Distributor ID, Contact Person -->
-    <div class="form-row three-col">
+    <!-- Row 1: Distributor Name, Contact Person Name -->
+    <div class="form-row two-col">
       <div class="form-group">
-        <label class="form-label">Distributor Company Name</label>
+        <label class="form-label">Distributor Name <span class="required">*</span></label>
         <input 
           type="text" 
           class="form-input"
-          [class.error]="errors['companyName']"
+          [class.error]="errors['name']"
           placeholder="e.g., Urban Agency"
-          [(ngModel)]="formData.companyName"
-          name="companyName"
-          (blur)="generateDistributorId()"
-          (input)="clearError('companyName')"
+          [(ngModel)]="formData.name"
+          name="name"
+          (input)="clearError('name')"
+          maxlength="255"
           required
         >
-        @if (errors['companyName']) {
-          <span class="error-message">{{ errors['companyName'] }}</span>
+        @if (errors['name']) {
+          <span class="error-message">{{ errors['name'] }}</span>
         }
+        <small class="form-hint">1-255 characters</small>
       </div>
 
       <div class="form-group">
-        <label class="form-label">
-          Distributor ID <span class="auto-badge">Auto</span>
-        </label>
+        <label class="form-label">Contact Person Name <span class="required">*</span></label>
         <input 
           type="text" 
           class="form-input"
-          [class.error]="errors['distributorId']"
-          placeholder="SR-EMP-001"
-          [(ngModel)]="formData.distributorId"
-          name="distributorId"
-          (input)="clearError('distributorId')"
-          required
-        >
-        @if (errors['distributorId']) {
-          <span class="error-message">{{ errors['distributorId'] }}</span>
-        }
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Contact Person name</label>
-        <input 
-          type="text" 
-          class="form-input"
-          [class.error]="errors['contactPersonName']"
+          [class.error]="errors['contact_person_name']"
           placeholder="e.g., Manoj Badayani"
-          [(ngModel)]="formData.contactPersonName"
-          name="contactPersonName"
-          (input)="clearError('contactPersonName')"
+          [(ngModel)]="formData.contact_person_name"
+          name="contact_person_name"
+          (input)="clearError('contact_person_name')"
+          maxlength="255"
           required
         >
-        @if (errors['contactPersonName']) {
-          <span class="error-message">{{ errors['contactPersonName'] }}</span>
+        @if (errors['contact_person_name']) {
+          <span class="error-message">{{ errors['contact_person_name'] }}</span>
         }
+        <small class="form-hint">1-255 characters</small>
       </div>
     </div>
 
     <!-- Row 2: Mobile Number, Email, License Number -->
     <div class="form-row three-col">
       <div class="form-group">
-        <label class="form-label">Mobile Number</label>
-        <div class="input-with-select">
-          <select 
-            class="country-code-select" 
-            [(ngModel)]="formData.countryCode"
-            name="countryCode"
-          >
-            @for (code of countryCodeOptions; track code) {
-              <option [value]="code">{{ code }}</option>
-            }
-          </select>
+        <label class="form-label">Mobile Number <span class="required">*</span></label>
           <input 
-            type="text" 
-            class="phone-input"
-            [class.error]="errors['mobileNumber']"
-            placeholder="eg. 9348950-00009"
-            [(ngModel)]="formData.mobileNumber"
-            name="mobileNumber"
-            (input)="clearError('mobileNumber')"
+          type="tel" 
+          class="form-input"
+          [class.error]="errors['mobile_number']"
+          placeholder="e.g., 9876543210"
+          [(ngModel)]="formData.mobile_number"
+          name="mobile_number"
+          (input)="clearError('mobile_number')"
+          maxlength="15"
             required
           >
-        </div>
-        @if (errors['mobileNumber']) {
-          <span class="error-message">{{ errors['mobileNumber'] }}</span>
+        @if (errors['mobile_number']) {
+          <span class="error-message">{{ errors['mobile_number'] }}</span>
         }
+        <small class="form-hint">10-15 characters</small>
       </div>
 
       <div class="form-group">
@@ -94,21 +69,33 @@
         <input 
           type="email" 
           class="form-input" 
+          [class.error]="errors['email']"
           placeholder="abc@companyname.com"
           [(ngModel)]="formData.email"
           name="email"
+          (input)="clearError('email')"
         >
+        @if (errors['email']) {
+          <span class="error-message">{{ errors['email'] }}</span>
+        }
       </div>
 
       <div class="form-group">
-        <label class="form-label">License Number</label>
+        <label class="form-label">License Number <span class="optional-text">(Optional)</span></label>
         <input 
           type="text" 
           class="form-input" 
-          placeholder="eg. 9190093303"
-          [(ngModel)]="formData.licenseNumber"
-          name="licenseNumber"
+          [class.error]="errors['license_no']"
+          placeholder="e.g., 9190093303"
+          [(ngModel)]="formData.license_no"
+          name="license_no"
+          (input)="clearError('license_no')"
+          maxlength="255"
         >
+        @if (errors['license_no']) {
+          <span class="error-message">{{ errors['license_no'] }}</span>
+        }
+        <small class="form-hint">Maximum 255 characters</small>
       </div>
     </div>
 
@@ -116,61 +103,92 @@
     <div class="form-row three-col">
       <div class="form-group">
         <label class="form-label">
-          GST Number <span class="optional-text">(Optional)</span>
+          GST Number <span class="required">*</span>
         </label>
         <input 
           type="text" 
           class="form-input" 
-          placeholder="0000 XXXXXXXXX"
-          [(ngModel)]="formData.gstNumber"
-          name="gstNumber"
+          [class.error]="errors['gst_no']"
+          placeholder="e.g., 27AABCU9603R1ZX"
+          [(ngModel)]="formData.gst_no"
+          name="gst_no"
+          (input)="clearError('gst_no')"
+          maxlength="15"
+          required
         >
+        @if (errors['gst_no']) {
+          <span class="error-message">{{ errors['gst_no'] }}</span>
+        }
+        <small class="form-hint">Exactly 15 characters</small>
       </div>
 
       <div class="form-group">
-        <label class="form-label">PAN Card Number</label>
+        <label class="form-label">PAN Card Number <span class="required">*</span></label>
         <input 
           type="text" 
           class="form-input" 
-          placeholder="DAU USDZNC"
-          [(ngModel)]="formData.panCardNumber"
-          name="panCardNumber"
+          [class.error]="errors['pan_no']"
+          placeholder="e.g., ABCDE1234F"
+          [(ngModel)]="formData.pan_no"
+          name="pan_no"
+          (input)="clearError('pan_no')"
+          maxlength="10"
+          required
         >
+        @if (errors['pan_no']) {
+          <span class="error-message">{{ errors['pan_no'] }}</span>
+        }
+        <small class="form-hint">Exactly 10 characters</small>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Pin code</label>
+        <label class="form-label">PIN Code <span class="required">*</span></label>
         <input 
           type="text" 
           class="form-input" 
-          placeholder="388126"
-          [(ngModel)]="formData.pinCode"
-          name="pinCode"
+          [class.error]="errors['pin_code']"
+          placeholder="e.g., 388126"
+          [(ngModel)]="formData.pin_code"
+          name="pin_code"
+          (input)="clearError('pin_code')"
+          maxlength="6"
+          pattern="[0-9]*"
+          required
         >
+        @if (errors['pin_code']) {
+          <span class="error-message">{{ errors['pin_code'] }}</span>
+        }
+        <small class="form-hint">Exactly 6 digits</small>
       </div>
     </div>
 
     <!-- Row 4: Full Address and Add Map Link -->
     <div class="form-row two-col">
       <div class="form-group">
-        <label class="form-label">Full Address</label>
+        <label class="form-label">Address <span class="required">*</span></label>
         <textarea 
           class="form-textarea" 
+          [class.error]="errors['address']"
           placeholder="Enter full address..."
-          [(ngModel)]="formData.fullAddress"
-          name="fullAddress"
+          [(ngModel)]="formData.address"
+          name="address"
+          (input)="clearError('address')"
           rows="3"
+          required
         ></textarea>
+        @if (errors['address']) {
+          <span class="error-message">{{ errors['address'] }}</span>
+        }
       </div>
 
       <div class="form-group">
-        <label class="form-label">Add Map Link</label>
+        <label class="form-label">Map Link <span class="optional-text">(Optional)</span></label>
         <input 
           type="url" 
           class="form-input" 
           placeholder="e.g., https://maps.app.goo.gl.../#m88977,sd=sbc"
-          [(ngModel)]="formData.mapLink"
-          name="mapLink"
+          [(ngModel)]="formData.map_link"
+          name="map_link"
         >
       </div>
     </div>
