@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ApiService } from '../../../core/services/api.service';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { CardComponent } from '../../../shared/components/card/card.component';
@@ -18,6 +19,9 @@ interface Company {
   gst_no?: string;
   cin_no?: string;
   address?: string;
+  hasAdmin?: boolean; // Track if company has admin users
+  roles?: any[]; // Assigned roles
+  admins?: any[]; // Assigned admins
 }
 
 interface AssignAdminForm {
@@ -36,6 +40,13 @@ interface AssignAdminForm {
     ifsc_code: string;
   };
   is_super_admin: boolean;
+}
+
+interface RoleForm {
+  name: string;
+  description: string;
+  permissions: string[];
+  is_active: boolean;
 }
 
 @Component({
@@ -60,9 +71,11 @@ export class CompaniesComponent implements OnInit {
   isEditModalOpen = false;
   isViewModalOpen = false;
   isAssignModalOpen = false;
+  isRoleModalOpen = false;
   isSubmitting = false;
   isEditing = false;
   isAssigning = false;
+  isRoleAssigning = false;
   isDeleting = false;
   isLoading = false;
   isLoadingView = false;
@@ -75,15 +88,21 @@ export class CompaniesComponent implements OnInit {
   viewErrorMessage = '';
   assignErrorMessage = '';
   assignSuccessMessage = '';
+  roleErrorMessage = '';
+  roleSuccessMessage = '';
   selectedCompany: Company | null = null;
+  selectedCompanyForRole: Company | null = null;
   editingCompany: Company | null = null;
   viewingCompany: Company | null = null;
+  isLoadingAdmins: { [companyId: string]: boolean } = {}; // Track loading state per company
+  isLoadingRoles: { [companyId: string]: boolean } = {}; // Track loading state for roles per company
 
   companyForm: Company = {
     name: '',
     gst_no: '',
     cin_no: '',
-    address: ''
+    address: '',
+    is_active: true
   };
 
   assignAdminForm: AssignAdminForm = {
@@ -106,6 +125,16 @@ export class CompaniesComponent implements OnInit {
 
   formErrors: { [key: string]: string } = {};
   assignFormErrors: { [key: string]: string } = {};
+  roleFormErrors: { [key: string]: string } = {};
+
+  roleForm: RoleForm = {
+    name: '',
+    description: '',
+    permissions: [],
+    is_active: true
+  };
+
+  newPermission: string = '';
 
   private readonly API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1/companies';
   private readonly USERS_API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1/users';
@@ -113,7 +142,8 @@ export class CompaniesComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -143,12 +173,150 @@ export class CompaniesComponent implements OnInit {
         } else {
           this.companies = [];
         }
+        
+        // Initialize properties for all companies
+        this.companies.forEach(company => {
+          company.hasAdmin = false;
+          company.roles = [];
+          company.admins = [];
+        });
+        
         console.log('Companies loaded:', this.companies);
+        
+        // Check for admin users and roles for each company
+        this.checkAdminsForAllCompanies();
+        this.loadRolesForAllCompanies();
       },
       error: (error: any) => {
         this.isLoading = false;
         console.error('Error loading companies:', error);
         this.listErrorMessage = error.error?.message || error.message || 'Failed to load companies. Please refresh the page.';
+      }
+    });
+  }
+
+  checkAdminsForAllCompanies(): void {
+    // Check admin status for each company
+    this.companies.forEach(company => {
+      if (company.id) {
+        this.checkCompanyHasAdmin(company.id);
+      }
+    });
+  }
+
+  checkCompanyHasAdmin(companyId: string): void {
+    if (!companyId) return;
+    
+    this.isLoadingAdmins[companyId] = true;
+    
+    // Try both "Admin" and "ADMIN" as role names
+    const roleNames = ['Admin', 'ADMIN'];
+    let attempts = 0;
+    
+    const tryFetchAdmin = (roleName: string) => {
+      const url = this.apiService.getApiUrl(`users/companies/${companyId}/roles/${roleName}/users`);
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+
+      const params = new HttpParams()
+        .set('is_active', 'true')
+        .set('limit', '20')
+        .set('offset', '0');
+
+      this.http.get<any>(url, { headers, params }).subscribe({
+        next: (response: any) => {
+          this.isLoadingAdmins[companyId] = false;
+          
+          // Get admin users list
+          let admins: any[] = [];
+          if (response.data && Array.isArray(response.data)) {
+            admins = response.data;
+          } else if (response.status_code === 1 && response.data) {
+            admins = Array.isArray(response.data) ? response.data : [];
+          }
+          
+          // Update the company's admin data
+          const company = this.companies.find(c => c.id === companyId);
+          if (company) {
+            company.admins = admins;
+            company.hasAdmin = admins.length > 0;
+          }
+        },
+        error: (error: any) => {
+          attempts++;
+          // Try the other role name if first attempt failed
+          if (attempts < roleNames.length) {
+            tryFetchAdmin(roleNames[attempts]);
+          } else {
+            this.isLoadingAdmins[companyId] = false;
+            console.error(`Error fetching admins for company ${companyId}:`, error);
+            
+            // On error, set empty
+            const company = this.companies.find(c => c.id === companyId);
+            if (company) {
+              company.admins = [];
+              company.hasAdmin = false;
+            }
+          }
+        }
+      });
+    };
+    
+    tryFetchAdmin(roleNames[0]);
+  }
+
+  loadRolesForAllCompanies(): void {
+    // Load roles for each company
+    this.companies.forEach(company => {
+      if (company.id) {
+        this.loadCompanyRoles(company.id);
+      }
+    });
+  }
+
+  loadCompanyRoles(companyId: string): void {
+    if (!companyId) return;
+    
+    this.isLoadingRoles[companyId] = true;
+    
+    const url = this.apiService.getApiUrl(`companies/${companyId}/roles`);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    const params = new HttpParams()
+      .set('is_active', 'true')
+      .set('limit', '20')
+      .set('offset', '0');
+
+    this.http.get<any>(url, { headers, params }).subscribe({
+      next: (response: any) => {
+        this.isLoadingRoles[companyId] = false;
+        
+        // Get roles list
+        let roles: any[] = [];
+        if (response.data && Array.isArray(response.data)) {
+          roles = response.data;
+        } else if (response.status_code === 1 && response.data) {
+          roles = Array.isArray(response.data) ? response.data : [];
+        }
+        
+        // Update the company's roles data
+        const company = this.companies.find(c => c.id === companyId);
+        if (company) {
+          company.roles = roles;
+        }
+      },
+      error: (error: any) => {
+        this.isLoadingRoles[companyId] = false;
+        console.error(`Error fetching roles for company ${companyId}:`, error);
+        
+        // On error, set empty
+        const company = this.companies.find(c => c.id === companyId);
+        if (company) {
+          company.roles = [];
+        }
       }
     });
   }
@@ -168,11 +336,71 @@ export class CompaniesComponent implements OnInit {
       name: '',
       gst_no: '',
       cin_no: '',
-      address: ''
+      address: '',
+      is_active: true
     };
     this.formErrors = {};
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  onGstInput(event: any): void {
+    const value = event.target?.value || '';
+    // Remove any non-digit characters
+    const digitsOnly = value.replace(/\D/g, '');
+    // Limit to 15 digits
+    const limited = digitsOnly.slice(0, 15);
+    // Update the form model (ngModel will sync back to input)
+    this.companyForm.gst_no = limited;
+    // Update the input value directly to ensure it's synced
+    if (event.target) {
+      event.target.value = limited;
+    }
+    // Clear error if valid
+    if (limited.length === 15) {
+      delete this.formErrors['gst_no'];
+    }
+  }
+
+  onCinInput(event: any): void {
+    const value = event.target?.value || '';
+    // Remove any non-digit characters
+    const digitsOnly = value.replace(/\D/g, '');
+    // Limit to 21 digits
+    const limited = digitsOnly.slice(0, 21);
+    // Update the form model (ngModel will sync back to input)
+    this.companyForm.cin_no = limited;
+    // Update the input value directly to ensure it's synced
+    if (event.target) {
+      event.target.value = limited;
+    }
+    // Clear error if valid
+    if (limited.length === 21) {
+      delete this.formErrors['cin_no'];
+    }
+  }
+
+  onActiveToggleChange(): void {
+    // Ensure is_active is explicitly set to boolean
+    this.companyForm.is_active = !!this.companyForm.is_active;
+  }
+
+  onContactNoInput(event: any): void {
+    const value = event.target?.value || '';
+    // Remove any non-digit characters
+    const digitsOnly = value.replace(/\D/g, '');
+    // Limit to 10 digits
+    const limited = digitsOnly.slice(0, 10);
+    // Update the form model (ngModel will sync back to input)
+    this.assignAdminForm.contact_no = limited;
+    // Update the input value directly to ensure it's synced
+    if (event.target) {
+      event.target.value = limited;
+    }
+    // Clear error if valid
+    if (limited.length === 10) {
+      delete this.assignFormErrors['contact_no'];
+    }
   }
 
   validateForm(): boolean {
@@ -187,10 +415,22 @@ export class CompaniesComponent implements OnInit {
     if (!this.companyForm.gst_no || this.companyForm.gst_no.trim() === '') {
       this.formErrors['gst_no'] = 'GST number is required';
       isValid = false;
+    } else if (this.companyForm.gst_no.trim().length !== 15) {
+      this.formErrors['gst_no'] = 'GST number must be exactly 15 digits';
+      isValid = false;
+    } else if (!/^\d{15}$/.test(this.companyForm.gst_no.trim())) {
+      this.formErrors['gst_no'] = 'GST number must contain only digits';
+      isValid = false;
     }
 
     if (!this.companyForm.cin_no || this.companyForm.cin_no.trim() === '') {
       this.formErrors['cin_no'] = 'CIN number is required';
+      isValid = false;
+    } else if (this.companyForm.cin_no.trim().length !== 21) {
+      this.formErrors['cin_no'] = 'CIN number must be exactly 21 digits';
+      isValid = false;
+    } else if (!/^\d{21}$/.test(this.companyForm.cin_no.trim())) {
+      this.formErrors['cin_no'] = 'CIN number must contain only digits';
       isValid = false;
     }
 
@@ -306,7 +546,8 @@ export class CompaniesComponent implements OnInit {
           name: companyData.name || '',
           gst_no: companyData.gst_no || '',
           cin_no: companyData.cin_no || '',
-          address: companyData.address || ''
+          address: companyData.address || '',
+          is_active: companyData.is_active !== undefined ? companyData.is_active : true
         };
 
         // Update the editingCompany with full data
@@ -321,7 +562,8 @@ export class CompaniesComponent implements OnInit {
           name: company.name || '',
           gst_no: company.gst_no || '',
           cin_no: company.cin_no || '',
-          address: company.address || ''
+          address: company.address || '',
+          is_active: company.is_active !== undefined ? company.is_active : true
         };
 
         // Show error but still allow editing with available data
@@ -366,7 +608,8 @@ export class CompaniesComponent implements OnInit {
       name: this.companyForm.name.trim(),
       address: this.companyForm.address?.trim() || '',
       gst_no: this.companyForm.gst_no?.trim() || '',
-      cin_no: this.companyForm.cin_no?.trim() || ''
+      cin_no: this.companyForm.cin_no?.trim() || '',
+      is_active: this.companyForm.is_active === true
     };
 
     const updateUrl = `${this.API_URL}/${this.editingCompany.id}`;
@@ -579,8 +822,11 @@ export class CompaniesComponent implements OnInit {
     if (!this.assignAdminForm.contact_no || this.assignAdminForm.contact_no.trim() === '') {
       this.assignFormErrors['contact_no'] = 'Contact number is required';
       isValid = false;
-    } else if (this.assignAdminForm.contact_no.trim().length < 1 || this.assignAdminForm.contact_no.trim().length > 20) {
-      this.assignFormErrors['contact_no'] = 'Contact number must be between 1 and 20 characters';
+    } else if (this.assignAdminForm.contact_no.trim().length !== 10) {
+      this.assignFormErrors['contact_no'] = 'Contact number must be exactly 10 digits';
+      isValid = false;
+    } else if (!/^\d{10}$/.test(this.assignAdminForm.contact_no.trim())) {
+      this.assignFormErrors['contact_no'] = 'Contact number must contain only digits';
       isValid = false;
     }
 
@@ -628,6 +874,11 @@ export class CompaniesComponent implements OnInit {
         this.isAssigning = false;
         this.assignSuccessMessage = 'Admin assigned successfully!';
         
+        // Update the company's admin data
+        if (this.selectedCompany?.id) {
+          this.checkCompanyHasAdmin(this.selectedCompany.id);
+        }
+        
         // Close modal after 2 seconds
         setTimeout(() => {
           this.closeAssignModal();
@@ -665,6 +916,142 @@ export class CompaniesComponent implements OnInit {
 
   logout(): void {
     this.authService.superAdminLogout();
+  }
+
+  onAssignRole(company: Company): void {
+    this.selectedCompanyForRole = company;
+    this.resetRoleForm();
+    this.isRoleModalOpen = true;
+  }
+
+  closeRoleModal(): void {
+    this.isRoleModalOpen = false;
+    this.selectedCompanyForRole = null;
+    this.resetRoleForm();
+  }
+
+  resetRoleForm(): void {
+    this.roleForm = {
+      name: '',
+      description: '',
+      permissions: [],
+      is_active: false
+    };
+    this.newPermission = '';
+    this.roleFormErrors = {};
+    this.roleErrorMessage = '';
+    this.roleSuccessMessage = '';
+  }
+
+  addPermission(): void {
+    if (this.newPermission && this.newPermission.trim() !== '') {
+      const permission = this.newPermission.trim();
+      if (!this.roleForm.permissions.includes(permission)) {
+        this.roleForm.permissions.push(permission);
+        this.newPermission = '';
+        this.roleFormErrors['permissions'] = '';
+      }
+    }
+  }
+
+  removePermission(index: number): void {
+    this.roleForm.permissions.splice(index, 1);
+  }
+
+  validateRoleForm(): boolean {
+    this.roleFormErrors = {};
+    let isValid = true;
+
+    if (!this.roleForm.name || this.roleForm.name.trim() === '') {
+      this.roleFormErrors['name'] = 'Role name is required';
+      isValid = false;
+    }
+
+    // Description and permissions are now optional, no validation needed
+
+    return isValid;
+  }
+
+  onRoleSubmit(): void {
+    this.roleErrorMessage = '';
+    this.roleSuccessMessage = '';
+
+    if (!this.validateRoleForm()) {
+      return;
+    }
+
+    if (!this.selectedCompanyForRole?.id) {
+      this.roleErrorMessage = 'Company ID is missing. Cannot create role.';
+      return;
+    }
+
+    this.isRoleAssigning = true;
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    const payload: any = {
+      name: this.roleForm.name.trim()
+    };
+
+    // Add optional fields only if they have values
+    if (this.roleForm.description && this.roleForm.description.trim() !== '') {
+      payload.description = this.roleForm.description.trim();
+    }
+
+    if (this.roleForm.permissions && this.roleForm.permissions.length > 0) {
+      payload.permissions = this.roleForm.permissions;
+    }
+
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyForRole.id}/roles`);
+
+    console.log('Creating role:', payload);
+    console.log('API URL:', url);
+
+    this.http.post(url, payload, { headers }).subscribe({
+      next: (response: any) => {
+        console.log('Role created successfully:', response);
+        this.isRoleAssigning = false;
+        this.roleSuccessMessage = 'Role created successfully!';
+        
+        // Reload roles for the company
+        if (this.selectedCompanyForRole?.id) {
+          this.loadCompanyRoles(this.selectedCompanyForRole.id);
+        }
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          this.closeRoleModal();
+        }, 2000);
+      },
+      error: (error: any) => {
+        this.isRoleAssigning = false;
+        console.error('Error creating role:', error);
+        console.error('Error status:', error.status);
+        console.error('Error body:', error.error);
+        
+        if (error.error) {
+          if (error.error.message) {
+            this.roleErrorMessage = error.error.message;
+          } else if (error.error.errors) {
+            const validationErrors = error.error.errors;
+            const errorMessages = Object.keys(validationErrors).map(key => {
+              return `${key}: ${Array.isArray(validationErrors[key]) ? validationErrors[key].join(', ') : validationErrors[key]}`;
+            });
+            this.roleErrorMessage = errorMessages.join('\n');
+          } else if (typeof error.error === 'string') {
+            this.roleErrorMessage = error.error;
+          } else {
+            this.roleErrorMessage = JSON.stringify(error.error);
+          }
+        } else if (error.message) {
+          this.roleErrorMessage = error.message;
+        } else {
+          this.roleErrorMessage = `Failed to create role. Status: ${error.status || 'Unknown'}. Please check the console for more details.`;
+        }
+      }
+    });
   }
 }
 

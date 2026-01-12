@@ -1,109 +1,99 @@
 <div class="form-container">
   <form class="employee-form">
-    <!-- Row 1: Employee Name, Employee ID, Mobile Number -->
+    <!-- Row 1: Name, Username, Contact Number -->
     <div class="form-row three-col">
       <div class="form-group">
-        <label class="form-label">Employee Name</label>
+        <label class="form-label">
+          Name
+          <span class="required">*</span>
+        </label>
         <input 
           type="text" 
           class="form-input"
-          [class.error]="errors['employeeName']"
+          [class.error]="errors['name']"
           placeholder="e.g., Manoj Badayani"
-          [(ngModel)]="formData.employeeName"
-          name="employeeName"
-          (blur)="generateEmployeeId()"
-          (input)="clearError('employeeName')"
+          [(ngModel)]="formData.name"
+          name="name"
+          (input)="clearError('name')"
           required
         >
-        @if (errors['employeeName']) {
-          <span class="error-message">{{ errors['employeeName'] }}</span>
+        @if (errors['name']) {
+          <span class="error-message">{{ errors['name'] }}</span>
         }
       </div>
 
       <div class="form-group">
-        <label class="form-label">Employee ID</label>
+        <label class="form-label">
+          Username
+          <span class="optional">(Optional)</span>
+        </label>
         <input 
           type="text" 
           class="form-input"
-          [class.error]="errors['employeeId']"
-          placeholder="SR-EMP-001"
-          [(ngModel)]="formData.employeeId"
-          name="employeeId"
-          (input)="clearError('employeeId')"
-          required
+          [class.error]="errors['username']"
+          placeholder="Enter username"
+          [(ngModel)]="formData.username"
+          name="username"
+          (input)="clearError('username')"
         >
-        @if (errors['employeeId']) {
-          <span class="error-message">{{ errors['employeeId'] }}</span>
+        @if (errors['username']) {
+          <span class="error-message">{{ errors['username'] }}</span>
         }
       </div>
 
       <div class="form-group">
-        <label class="form-label">Mobile Number</label>
-        <div class="input-with-select">
-          <select 
-            class="country-code-select" 
-            [(ngModel)]="formData.countryCode"
-            name="countryCode"
-          >
-            @for (code of countryCodeOptions; track code) {
-              <option [value]="code">{{ code }}</option>
-            }
-          </select>
-          <input 
-            type="text" 
-            class="phone-input"
-            [class.error]="errors['mobileNumber']"
-            placeholder="eg. 9449910-00090"
-            [(ngModel)]="formData.mobileNumber"
-            name="mobileNumber"
-            (input)="clearError('mobileNumber')"
-            required
-          >
-        </div>
-        @if (errors['mobileNumber']) {
-          <span class="error-message">{{ errors['mobileNumber'] }}</span>
+        <label class="form-label">
+          Contact Number
+          <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-input"
+          [class.error]="errors['contact_no']"
+          placeholder="e.g., 9876543210"
+          [(ngModel)]="formData.contact_no"
+          name="contact_no"
+          (input)="clearError('contact_no')"
+          required
+        >
+        @if (errors['contact_no']) {
+          <span class="error-message">{{ errors['contact_no'] }}</span>
         }
       </div>
     </div>
 
-    <!-- Row 2: Aadhaar Number, Role, Reporting Manager -->
-    <div class="form-row three-col">
+    <!-- Row 2: Role -->
+    <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Aadhaar Number</label>
-        <input 
-          type="text" 
-          class="form-input" 
-          placeholder="0000 0000 0000"
-          [(ngModel)]="formData.aadhaarNumber"
-          name="aadhaarNumber"
-        >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Role</label>
+        <label class="form-label">
+          Role
+          <span class="optional">(Optional)</span>
+        </label>
         <select 
-          class="form-select" 
+          class="form-select"
+          [class.error]="errors['role']"
           [(ngModel)]="formData.role"
           name="role"
+          [disabled]="isLoadingRoles"
+          (change)="clearError('role')"
         >
-          @for (role of roleOptions; track role) {
-            <option [value]="role">{{ role }}</option>
+          <option [value]="''">
+            @if (isLoadingRoles) {
+              Loading roles...
+            } @else {
+              Select Role
+            }
+          </option>
+          @for (role of roles; track role.name) {
+            <option [value]="role.name">{{ role.name }}</option>
           }
         </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Reporting Manager</label>
-        <select 
-          class="form-select" 
-          [(ngModel)]="formData.reportingManager"
-          name="reportingManager"
-        >
-          <option value="">Nehls Singh (SO)</option>
-          @for (manager of reportingManagerOptions; track manager) {
-            <option [value]="manager">{{ manager }}</option>
-          }
-        </select>
+        @if (errors['role']) {
+          <span class="error-message">{{ errors['role'] }}</span>
+        }
+        @if (rolesError) {
+          <span class="error-message">{{ rolesError }}</span>
+        }
       </div>
     </div>
 
@@ -112,108 +102,204 @@
       <div class="form-group">
         <label class="form-label">Select Country</label>
         <select 
-          class="form-select" 
-          [(ngModel)]="formData.selectedCountry"
-          name="selectedCountry"
+          class="form-select"
+          [class.error]="errors['selectedCountryId']"
+          [ngModel]="selectedCountryId"
+          (ngModelChange)="onCountryChange($event)"
+          name="selectedCountryId"
+          [disabled]="isLoadingAllAreas || !selectedCompanyId"
         >
-          @for (country of countryOptions; track country) {
-            <option [value]="country">{{ country }}</option>
+          <option [value]="null">
+            @if (isLoadingAllAreas) {
+              Loading...
+            } @else {
+              Select Country
+            }
+          </option>
+          @for (country of countryOptions; track country.id) {
+            <option [value]="country.id">{{ country.name }}</option>
           }
         </select>
+        @if (errors['selectedCountryId']) {
+          <span class="error-message">{{ errors['selectedCountryId'] }}</span>
+        }
+        @if (isLoadingAllAreas) {
+          <span class="form-hint">Loading areas...</span>
+        }
       </div>
 
       <div class="form-group">
         <label class="form-label">Select Zone</label>
         <select 
-          class="form-select" 
-          [(ngModel)]="formData.selectedZone"
-          name="selectedZone"
+          class="form-select"
+          [class.error]="errors['selectedZoneId']"
+          [ngModel]="selectedZoneId"
+          (ngModelChange)="onZoneChange($event)"
+          name="selectedZoneId"
+          [disabled]="!selectedCountryId || isLoadingZones || isLoadingAllAreas"
         >
-          @for (zone of zoneOptions; track zone) {
-            <option [value]="zone">{{ zone }}</option>
+          <option [value]="null">
+            @if (isLoadingZones) {
+              Loading zones...
+            } @else {
+              Select Zone
+            }
+          </option>
+          @for (zone of zoneOptions; track zone.id) {
+            <option [value]="zone.id">{{ zone.name }}</option>
           }
         </select>
+        @if (errors['selectedZoneId']) {
+          <span class="error-message">{{ errors['selectedZoneId'] }}</span>
+        }
+        @if (isLoadingZones) {
+          <span class="form-hint">Loading zones...</span>
+        }
       </div>
 
       <div class="form-group">
         <label class="form-label">Select Region</label>
         <select 
-          class="form-select" 
-          [(ngModel)]="formData.selectedRegion"
-          name="selectedRegion"
+          class="form-select"
+          [class.error]="errors['selectedRegionId']"
+          [ngModel]="selectedRegionId"
+          (ngModelChange)="onRegionChange($event)"
+          name="selectedRegionId"
+          [disabled]="!selectedZoneId || isLoadingRegions || isLoadingAllAreas"
         >
-          @for (region of regionOptions; track region) {
-            <option [value]="region">{{ region }}</option>
+          <option [value]="null">
+            @if (isLoadingRegions) {
+              Loading regions...
+            } @else {
+              Select Region
+            }
+          </option>
+          @for (region of regionOptions; track region.id) {
+            <option [value]="region.id">{{ region.name }}</option>
           }
         </select>
+        @if (errors['selectedRegionId']) {
+          <span class="error-message">{{ errors['selectedRegionId'] }}</span>
+        }
+        @if (isLoadingRegions) {
+          <span class="form-hint">Loading regions...</span>
+        }
       </div>
     </div>
 
-    <!-- Row 4: Select Area, Employee Route, Select Start and End Dates -->
-    <div class="form-row three-col">
+    <!-- Row 4: Select Area -->
+    <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Select Area</label>
+        <label class="form-label">
+          Select Area
+          <span class="optional">(Optional)</span>
+        </label>
         <select 
-          class="form-select" 
-          [(ngModel)]="formData.selectedArea"
-          name="selectedArea"
+          class="form-select"
+          [class.error]="errors['selectedAreaId']"
+          [ngModel]="selectedAreaId"
+          (ngModelChange)="onAreaChange($event)"
+          name="selectedAreaId"
+          [disabled]="!selectedRegionId || isLoadingAreas || isLoadingAllAreas"
         >
-          @for (area of areaOptions; track area) {
-            <option [value]="area">{{ area }}</option>
+          <option [value]="null">
+            @if (isLoadingAreas) {
+              Loading areas...
+            } @else {
+              Select Area
+            }
+          </option>
+          @for (area of areaOptions; track area.id) {
+            <option [value]="area.id">{{ area.name }}</option>
           }
         </select>
+        @if (errors['selectedAreaId']) {
+          <span class="error-message">{{ errors['selectedAreaId'] }}</span>
+        }
+        @if (isLoadingAreas) {
+          <span class="form-hint">Loading areas...</span>
+        }
       </div>
+    </div>
 
-      <div class="form-group">
-        <label class="form-label">Employee Route</label>
-        <div class="radio-group">
-          <label class="radio-item">
-            <input 
-              type="radio" 
-              name="employeeRoute" 
-              value="Permanent"
-              [(ngModel)]="formData.employeeRoute"
-              class="radio-input"
-            >
-            <span class="radio-label">Permanent</span>
-          </label>
+    <!-- Bank Details Section -->
+    <div class="form-section">
+      <h3 class="section-title">Bank Details <span class="optional">(Optional)</span></h3>
+      
+      <div class="form-row three-col">
+        <div class="form-group">
+          <label class="form-label">Account Number</label>
+          <input 
+            type="text" 
+            class="form-input"
+            placeholder="Enter account number"
+            [(ngModel)]="bankDetails.account_number"
+            name="account_number"
+          >
+        </div>
 
-          <label class="radio-item">
-            <input 
-              type="radio" 
-              name="employeeRoute" 
-              value="Temporary"
-              [(ngModel)]="formData.employeeRoute"
-              class="radio-input"
-            >
-            <span class="radio-label">Temporary</span>
-          </label>
+        <div class="form-group">
+          <label class="form-label">Account Name</label>
+          <input 
+            type="text" 
+            class="form-input"
+            placeholder="Enter account name"
+            [(ngModel)]="bankDetails.account_name"
+            name="account_name"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Bank Name</label>
+          <input 
+            type="text" 
+            class="form-input"
+            placeholder="Enter bank name"
+            [(ngModel)]="bankDetails.bank_name"
+            name="bank_name"
+          >
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Select Start and End Dates</label>
-        <div class="date-range">
+      <div class="form-row three-col">
+        <div class="form-group">
+          <label class="form-label">Bank Branch</label>
           <input 
-            type="date" 
-            class="date-input" 
-            [(ngModel)]="formData.startDate"
-            name="startDate"
-            placeholder="9-Sep-2025"
+            type="text" 
+            class="form-input"
+            placeholder="Enter bank branch"
+            [(ngModel)]="bankDetails.bank_branch"
+            name="bank_branch"
           >
-          <span class="date-separator">to</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Account Type</label>
+          <select 
+            class="form-select"
+            [(ngModel)]="bankDetails.account_type"
+            name="account_type"
+          >
+            @for (type of accountTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">IFSC Code</label>
           <input 
-            type="date" 
-            class="date-input" 
-            [(ngModel)]="formData.endDate"
-            name="endDate"
-            placeholder="13-Sep-2025"
+            type="text" 
+            class="form-input"
+            placeholder="Enter IFSC code"
+            [(ngModel)]="bankDetails.ifsc_code"
+            name="ifsc_code"
           >
         </div>
       </div>
     </div>
 
-    <!-- Week Schedule Section -->
+    <!-- Week Schedule Section (for display only, not sent to API) -->
     <div class="schedule-section">
       <div class="schedule-header">
         <h3 class="schedule-title">Days</h3>
@@ -229,12 +315,13 @@
           <div class="route-select-wrapper">
             <select 
               class="route-select" 
-              [(ngModel)]="weekSchedule[0].route"
+              [(ngModel)]="weekSchedule[0].route_id"
               [name]="'route-' + weekSchedule[0].day"
+              [disabled]="isLoadingRoutes"
             >
-              <option value="">Disable</option>
-              @for (route of routeOptions; track route) {
-                <option [value]="route">{{ route }}</option>
+              <option [value]="null">Disable</option>
+              @for (route of routes; track route.id) {
+                <option [value]="route.id">{{ route.name }} ({{ route.code }})</option>
               }
             </select>
           </div>
@@ -243,12 +330,13 @@
           <div class="route-select-wrapper">
             <select 
               class="route-select" 
-              [(ngModel)]="weekSchedule[3].route"
+              [(ngModel)]="weekSchedule[3].route_id"
               [name]="'route-' + weekSchedule[3].day"
+              [disabled]="isLoadingRoutes"
             >
-              <option value="">Route 3 Name</option>
-              @for (route of routeOptions; track route) {
-                <option [value]="route">{{ route }}</option>
+              <option [value]="null">Disable</option>
+              @for (route of routes; track route.id) {
+                <option [value]="route.id">{{ route.name }} ({{ route.code }})</option>
               }
             </select>
           </div>
@@ -260,12 +348,13 @@
           <div class="route-select-wrapper">
             <select 
               class="route-select" 
-              [(ngModel)]="weekSchedule[1].route"
+              [(ngModel)]="weekSchedule[1].route_id"
               [name]="'route-' + weekSchedule[1].day"
+              [disabled]="isLoadingRoutes"
             >
-              <option value="">Route 1 Name</option>
-              @for (route of routeOptions; track route) {
-                <option [value]="route">{{ route }}</option>
+              <option [value]="null">Disable</option>
+              @for (route of routes; track route.id) {
+                <option [value]="route.id">{{ route.name }} ({{ route.code }})</option>
               }
             </select>
           </div>
@@ -274,12 +363,13 @@
           <div class="route-select-wrapper">
             <select 
               class="route-select" 
-              [(ngModel)]="weekSchedule[4].route"
+              [(ngModel)]="weekSchedule[4].route_id"
               [name]="'route-' + weekSchedule[4].day"
+              [disabled]="isLoadingRoutes"
             >
-              <option value="">Route 4 Name</option>
-              @for (route of routeOptions; track route) {
-                <option [value]="route">{{ route }}</option>
+              <option [value]="null">Disable</option>
+              @for (route of routes; track route.id) {
+                <option [value]="route.id">{{ route.name }} ({{ route.code }})</option>
               }
             </select>
           </div>
@@ -291,12 +381,13 @@
           <div class="route-select-wrapper">
             <select 
               class="route-select" 
-              [(ngModel)]="weekSchedule[2].route"
+              [(ngModel)]="weekSchedule[2].route_id"
               [name]="'route-' + weekSchedule[2].day"
+              [disabled]="isLoadingRoutes"
             >
-              <option value="">Route 2 Name</option>
-              @for (route of routeOptions; track route) {
-                <option [value]="route">{{ route }}</option>
+              <option [value]="null">Disable</option>
+              @for (route of routes; track route.id) {
+                <option [value]="route.id">{{ route.name }} ({{ route.code }})</option>
               }
             </select>
           </div>
@@ -305,17 +396,24 @@
           <div class="route-select-wrapper">
             <select 
               class="route-select" 
-              [(ngModel)]="weekSchedule[5].route"
+              [(ngModel)]="weekSchedule[5].route_id"
               [name]="'route-' + weekSchedule[5].day"
+              [disabled]="isLoadingRoutes"
             >
-              <option value="">Route 5 Name</option>
-              @for (route of routeOptions; track route) {
-                <option [value]="route">{{ route }}</option>
+              <option [value]="null">Disable</option>
+              @for (route of routes; track route.id) {
+                <option [value]="route.id">{{ route.name }} ({{ route.code }})</option>
               }
             </select>
           </div>
         </div>
       </div>
+      @if (isLoadingRoutes) {
+        <span class="form-hint">Loading routes...</span>
+      }
+      @if (routesError) {
+        <span class="error-message">{{ routesError }}</span>
+      }
     </div>
   </form>
 
@@ -331,9 +429,9 @@
     <button 
       type="button" 
       class="btn-save"
-      (click)="onSaveAndNext()"
+      (click)="onSave()"
     >
-      Save & Next
+      Save
     </button>
   </div>
 </div>

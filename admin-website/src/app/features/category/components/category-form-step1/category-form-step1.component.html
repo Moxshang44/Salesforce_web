@@ -1,203 +1,430 @@
 <div class="category-form-step1">
-  <div class="form-row">
-    <div class="form-group full-width">
-      <label for="categoryName">Category Name</label>
-      <input
-        type="text"
-        id="categoryName"
-        [class.error]="errors['categoryName']"
-        [(ngModel)]="categoryData.categoryName"
-        placeholder="e.g., North India Visible"
-        class="form-input"
-        (input)="clearError('categoryName')"
-        required
-      />
-      @if (errors['categoryName']) {
-        <span class="error-message">{{ errors['categoryName'] }}</span>
-      }
-    </div>
-  </div>
-
-  <div class="form-row">
-    <div class="form-group">
-      <label for="subCategoryName">Sub Category Name (Optional)</label>
-      <div class="sub-category-input-group">
-        <input
-          type="text"
-          id="subCategoryName"
-          [(ngModel)]="newSubCategory"
-          placeholder="e.g., North India Visible"
+  <form class="category-form">
+    <!-- Category Name, Brand, and Code -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">
+          Category Name
+          <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
           class="form-input"
-          (keyup.enter)="addSubCategory()"
-        />
-        <button type="button" class="add-sub-btn" (click)="addSubCategory()">
-          +
-        </button>
+          [class.error]="errors['name']"
+          placeholder="Enter category name"
+          [(ngModel)]="formData.name"
+          name="categoryName"
+          (blur)="generateCategoryCode()"
+          (input)="clearError('name')"
+          required
+        >
+        @if (errors['name']) {
+          <span class="error-message">{{ errors['name'] }}</span>
+        }
       </div>
-      @if (categoryData.subCategoryNames.length > 0) {
-        <div class="sub-category-list">
-          @for (subCat of categoryData.subCategoryNames; track $index) {
-            <div class="sub-category-tag">
-              <span>{{ subCat }}</span>
-              <button type="button" class="remove-btn" (click)="removeSubCategory($index)">
-                ×
-              </button>
-            </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Brand
+          <span class="required">*</span>
+        </label>
+        <select 
+          class="form-select"
+          [class.error]="errors['brand_id']"
+          [(ngModel)]="formData.brand_id"
+          name="brand_id"
+          (change)="clearError('brand_id')"
+          [disabled]="isLoadingBrands"
+          required
+        >
+          <option [ngValue]="null">
+            @if (isLoadingBrands) {
+              Loading brands...
+            } @else {
+              Select Brand
+            }
+          </option>
+          @for (brand of brands; track brand.id) {
+            <option [ngValue]="brand.id">{{ brand.name }} ({{ brand.code }})</option>
           }
+        </select>
+        @if (errors['brand_id']) {
+          <span class="error-message">{{ errors['brand_id'] }}</span>
+        }
+        @if (brandsError) {
+          <span class="error-message">{{ brandsError }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Category Code
+          <span class="auto-badge">Auto</span>
+          <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          class="form-input"
+          [class.error]="errors['code']"
+          placeholder="CAT-XXX-XXXX"
+          [(ngModel)]="formData.code"
+          name="categoryCode"
+          (input)="clearError('code')"
+          required
+        >
+        @if (errors['code']) {
+          <span class="error-message">{{ errors['code'] }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Geographic Mapping Section -->
+    <div class="form-section">
+      <h3 class="section-title">Geographic Mapping</h3>
+      <p class="section-subtitle">Select country, zone, region, and areas</p>
+
+      <!-- Row 1: Select Country, Select Zone, Select Region -->
+      <div class="form-row three-col">
+        <div class="form-group">
+          <label class="form-label">Select Country</label>
+          <select 
+            class="form-select"
+            [ngModel]="selectedCountryId"
+            (ngModelChange)="onCountryChange($event)"
+            name="selectedCountryId"
+            [disabled]="isLoadingAllAreas || !selectedCompanyId"
+          >
+            <option [value]="null">
+              @if (isLoadingAllAreas) {
+                Loading...
+              } @else {
+                Select Country
+              }
+            </option>
+            @for (country of countryOptions; track country.id) {
+              <option [value]="country.id">{{ country.name }}</option>
+            }
+          </select>
+          @if (isLoadingAllAreas) {
+            <span class="form-hint">Loading areas...</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Zone</label>
+          <select 
+            class="form-select"
+            [ngModel]="selectedZoneId"
+            (ngModelChange)="onZoneChange($event)"
+            name="selectedZoneId"
+            [disabled]="!selectedCountryId || isLoadingZones || isLoadingAllAreas"
+          >
+            <option [value]="null">
+              @if (isLoadingZones) {
+                Loading zones...
+              } @else {
+                Select Zone
+              }
+            </option>
+            @for (zone of zoneOptions; track zone.id) {
+              <option [value]="zone.id">{{ zone.name }}</option>
+            }
+          </select>
+          @if (isLoadingZones) {
+            <span class="form-hint">Loading zones...</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Region</label>
+          <select 
+            class="form-select"
+            [ngModel]="selectedRegionId"
+            (ngModelChange)="onRegionChange($event)"
+            name="selectedRegionId"
+            [disabled]="!selectedZoneId || isLoadingRegions || isLoadingAllAreas"
+          >
+            <option [value]="null">
+              @if (isLoadingRegions) {
+                Loading regions...
+              } @else {
+                Select Region
+              }
+            </option>
+            @for (region of regionOptions; track region.id) {
+              <option [value]="region.id">{{ region.name }}</option>
+            }
+          </select>
+          @if (isLoadingRegions) {
+            <span class="form-hint">Loading regions...</span>
+          }
+        </div>
+      </div>
+
+      <!-- Area Selection (Checkbox Grid) -->
+      @if (selectedRegionId && areaOptions.length > 0) {
+        <div class="form-row full-width">
+          <div class="form-group full-width">
+            <label class="form-label">
+              Select Areas
+              <span class="optional">(Optional)</span>
+            </label>
+            <div class="checkbox-grid">
+              @for (area of areaOptions; track area.id) {
+                <label class="checkbox-item">
+                  <input 
+                    type="checkbox" 
+                    [checked]="isAreaSelected(area.id)"
+                    (change)="toggleArea(area.id)"
+                    class="checkbox-input"
+                  >
+                  <span class="checkbox-label">{{ area.name }}</span>
+                </label>
+              }
+            </div>
+            @if (isLoadingAreas) {
+              <span class="form-hint">Loading areas...</span>
+            }
+          </div>
         </div>
       }
     </div>
-    <div class="form-group">
-      <label for="categoryCode">Category Code (Auto)</label>
-      <input
-        type="text"
-        id="categoryCode"
-        [class.error]="errors['categoryCode']"
-        [(ngModel)]="categoryData.categoryCode"
-        placeholder="#CAT1000"
-        class="form-input"
-        (input)="clearError('categoryCode')"
-        required
-      />
-      @if (errors['categoryCode']) {
-        <span class="error-message">{{ errors['categoryCode'] }}</span>
+
+    <!-- Channel Visibility -->
+    <div class="form-section">
+      <label class="section-label">
+        Channel Visibility
+        <span class="required">*</span>
+      </label>
+      <div class="checkbox-row">
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.for_general"
+            name="for_general"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">General Trade</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.for_modern"
+            name="for_modern"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">Modern Trade</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.for_horeca"
+            name="for_horeca"
+            class="checkbox-input"
+          >
+          <span class="checkbox-label">HoReCa Trade</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Category Logo Upload (Optional) -->
+    <div class="form-section">
+      <label class="section-label">
+        Category Logo
+        <span class="optional">(Optional)</span>
+      </label>
+      
+      @if (!logoPreview) {
+        <div 
+          class="file-upload-area"
+          [class.dragging]="isDragging"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+        >
+          <div class="upload-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="upload-text">Drag & drop image here or click to browse</p>
+          <p class="upload-hint">PNG, JPG, JPEG up to 5MB</p>
+          <input 
+            type="file" 
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="file-input"
+            #fileInput
+          >
+          <button 
+            type="button" 
+            class="browse-btn"
+            (click)="fileInput.click()"
+          >
+            Browse Files
+          </button>
+        </div>
+      } @else {
+        <div class="logo-preview">
+          <img [src]="logoPreview" alt="Category Logo Preview" class="preview-image">
+          <button 
+            type="button" 
+            class="remove-logo-btn"
+            (click)="removeLogo()"
+          >
+            Remove Logo
+          </button>
+        </div>
       }
     </div>
-  </div>
 
-  <div class="form-row">
-    <div class="form-group">
-      <label for="selectBrand">Select Brand</label>
-      <select
-        id="selectBrand"
-        [(ngModel)]="categoryData.selectedBrand"
-        class="form-select"
-      >
-        <option value="">Select</option>
-        <option value="brand1">Brand 1</option>
-        <option value="brand2">Brand 2</option>
-        <option value="brand3">Brand 3</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="selectCountry">Select Country</label>
-      <select
-        id="selectCountry"
-        [(ngModel)]="categoryData.selectedCountry"
-        class="form-select"
-      >
-        <option value="1 Selected">1 Selected</option>
-        <option value="2 Selected">2 Selected</option>
-        <option value="All Selected">All Selected</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="selectZone">Select Zone</label>
-      <select
-        id="selectZone"
-        [(ngModel)]="categoryData.selectedZone"
-        class="form-select"
-      >
-        <option value="All Selected">All Selected</option>
-        <option value="North">North</option>
-        <option value="South">South</option>
-        <option value="East">East</option>
-        <option value="West">West</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="form-row">
-    <div class="form-group">
-      <label for="selectRegions">Select Regions</label>
-      <select
-        id="selectRegions"
-        [(ngModel)]="categoryData.selectedRegions"
-        class="form-select"
-      >
-        <option value="Select Regions">Select Regions</option>
-        <option value="Region 1">Region 1</option>
-        <option value="Region 2">Region 2</option>
-        <option value="All Regions">All Regions</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="selectAreas">Select Areas</label>
-      <select
-        id="selectAreas"
-        [(ngModel)]="categoryData.selectedAreas"
-        class="form-select"
-      >
-        <option value="All Selected">All Selected</option>
-        <option value="Area 1">Area 1</option>
-        <option value="Area 2">Area 2</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="form-section">
-    <label class="section-label">Channel Visibility</label>
-    <div class="checkbox-group">
-      <label class="checkbox-label">
-        <input
-          type="checkbox"
-          [(ngModel)]="categoryData.channelVisibility.generalTrade"
-        />
-        <span>General Trade</span>
-      </label>
-      <label class="checkbox-label">
-        <input
-          type="checkbox"
-          [(ngModel)]="categoryData.channelVisibility.modernTrade"
-        />
-        <span>Modern Trade</span>
-      </label>
-      <label class="checkbox-label">
-        <input
-          type="checkbox"
-          [(ngModel)]="categoryData.channelVisibility.horecaTrade"
-        />
-        <span>HoReCa Trade</span>
-      </label>
-    </div>
-  </div>
-
-  <div class="form-section">
-    <label class="section-label">Category Image</label>
-    <div
-      class="upload-area"
-      [class.drag-over]="dragOver"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave($event)"
-      (drop)="onDrop($event)"
-      (click)="fileInput.click()"
-    >
-      <div class="upload-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+    <!-- Margins Section (Optional) -->
+    <div class="form-section">
+      <div class="margins-header">
+        <h3 class="section-title">Margins <span class="optional">(Optional)</span></h3>
+        <button type="button" class="add-margin-btn" (click)="addMargin()">
+          + Add Margin
+        </button>
       </div>
-      <div class="upload-text">
-        <strong>Drag & drop images here or click to browse</strong>
-      </div>
-      <div class="upload-subtext">(PNG, JPG, GIF (max 5x 10 MB))</div>
-      @if (categoryData.categoryImage) {
-        <div class="file-name">{{ categoryData.categoryImage.name }}</div>
+
+      @if (formData.margins.length > 0) {
+        @for (margin of formData.margins; track $index) {
+          <div class="margin-card">
+            <div class="margin-card-header">
+              <h4>Margin Entry {{ $index + 1 }}</h4>
+              <button type="button" class="remove-margin-btn" (click)="removeMargin($index)">
+                Remove
+              </button>
+            </div>
+
+            <div class="form-grid">
+              <!-- Area -->
+              <div class="form-group">
+                <label class="form-label">Area <span class="optional">(Optional)</span></label>
+                <select class="form-select" [(ngModel)]="margin.area_id" [name]="'margin_area_' + $index">
+                  <option [ngValue]="null">Select Area</option>
+                  @for (area of areaOptions; track area.id) {
+                    <option [ngValue]="area.id">{{ area.name }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- Margins for each level -->
+            <div class="margin-levels-section">
+              <h5>Margin Levels</h5>
+              <div class="margin-levels-table-wrapper">
+                <table class="margin-levels-table">
+                  <thead>
+                    <tr>
+                      <th>Level</th>
+                      <th>Type</th>
+                      <th>Value (%)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Super Stockist -->
+                    <tr>
+                      <td>Super Stockist</td>
+                      <td>
+                        <select class="form-select-small" [(ngModel)]="margin.margins.super_stockist.type" [name]="'margin_type_super_' + $index">
+                          @for (type of marginTypes; track type) {
+                            <option [value]="type">{{ type }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        <input 
+                          type="number" 
+                          class="form-input-small" 
+                          [(ngModel)]="margin.margins.super_stockist.value" 
+                          [name]="'margin_value_super_' + $index"
+                          placeholder="0"
+                        />
+                      </td>
+                    </tr>
+
+                    <!-- Distributor -->
+                    <tr>
+                      <td>Distributor</td>
+                      <td>
+                        <select class="form-select-small" [(ngModel)]="margin.margins.distributor.type" [name]="'margin_type_dist_' + $index">
+                          @for (type of marginTypes; track type) {
+                            <option [value]="type">{{ type }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        <input 
+                          type="number" 
+                          class="form-input-small" 
+                          [(ngModel)]="margin.margins.distributor.value" 
+                          [name]="'margin_value_dist_' + $index"
+                          placeholder="0"
+                        />
+                      </td>
+                    </tr>
+
+                    <!-- Retailer -->
+                    <tr>
+                      <td>Retailer</td>
+                      <td>
+                        <select class="form-select-small" [(ngModel)]="margin.margins.retailer.type" [name]="'margin_type_ret_' + $index">
+                          @for (type of marginTypes; track type) {
+                            <option [value]="type">{{ type }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        <input 
+                          type="number" 
+                          class="form-input-small" 
+                          [(ngModel)]="margin.margins.retailer.value" 
+                          [name]="'margin_value_ret_' + $index"
+                          placeholder="0"
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="empty-state">
+          <p>No margins added yet. Click "Add Margin" to add margin information.</p>
+        </div>
       }
-      <input
-        #fileInput
-        type="file"
-        accept="image/*"
-        (change)="onFileSelected($event)"
-        style="display: none;"
-      />
     </div>
-  </div>
 
+    <!-- Validation Error -->
+    @if (errors['brand_id']) {
+      <div class="alert alert-error">
+        {{ errors['brand_id'] }}
+      </div>
+    }
+  </form>
+
+  <!-- Action Buttons -->
   <div class="form-actions">
-    <app-button variant="secondary" (click)="onCancel()">Cancel</app-button>
-    <app-button variant="primary" (click)="onSave()">Save & Next</app-button>
+    <app-button 
+      variant="outline" 
+      type="button"
+      (click)="onCancel()"
+    >
+      Cancel
+    </app-button>
+    <app-button 
+      variant="primary" 
+      type="button"
+      (click)="onSave()"
+    >
+      Save & Next
+    </app-button>
   </div>
 </div>

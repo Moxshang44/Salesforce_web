@@ -8,6 +8,8 @@ export class AuthService {
   private readonly AUTH_KEY = 'isAuthenticated';
   private readonly DMS_AUTH_KEY = 'isDmsAuthenticated';
   private readonly SUPER_ADMIN_AUTH_KEY = 'isSuperAdminAuthenticated';
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly COMPANY_KEY = 'company_info';
   
   // Store OTPs temporarily (in production, this would be handled by backend)
   // Format: { mobileNumber: { otp: string, expiresAt: number } }
@@ -54,7 +56,33 @@ export class AuthService {
       return { success: false, isDms: false };
     }
 
-    // Check if OTP exists and is valid
+    // Determine if this is DMS or Admin based on mobile number
+    const isDms = mobileNumber === this.VALID_DMS_MOBILE;
+    const isDemoCredential = mobileNumber === this.VALID_ADMIN_MOBILE || mobileNumber === this.VALID_DMS_MOBILE;
+    
+    // Allow demo credentials to bypass OTP verification (temporary until OTP is fully implemented)
+    if (isDemoCredential && otp === '123456') {
+      // Direct login for demo credentials
+      if (isDms) {
+        // DMS login
+        localStorage.setItem(this.DMS_AUTH_KEY, 'true');
+        localStorage.setItem('dmsUserMobile', mobileNumber);
+        // Clear any admin auth that might exist
+        localStorage.removeItem(this.AUTH_KEY);
+        localStorage.removeItem('userMobile');
+      } else {
+        // Admin login
+        localStorage.setItem(this.AUTH_KEY, 'true');
+        localStorage.setItem('userMobile', mobileNumber);
+        // Clear any DMS auth that might exist
+        localStorage.removeItem(this.DMS_AUTH_KEY);
+        localStorage.removeItem('dmsUserMobile');
+      }
+      
+      return { success: true, isDms };
+    }
+
+    // For non-demo credentials, check OTP from storage
     const otpData = this.otpStorage.get(mobileNumber);
     
     if (!otpData) {
@@ -71,9 +99,6 @@ export class AuthService {
     if (otpData.otp !== otp) {
       return { success: false, isDms: false };
     }
-
-    // Determine if this is DMS or Admin based on mobile number
-    const isDms = mobileNumber === this.VALID_DMS_MOBILE;
     
     // Clear OTP after successful login
     this.otpStorage.delete(mobileNumber);
@@ -124,6 +149,8 @@ export class AuthService {
     localStorage.removeItem('userMobile');
     localStorage.removeItem(this.DMS_AUTH_KEY);
     localStorage.removeItem('dmsUserMobile');
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.COMPANY_KEY);
     this.router.navigate(['/login']);
   }
 
@@ -133,6 +160,8 @@ export class AuthService {
     localStorage.removeItem('userMobile');
     localStorage.removeItem(this.DMS_AUTH_KEY);
     localStorage.removeItem('dmsUserMobile');
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.COMPANY_KEY);
     this.router.navigate(['/login']);
   }
 
@@ -160,5 +189,39 @@ export class AuthService {
   superAdminLogout(): void {
     localStorage.removeItem(this.SUPER_ADMIN_AUTH_KEY);
     this.router.navigate(['/superadmin']);
+  }
+
+  // Store token and company info after successful login
+  setAuthToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
+  }
+
+  getAuthToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  setCompanyInfo(companyInfo: { company_id: string; company_name: string }[]): void {
+    if (companyInfo && companyInfo.length > 0) {
+      // Store the first company (you can extend this to handle multiple companies later)
+      localStorage.setItem(this.COMPANY_KEY, JSON.stringify(companyInfo[0]));
+    }
+  }
+
+  getCompanyInfo(): { company_id: string; company_name: string } | null {
+    const companyInfo = localStorage.getItem(this.COMPANY_KEY);
+    if (companyInfo) {
+      try {
+        return JSON.parse(companyInfo);
+      } catch (e) {
+        console.error('Error parsing company info:', e);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  getCompanyName(): string {
+    const companyInfo = this.getCompanyInfo();
+    return companyInfo?.company_name || 'Company Name';
   }
 }

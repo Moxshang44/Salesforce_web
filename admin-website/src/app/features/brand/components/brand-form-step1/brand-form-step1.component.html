@@ -3,20 +3,23 @@
     <!-- Brand Name -->
     <div class="form-row">
       <div class="form-group full-width">
-        <label class="form-label">Brand Name</label>
+        <label class="form-label">
+          Brand Name
+          <span class="required">*</span>
+        </label>
         <input 
           type="text" 
           class="form-input"
-          [class.error]="errors['brandName']"
+          [class.error]="errors['name']"
           placeholder="e.g., Maude Hlaze"
-          [(ngModel)]="formData.brandName"
-          name="brandName"
+          [(ngModel)]="formData.name"
+          name="name"
           (blur)="generateBrandCode()"
-          (input)="clearError('brandName')"
+          (input)="clearError('name')"
           required
         >
-        @if (errors['brandName']) {
-          <span class="error-message">{{ errors['brandName'] }}</span>
+        @if (errors['name']) {
+          <span class="error-message">{{ errors['name'] }}</span>
         }
       </div>
     </div>
@@ -25,158 +28,41 @@
     <div class="form-row">
       <div class="form-group full-width">
         <label class="form-label">
-          Brand Code <span class="auto-badge">Auto</span>
+          Brand Code
+          <span class="required">*</span>
         </label>
         <input 
           type="text" 
           class="form-input"
-          [class.error]="errors['brandCode']"
+          [class.error]="errors['code']"
           placeholder="e.g., BCAT1001"
-          [(ngModel)]="formData.brandCode"
-          name="brandCode"
-          (input)="clearError('brandCode')"
-          required
+          [(ngModel)]="formData.code"
+          name="code"
+          (input)="clearError('code')"
+          [disabled]="isEditMode"
+          [required]="!isEditMode"
         >
-        @if (errors['brandCode']) {
-          <span class="error-message">{{ errors['brandCode'] }}</span>
+        @if (errors['code']) {
+          <span class="error-message">{{ errors['code'] }}</span>
+        }
+        @if (isEditMode) {
+          <span class="form-hint">Brand code cannot be changed</span>
         }
       </div>
     </div>
 
-    <!-- Brand Visibility Control -->
+    <!-- Channel Visibility (Required) -->
     <div class="form-section">
-      <label class="section-label">Brand Visibility Control</label>
+      <label class="section-label">
+        Channel Visibility
+        <span class="required">*</span>
+      </label>
       <div class="checkbox-row">
         <label class="checkbox-item">
           <input 
             type="checkbox" 
-            [(ngModel)]="formData.availableInAllRegions"
-            name="availableInAllRegions"
-            class="checkbox-input"
-          >
-          <span class="checkbox-label">Available in all regions</span>
-        </label>
-        <label class="checkbox-item">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="formData.limitedLaunch"
-            name="limitedLaunch"
-            class="checkbox-input"
-          >
-          <span class="checkbox-label">Limited launch</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- Select Country -->
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Select Country</label>
-        <div class="custom-dropdown">
-          <button type="button" class="dropdown-toggle">
-            {{ getSelectedCountriesText() }}
-            <span class="dropdown-arrow">▼</span>
-          </button>
-          <div class="dropdown-menu">
-            @for (country of countryOptions; track country) {
-              <label class="dropdown-item">
-                <input 
-                  type="checkbox" 
-                  [checked]="isCountrySelected(country)"
-                  (change)="toggleCountry(country)"
-                  class="dropdown-checkbox"
-                >
-                <span>{{ country }}</span>
-              </label>
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- Select Regions -->
-      <div class="form-group">
-        <label class="form-label">Select Regions</label>
-        <div class="custom-dropdown">
-          <button type="button" class="dropdown-toggle">
-            {{ getSelectedRegionsText() }}
-            <span class="dropdown-arrow">▼</span>
-          </button>
-          <div class="dropdown-menu">
-            @for (region of regionOptions; track region) {
-              <label class="dropdown-item">
-                <input 
-                  type="checkbox" 
-                  [checked]="isRegionSelected(region)"
-                  (change)="toggleRegion(region)"
-                  class="dropdown-checkbox"
-                >
-                <span>{{ region }}</span>
-              </label>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Select Zone -->
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Select Zone</label>
-        <div class="custom-dropdown">
-          <button type="button" class="dropdown-toggle">
-            {{ getSelectedZonesText() }}
-            <span class="dropdown-arrow">▼</span>
-          </button>
-          <div class="dropdown-menu">
-            @for (zone of zoneOptions; track zone) {
-              <label class="dropdown-item">
-                <input 
-                  type="checkbox" 
-                  [checked]="isZoneSelected(zone)"
-                  (change)="toggleZone(zone)"
-                  class="dropdown-checkbox"
-                >
-                <span>{{ zone }}</span>
-              </label>
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- Select Areas -->
-      <div class="form-group">
-        <label class="form-label">Select Areas</label>
-        <div class="custom-dropdown">
-          <button type="button" class="dropdown-toggle">
-            {{ getSelectedAreasText() }}
-            <span class="dropdown-arrow">▼</span>
-          </button>
-          <div class="dropdown-menu">
-            @for (area of areaOptions; track area) {
-              <label class="dropdown-item">
-                <input 
-                  type="checkbox" 
-                  [checked]="isAreaSelected(area)"
-                  (change)="toggleArea(area)"
-                  class="dropdown-checkbox"
-                >
-                <span>{{ area }}</span>
-              </label>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Channel Visibility (Optional) -->
-    <div class="form-section">
-      <label class="section-label">Channel Visibility <span class="optional-text">(Optional)</span></label>
-      <div class="checkbox-row">
-        <label class="checkbox-item">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="formData.channelVisibility.generalTrade"
-            name="generalTrade"
+            [(ngModel)]="formData.for_general"
+            name="for_general"
             class="checkbox-input"
           >
           <span class="checkbox-label">General Trade</span>
@@ -184,8 +70,8 @@
         <label class="checkbox-item">
           <input 
             type="checkbox" 
-            [(ngModel)]="formData.channelVisibility.modernTrade"
-            name="modernTrade"
+            [(ngModel)]="formData.for_modern"
+            name="for_modern"
             class="checkbox-input"
           >
           <span class="checkbox-label">Modern Trade</span>
@@ -193,8 +79,8 @@
         <label class="checkbox-item">
           <input 
             type="checkbox" 
-            [(ngModel)]="formData.channelVisibility.horecaTrade"
-            name="horecaTrade"
+            [(ngModel)]="formData.for_horeca"
+            name="for_horeca"
             class="checkbox-input"
           >
           <span class="checkbox-label">HoReCa Trade</span>
@@ -202,12 +88,38 @@
       </div>
     </div>
 
-    <!-- Brand Logo Upload -->
+    <!-- Area Selection (Optional) -->
     <div class="form-row">
       <div class="form-group full-width">
-        <label class="form-label">Brand Logo</label>
+        <label class="form-label">
+          Select Areas
+          <span class="optional">(Optional)</span>
+        </label>
+        <div class="checkbox-grid">
+          @for (area of areas; track area.id) {
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [checked]="isAreaSelected(area.id)"
+                (change)="toggleArea(area.id)"
+                class="checkbox-input"
+              >
+              <span class="checkbox-label">{{ area.name }}</span>
+            </label>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Brand Logo Upload (Optional) -->
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label class="form-label">
+          Brand Logo
+          <span class="optional">(Optional)</span>
+        </label>
         
-        @if (!formData.brandLogoPreview) {
+        @if (!logoPreview) {
           <div 
             class="file-upload-area"
             [class.dragging]="isDragging"
@@ -241,7 +153,7 @@
           </div>
         } @else {
           <div class="logo-preview">
-            <img [src]="formData.brandLogoPreview" alt="Brand Logo Preview" class="preview-image">
+            <img [src]="logoPreview" alt="Brand Logo Preview" class="preview-image">
             <button 
               type="button" 
               class="remove-logo-btn"
@@ -257,20 +169,23 @@
 
   <!-- Action Buttons -->
   <div class="form-actions">
-    <button 
-      type="button" 
-      class="btn-cancel"
+    <app-button 
+      variant="outline" 
+      type="button"
       (click)="onCancel()"
     >
       Cancel
-    </button>
-    <button 
-      type="button" 
-      class="btn-save"
+    </app-button>
+    <app-button 
+      variant="primary" 
+      type="button"
       (click)="onSaveAndNext()"
     >
-      Save & Next
-    </button>
+      @if (isEditMode) {
+        Save
+      } @else {
+        Save & Next
+      }
+    </app-button>
   </div>
 </div>
-

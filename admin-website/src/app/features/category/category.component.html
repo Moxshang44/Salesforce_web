@@ -46,6 +46,20 @@
       </div>
 
       <div class="table-container">
+        @if (isLoadingCategories) {
+          <div class="loading-state-container">
+            <p>Loading categories...</p>
+          </div>
+        } @else if (categoriesError) {
+          <div class="error-state-container">
+            <p class="error-text">{{ categoriesError }}</p>
+            <button class="retry-btn" (click)="loadCategories(currentPage)">Retry</button>
+          </div>
+        } @else if (categories.length === 0) {
+          <div class="empty-state-container">
+            <p>No categories found. Click "Add" to create a new category.</p>
+          </div>
+        } @else {
         <table class="data-table">
           <thead>
             <tr>
@@ -111,6 +125,7 @@
             }
           </tbody>
         </table>
+        }
       </div>
 
       <div class="table-footer">
@@ -132,15 +147,199 @@
   <app-modal
     [isOpen]="isAddModalOpen"
     [title]="getModalTitle()"
-    [stepIndicator]="'Step ' + currentStep + ' of 1'"
+    [stepIndicator]="currentStep > 1 ? 'Step ' + (currentStep - 1) + ' of 1' : ''"
     width="1400px"
     (close)="closeAddModal()"
   >
     @if (currentStep === 1) {
       <app-category-form-step1
+        [selectedCompanyId]="selectedCompanyId"
+        [categoryData]="categoryDataForEdit"
+        [isEditMode]="isEditMode"
         (save)="onSaveStep1($event)"
         (cancel)="closeAddModal()"
       ></app-category-form-step1>
+    }
+  </app-modal>
+
+  <!-- View Category Modal -->
+  <app-modal
+    [isOpen]="isViewModalOpen"
+    title="Category Details"
+    width="1000px"
+    (close)="closeViewModal()"
+  >
+    @if (isLoadingView) {
+      <div class="loading-state">
+        <p>Loading category details...</p>
+      </div>
+    } @else if (viewErrorMessage) {
+      <div class="alert alert-error">
+        <strong>Error:</strong>
+        <pre class="error-pre">{{ viewErrorMessage }}</pre>
+      </div>
+      <div class="form-actions">
+        <app-button
+          type="button"
+          variant="primary"
+          (click)="closeViewModal()"
+        >
+          Close
+        </app-button>
+      </div>
+    } @else if (viewingCategory) {
+      <div class="view-category-details">
+        <!-- Basic Information -->
+        <div class="detail-section">
+          <h3 class="section-title">Basic Information</h3>
+          
+          <div class="detail-row">
+            <div class="detail-label">Category ID:</div>
+            <div class="detail-value">{{ viewingCategory.id }}</div>
+          </div>
+          
+          <div class="detail-row">
+            <div class="detail-label">Category Name:</div>
+            <div class="detail-value">{{ viewingCategory.name || 'N/A' }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Category Code:</div>
+            <div class="detail-value">{{ viewingCategory.code || 'N/A' }}</div>
+          </div>
+
+          @if (viewingCategory.brand_id) {
+            <div class="detail-row">
+              <div class="detail-label">Brand ID:</div>
+              <div class="detail-value">{{ viewingCategory.brand_id }}</div>
+            </div>
+          }
+
+          @if (viewingCategory.parent_category_id) {
+            <div class="detail-row">
+              <div class="detail-label">Parent Category:</div>
+              <div class="detail-value">
+                {{ viewingCategory.parent_category_name || 'N/A' }} (ID: {{ viewingCategory.parent_category_id }})
+              </div>
+            </div>
+          }
+
+          <div class="detail-row">
+            <div class="detail-label">Channel Types:</div>
+            <div class="detail-value">
+              <div class="channel-badges">
+                @if (viewingCategory.for_general) {
+                  <span class="channel-badge">General Trade</span>
+                }
+                @if (viewingCategory.for_modern) {
+                  <span class="channel-badge">Modern Trade</span>
+                }
+                @if (viewingCategory.for_horeca) {
+                  <span class="channel-badge">HORECA Trade</span>
+                }
+                @if (!viewingCategory.for_general && !viewingCategory.for_modern && !viewingCategory.for_horeca) {
+                  <span class="channel-badge none">None</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Areas -->
+        @if (viewingCategory.area && viewingCategory.area.length > 0) {
+          <div class="detail-section">
+            <h3 class="section-title">Areas</h3>
+            <div class="detail-row">
+              <div class="detail-label">Assigned Areas:</div>
+              <div class="detail-value">
+                <div class="area-list">
+                  @for (area of viewingCategory.area; track area.id) {
+                    <span class="area-badge">{{ area.name }} ({{ area.type }})</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Margins -->
+        @if (viewingCategory.margins && viewingCategory.margins.length > 0) {
+          <div class="detail-section">
+            <h3 class="section-title">Margins</h3>
+            <div class="margins-list">
+              @for (margin of viewingCategory.margins; track margin.id) {
+                <div class="margin-item">
+                  <div class="margin-header">
+                    <strong>{{ margin.name || 'Area ID: ' + margin.area_id }}</strong>
+                    @if (margin.area_id) {
+                      <span class="area-badge">Area ID: {{ margin.area_id }}</span>
+                    }
+                  </div>
+                  <div class="margin-details">
+                    <div>Super Stockist: {{ margin.margins?.super_stockist?.type || 'N/A' }} - {{ margin.margins?.super_stockist?.value || 'N/A' }}%</div>
+                    <div>Distributor: {{ margin.margins?.distributor?.type || 'N/A' }} - {{ margin.margins?.distributor?.value || 'N/A' }}%</div>
+                    <div>Retailer: {{ margin.margins?.retailer?.type || 'N/A' }} - {{ margin.margins?.retailer?.value || 'N/A' }}%</div>
+                  </div>
+                  <div class="margin-status">
+                    <span [class.active]="margin.is_active" [class.inactive]="!margin.is_active">
+                      {{ margin.is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Status & Dates -->
+        <div class="detail-section">
+          <h3 class="section-title">Status & Dates</h3>
+          
+          <div class="detail-row">
+            <div class="detail-label">Is Active:</div>
+            <div class="detail-value">
+              <span [class.active]="viewingCategory.is_active" [class.inactive]="!viewingCategory.is_active">
+                {{ viewingCategory.is_active ? 'Yes' : 'No' }}
+              </span>
+            </div>
+          </div>
+
+          @if (viewingCategory.is_deleted !== undefined) {
+            <div class="detail-row">
+              <div class="detail-label">Is Deleted:</div>
+              <div class="detail-value">
+                <span [class.active]="!viewingCategory.is_deleted" [class.inactive]="viewingCategory.is_deleted">
+                  {{ viewingCategory.is_deleted ? 'Yes' : 'No' }}
+                </span>
+              </div>
+            </div>
+          }
+
+          @if (viewingCategory.created_at) {
+            <div class="detail-row">
+              <div class="detail-label">Created At:</div>
+              <div class="detail-value">{{ viewingCategory.created_at | date:'medium' }}</div>
+            </div>
+          }
+
+          @if (viewingCategory.updated_at) {
+            <div class="detail-row">
+              <div class="detail-label">Updated At:</div>
+              <div class="detail-value">{{ viewingCategory.updated_at | date:'medium' }}</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions" style="margin-top: 24px;">
+        <app-button
+          type="button"
+          variant="primary"
+          (click)="closeViewModal()"
+        >
+          Close
+        </app-button>
+      </div>
     }
   </app-modal>
 </div>

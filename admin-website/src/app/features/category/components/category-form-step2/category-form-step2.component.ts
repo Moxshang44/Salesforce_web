@@ -1,10 +1,9 @@
-import { Component, EventEmitter, Output, Input } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
-export interface BrandMargin {
-  name: string;
+export interface CategoryMargin {
   area_id: number | null;
   margins: {
     super_stockist: {
@@ -22,23 +21,22 @@ export interface BrandMargin {
   };
 }
 
-export interface BrandFormStep2Data {
-  margins: BrandMargin[];
+export interface CategoryFormStep2Data {
+  margins: CategoryMargin[];
 }
 
 @Component({
-  selector: 'app-brand-form-step2',
+  selector: 'app-category-form-step2',
   standalone: true,
   imports: [CommonModule, FormsModule, ButtonComponent],
-  templateUrl: './brand-form-step2.component.html',
-  styleUrl: './brand-form-step2.component.scss'
+  templateUrl: './category-form-step2.component.html',
+  styleUrl: './category-form-step2.component.scss'
 })
-export class BrandFormStep2Component {
-  @Input() step1Data: any = null;
-  @Output() save = new EventEmitter<BrandFormStep2Data>();
+export class CategoryFormStep2Component {
+  @Output() save = new EventEmitter<CategoryFormStep2Data>();
   @Output() previous = new EventEmitter<void>();
 
-  formData: BrandFormStep2Data = {
+  formData: CategoryFormStep2Data = {
     margins: []
   };
 
@@ -55,7 +53,6 @@ export class BrandFormStep2Component {
 
   addMargin() {
     this.formData.margins.push({
-      name: '',
       area_id: null,
       margins: {
         super_stockist: {
@@ -107,3 +104,4 @@ export class BrandFormStep2Component {
     this.previous.emit();
   }
 }
+

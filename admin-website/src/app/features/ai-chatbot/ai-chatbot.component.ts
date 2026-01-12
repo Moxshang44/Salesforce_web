@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } fro
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { DmsSidebarComponent } from '../components/dms-sidebar/dms-sidebar.component';
-import { HeaderComponent } from '../../../core/layout/header/header.component';
+import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
+import { HeaderComponent } from '../../core/layout/header/header.component';
 
 interface ChatMessage {
   id: number;
@@ -35,7 +35,7 @@ interface ModeItem {
   imports: [
     CommonModule,
     FormsModule,
-    DmsSidebarComponent,
+    SidebarComponent,
     HeaderComponent
   ],
   templateUrl: './ai-chatbot.component.html',
@@ -100,7 +100,7 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
       {
         id: 1,
         role: 'assistant',
-        content: 'Hello! I\'m your AI assistant. How can I help you with orders, inventory, billing mode, or any questions about your DMS system?',
+        content: 'Hello! I\'m your AI assistant. How can I help you with your admin tasks, product management, routes, distributors, employees, or any questions about the admin system?',
         timestamp: new Date()
       }
     ];
@@ -251,26 +251,26 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
     const modePrefix = mode === 'ask' ? 'Let me answer that' : mode === 'do' ? 'I\'ll help you perform that' : 'Let me plan that';
     
     if (mode === 'ask') {
-      if (lowerInput.includes('order') || lowerInput.includes('orders')) {
-        return modePrefix + ': You can view, create, or manage orders in the Orders section. Orders allow you to track inventory requests, manage stock levels, and process sales orders. Would you like to know more about any specific order functionality?';
-      } else if (lowerInput.includes('inventory') || lowerInput.includes('stock')) {
-        return modePrefix + ': For inventory and stock management, you can check the Stock section. I can help you track inventory levels, update stock, or answer questions about specific products.';
-      } else if (lowerInput.includes('billing') || lowerInput.includes('tally')) {
-        return modePrefix + ': Billing Mode allows you to configure Tally integration, manage mappings, and view sync logs. What specific aspect would you like to know about?';
-      } else if (lowerInput.includes('invoice') || lowerInput.includes('invoices')) {
-        return modePrefix + ': For invoice management, you can access the Invoices section. This includes invoice processing, status tracking, and invoice-related queries.';
+      if (lowerInput.includes('product') || lowerInput.includes('products')) {
+        return modePrefix + ': You can manage products, brands, categories, and schemes in the Product Master section. I can help you with product information, inventory queries, or product-related operations.';
+      } else if (lowerInput.includes('route') || lowerInput.includes('routes')) {
+        return modePrefix + ': For route management, you can access the Routes section. I can help you create routes, assign routes to employees, or answer questions about route configurations.';
+      } else if (lowerInput.includes('distributor') || lowerInput.includes('distributors')) {
+        return modePrefix + ': Distributor management is available in the Distributors section. I can help you with distributor information, stock management, or distributor-related queries.';
+      } else if (lowerInput.includes('employee') || lowerInput.includes('employees')) {
+        return modePrefix + ': Employee management is in the Employee Master section. I can help you with employee information, role assignments, or employee-related operations.';
       } else if (lowerInput.includes('help')) {
-        return modePrefix + ': I can assist you with:\n- Managing orders and understanding order status\n- Inventory and stock queries\n- Billing mode and Tally integration\n- Invoice management\n- Navigation within the DMS system\n- General questions about features\n\nWhat would you like to know?';
+        return modePrefix + ': I can assist you with:\n- Product management (brands, categories, products, schemes)\n- Route management and assignments\n- Distributor and retailer management\n- Employee management\n- Navigation within the admin system\n- General questions about features\n\nWhat would you like to know?';
       }
     } else if (mode === 'do') {
       if (lowerInput.includes('create') || lowerInput.includes('add') || lowerInput.includes('new')) {
-        return modePrefix + ' action for you. Based on your request, I can help you create new orders, add inventory items, or perform other operations. What specific action would you like me to perform?';
+        return modePrefix + ' action for you. Based on your request, I can help you create new products, routes, distributors, employees, or perform other operations. What specific action would you like me to perform?';
       } else if (lowerInput.includes('update') || lowerInput.includes('edit') || lowerInput.includes('modify')) {
-        return modePrefix + ' update operation. I can help you update order status, modify inventory levels, or edit existing records. Which item would you like to update?';
+        return modePrefix + ' update operation. I can help you update product details, modify routes, edit distributor information, or update employee records. Which item would you like to update?';
       } else if (lowerInput.includes('delete') || lowerInput.includes('remove')) {
         return modePrefix + ' deletion. Please specify which item you\'d like to delete, and I\'ll guide you through the process safely.';
       } else {
-        return modePrefix + ' operation. I\'m ready to perform actions in the DMS system. What would you like me to do?';
+        return modePrefix + ' operation. I\'m ready to perform actions in the admin system. What would you like me to do?';
       }
     } else if (mode === 'plan') {
       if (lowerInput.includes('strategy') || lowerInput.includes('plan') || lowerInput.includes('approach')) {
@@ -284,7 +284,7 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
     if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
       return 'Hello! I\'m your AI assistant in ' + mode + ' mode. How can I help you today?';
     } else {
-      return modePrefix + '. I understand you\'re asking about: "' + userInput + '". I\'m here to help with DMS system operations. Could you provide more details?';
+      return modePrefix + '. I understand you\'re asking about: "' + userInput + '". I\'m here to help with admin system operations. Could you provide more details?';
     }
   }
 

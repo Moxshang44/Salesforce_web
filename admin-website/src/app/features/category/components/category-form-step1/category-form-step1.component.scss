@@ -27,16 +27,48 @@
   }
 }
 
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .required {
+    color: #dc3545;
+    font-weight: 600;
+  }
+
+  .optional {
+    font-size: 12px;
+    font-weight: 400;
+    color: #999;
+    margin-left: 4px;
+  }
+}
+
+.auto-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .form-input,
 .form-select {
-  width: 100%;
   padding: 10px 14px;
   border: 1px solid rgba(221, 221, 221, 0.7);
   border-radius: 6px;
   font-size: 14px;
-  color: #2c3e50;
+  transition: all 0.2s ease;
   background: rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: #999;
+  }
 
   &:focus {
     outline: none;
@@ -45,13 +77,20 @@
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 
-  &::placeholder {
-    color: #9ca3af;
-  }
-
   &.error {
     border-color: #dc3545;
     background: rgba(255, 255, 255, 0.5);
+    
+    &:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+  }
+
+  &:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 }
 
@@ -66,10 +105,22 @@
 .form-select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
+
+  &:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
 }
 
 .sub-category-input-group {
@@ -142,124 +193,408 @@
 }
 
 .form-section {
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(224, 224, 224, 0.5);
   border-radius: 8px;
 }
 
-.section-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: #2c3e50;
-  margin-bottom: 12px;
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+
+  .optional {
+    font-size: 12px;
+    font-weight: 400;
+    color: #999;
+    margin-left: 4px;
+  }
 }
 
-.checkbox-group {
+.section-subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: -8px 0 0 0;
+}
+
+.section-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+
+  .required {
+    color: #dc3545;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  .optional {
+    font-size: 12px;
+    font-weight: 400;
+    color: #999;
+    margin-left: 4px;
+  }
+}
+
+.checkbox-row {
   display: flex;
   gap: 24px;
   flex-wrap: wrap;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
 }
 
-.checkbox-label {
+.checkbox-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  color: #2c3e50;
   cursor: pointer;
-
-  input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: #664423;
-  }
-
-  span {
-    user-select: none;
-  }
+  user-select: none;
 }
 
-.upload-area {
-  border: 2px dashed rgba(209, 213, 219, 0.7);
+.checkbox-input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #664423;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(221, 221, 221, 0.3);
+}
+
+// File Upload Styles
+.file-upload-area {
+  border: 2px dashed rgba(221, 221, 221, 0.7);
   border-radius: 8px;
   padding: 40px 20px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.2);
-  cursor: pointer;
+  background: rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
 
-  &:hover,
-  &.drag-over {
-    border-color: rgba(102, 68, 35, 0.7);
-    background: rgba(243, 244, 246, 0.3);
+  &.dragging {
+    border-color: #664423;
+    background: rgba(102, 68, 35, 0.05);
+  }
+
+  &:hover {
+    border-color: #664423;
+    background: rgba(255, 255, 255, 0.4);
   }
 }
 
 .upload-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-  svg {
-    width: 48px;
-    height: 48px;
-    color: #664423;
-  }
+  margin-bottom: 16px;
+  color: #664423;
 }
 
 .upload-text {
-  font-size: 14px;
-  color: #2c3e50;
-  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
 
-  strong {
-    font-weight: 600;
+.upload-hint {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 16px;
+}
+
+.file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.browse-btn {
+  padding: 10px 24px;
+  background: #664423;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #4a3119;
   }
 }
 
-.upload-subtext {
+.logo-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(221, 221, 221, 0.5);
+}
+
+.preview-image {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: white;
+  padding: 8px;
+}
+
+.remove-logo-btn {
+  padding: 10px 20px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #c82333;
+  }
+}
+
+// Margins Section (from brand-form-step2)
+.margins-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.margins-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(224, 224, 224, 0.5);
+}
+
+.add-margin-btn {
+  padding: 8px 16px;
+  background: #664423;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #4a3119;
+  }
+}
+
+.margin-card {
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(221, 221, 221, 0.5);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.margin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(221, 221, 221, 0.3);
+
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+}
+
+.remove-margin-btn {
+  padding: 6px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
   font-size: 12px;
-  color: #6c757d;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #c82333;
+  }
 }
 
-.file-name {
-  margin-top: 12px;
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.margin-levels-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.margin-levels-section h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.margin-levels-table-wrapper {
+  overflow-x: auto;
+}
+
+.margin-levels-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+
+  thead {
+    background: rgba(245, 240, 232, 0.5);
+  }
+
+  th {
+    padding: 12px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid rgba(221, 221, 221, 0.5);
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(221, 221, 221, 0.3);
+    font-size: 13px;
+    color: #333;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.form-select-small {
+  padding: 8px 12px;
+  border: 1px solid rgba(221, 221, 221, 0.7);
+  border-radius: 6px;
   font-size: 13px;
-  color: #664423;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: #664423;
+    background: rgba(255, 255, 255, 0.6);
+  }
 }
 
+.form-input-small {
+  padding: 8px 12px;
+  border: 1px solid rgba(221, 221, 221, 0.7);
+  border-radius: 6px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.4);
+  width: 100%;
+
+  &::placeholder {
+    color: #999;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #664423;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
+  }
+}
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  border: 1px dashed rgba(221, 221, 221, 0.5);
+
+  p {
+    font-size: 14px;
+    color: #999;
+    margin: 0;
+  }
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.alert-error {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+// Action Buttons
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 32px;
-  padding: 10px 0 0 0;
-  border-top: 1px solid rgba(229, 231, 235, 0.5);
-  background: transparent;
-  position: sticky;
-  bottom: 0;
+  margin-top: 24px;
+  padding: 0 24px 24px 24px;
 }
 
 // Responsive
 @media (max-width: 768px) {
   .form-row {
-    flex-direction: column;
-    gap: 16px;
+    grid-template-columns: 1fr;
+
+    &.three-col {
+      grid-template-columns: 1fr;
+    }
   }
 
-  .checkbox-group {
+  .checkbox-row {
     flex-direction: column;
     gap: 12px;
   }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
+
 

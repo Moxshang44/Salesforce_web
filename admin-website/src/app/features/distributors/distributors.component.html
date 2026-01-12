@@ -85,24 +85,20 @@
       <!-- Table Controls -->
       <div class="table-controls">
         <div class="pagination-controls">
-          <button class="page-nav" (click)="previousPage()" [disabled]="currentPage === 1">
+          <button class="page-nav" (click)="previousPage()" [disabled]="currentPage === 1 || isLoading">
             <<
           </button>
-          <button 
-            class="page-number" 
-            [class.active]="currentPage === 1"
-            (click)="goToPage(1)"
-          >
-            1
-          </button>
-          <button 
-            class="page-number"
-            [class.active]="currentPage === 2"
-            (click)="goToPage(2)"
-          >
-            2
-          </button>
-          <button class="page-nav" (click)="nextPage()" [disabled]="currentPage === totalPages">
+          @for (page of getPageNumbers(); track page) {
+            <button 
+              class="page-number" 
+              [class.active]="currentPage === page"
+              (click)="goToPage(page)"
+              [disabled]="isLoading"
+            >
+              {{ page }}
+            </button>
+          }
+          <button class="page-nav" (click)="nextPage()" [disabled]="currentPage === totalPages || isLoading">
             >>
           </button>
         </div>
@@ -124,127 +120,148 @@
 
       <!-- Table Card -->
       <div class="table-card">
-        <!-- Data Table -->
-        <div class="table-wrapper">
-          <table class="distributors-table">
-            <thead>
-              <tr>
-                <th class="col-action">
-                  <div class="sortable-header">
-                    Action
-                    <span class="sort-indicator">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
-                        <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
-                      </svg>
-                    </span>
-                  </div>
-                </th>
-                <th class="col-distributor-store">
-                  <div class="sortable-header">
-                    Distributor Store
-                    <span class="sort-indicator">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
-                        <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
-                      </svg>
-                    </span>
-                  </div>
-                </th>
-                <th class="col-contact">
-                  <div class="sortable-header">
-                    Contact
-                    <span class="sort-indicator">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
-                        <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
-                      </svg>
-                    </span>
-                  </div>
-                </th>
-                <th class="col-area-address">
-                  <div class="sortable-header">
-                    Area / Address
-                    <span class="sort-indicator">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
-                        <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
-                      </svg>
-                    </span>
-                  </div>
-                </th>
-                <th class="col-routes-cover">
-                  <div class="sortable-header">
-                    Routes Cover
-                    <span class="sort-indicator">
-                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
-                        <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
-                      </svg>
-                    </span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (distributor of distributors; track distributor.id) {
-                <tr class="table-row" (click)="onRowClick(distributor)">
-                  <td class="col-action" (click)="$event.stopPropagation()">
-                    <div class="action-buttons">
-                      <button class="action-btn edit" (click)="onEdit(distributor)" title="Edit">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        @if (isLoading) {
+          <div class="loading-state" style="padding: 40px; text-align: center;">
+            <p>Loading distributors...</p>
+          </div>
+        } @else if (loadError) {
+          <div class="error-state" style="padding: 40px; text-align: center; color: #c33;">
+            <p>{{ loadError }}</p>
+            <button (click)="loadDistributors()" style="margin-top: 16px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              Retry
+            </button>
+          </div>
+        } @else {
+          <!-- Data Table -->
+          <div class="table-wrapper">
+            <table class="distributors-table">
+              <thead>
+                <tr>
+                  <th class="col-action">
+                    <div class="sortable-header">
+                      Action
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
                         </svg>
-                      </button>
-                      <button class="action-btn view" (click)="onView(distributor)" title="View">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-distributor-store">
+                    <div class="sortable-header">
+                      Distributor Store
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
                         </svg>
-                      </button>
-                      <button class="action-btn delete" (click)="onDelete(distributor)" title="Delete">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                          <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </span>
+                    </div>
+                  </th>
+                  <th class="col-contact">
+                    <div class="sortable-header">
+                      Contact
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
                         </svg>
-                      </button>
+                      </span>
                     </div>
-                  </td>
-                  <td class="col-distributor-store">
-                    <div class="distributor-store-info">
-                      <div class="distributor-name">{{ distributor.name }}</div>
-                      <div class="distributor-id">{{ distributor.distributorId }}</div>
+                  </th>
+                  <th class="col-area-address">
+                    <div class="sortable-header">
+                      Area / Address
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
                     </div>
-                  </td>
-                  <td class="col-contact">
-                    <div class="contact-info">
-                      <div class="contact-name">{{ distributor.contactName }}</div>
-                      <div class="contact-phone">{{ distributor.contactPhone }}</div>
+                  </th>
+                  <th class="col-routes-cover">
+                    <div class="sortable-header">
+                      Routes Cover
+                      <span class="sort-indicator">
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 0L6 3H2L4 0Z" fill="currentColor"/>
+                          <path d="M4 8L2 5H6L4 8Z" fill="currentColor"/>
+                        </svg>
+                      </span>
                     </div>
-                  </td>
-                  <td class="col-area-address">
-                    <div class="area-address-info">
-                      <div class="area-address-text">{{ distributor.areaAddress }}</div>
-                    </div>
-                  </td>
-                  <td class="col-routes-cover">
-                    <div class="routes-cover-info">
-                      <div class="routes-cover-text">{{ distributor.routesCover }}</div>
-                    </div>
-                  </td>
+                  </th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                @if (distributors.length === 0) {
+                  <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px;">
+                      No distributors found
+                    </td>
+                  </tr>
+                } @else {
+                  @for (distributor of distributors; track distributor.id) {
+                    <tr class="table-row" (click)="onRowClick(distributor)">
+                      <td class="col-action" (click)="$event.stopPropagation()">
+                        <div class="action-buttons">
+                          <button class="action-btn edit" (click)="onEdit(distributor)" title="Edit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                          <button class="action-btn view" (click)="onView(distributor)" title="View">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                          <button class="action-btn delete" (click)="onDelete(distributor)" title="Delete">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                              <line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                              <line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                      <td class="col-distributor-store">
+                        <div class="distributor-store-info">
+                          <div class="distributor-name">{{ distributor.name }}</div>
+                          <div class="distributor-id">{{ distributor.distributorId }}</div>
+                        </div>
+                      </td>
+                      <td class="col-contact">
+                        <div class="contact-info">
+                          <div class="contact-name">{{ distributor.contactName }}</div>
+                          <div class="contact-phone">{{ distributor.contactPhone }}</div>
+                        </div>
+                      </td>
+                      <td class="col-area-address">
+                        <div class="area-address-info">
+                          <div class="area-address-text">{{ distributor.areaAddress }}</div>
+                        </div>
+                      </td>
+                      <td class="col-routes-cover">
+                        <div class="routes-cover-info">
+                          <div class="routes-cover-text">{{ distributor.routesCover }}</div>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
 
-        <!-- Table Footer -->
-        <div class="table-footer">
-          <p>Showing 1 to 9 of 15 entries</p>
-        </div>
+          <!-- Table Footer -->
+          <div class="table-footer">
+            <p>Showing {{ getStartEntry() }} to {{ getEndEntry() }} of {{ totalCount }} entries</p>
+          </div>
+        }
       </div>
     </div>
 
@@ -256,49 +273,6 @@
       width="1400px"
       (close)="closeAddModal()"
     >
-      <!-- Company Selection (shown before step 1) -->
-      @if (currentStep === 0) {
-        <div class="company-selection-container">
-          <div class="form-group">
-            <label class="form-label">Select Company <span class="required">*</span></label>
-            @if (isLoadingCompanies) {
-              <p>Loading companies...</p>
-            } @else if (companyError) {
-              <div class="error-message">{{ companyError }}</div>
-            } @else {
-              <select 
-                class="form-input"
-                [(ngModel)]="selectedCompanyId"
-                name="selectedCompanyId"
-                style="width: 100%; padding: 12px; margin-top: 8px;"
-              >
-                <option value="">-- Select a Company --</option>
-                @for (company of companies; track company.id) {
-                  <option [value]="company.id">{{ company.name }}</option>
-                }
-              </select>
-              <div class="form-actions" style="margin-top: 24px;">
-                <button 
-                  type="button" 
-                  class="btn-cancel"
-                  (click)="closeAddModal()"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="button" 
-                  class="btn-save"
-                  (click)="currentStep = 1"
-                  [disabled]="!selectedCompanyId"
-                >
-                  Next
-                </button>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
       @if (currentStep === 1) {
         <app-distributor-form-step1
           [selectedCompanyId]="selectedCompanyId"

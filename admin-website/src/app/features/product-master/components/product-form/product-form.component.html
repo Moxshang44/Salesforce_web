@@ -9,19 +9,26 @@
       </label>
       <select 
         class="form-select"
-        [class.error]="errors['brand']"
-        [(ngModel)]="formData.brand" 
-        name="brand"
-        (change)="clearError('brand')"
+        [class.error]="errors['brand_id']"
+        [(ngModel)]="formData.brand_id" 
+        name="brand_id"
+        (change)="onBrandChange()"
+        [disabled]="isLoadingBrands"
         required
       >
-        <option value="">Select Brand</option>
-        @for (brand of brands; track brand) {
-          <option [value]="brand">{{ brand }}</option>
+        <option [ngValue]="null">
+          @if (isLoadingBrands) {
+            Loading brands...
+          } @else {
+            Select Brand
+          }
+        </option>
+        @for (brand of brands; track brand.id) {
+          <option [ngValue]="brand.id">{{ brand.name }}</option>
         }
       </select>
-      @if (errors['brand']) {
-        <span class="error-message">{{ errors['brand'] }}</span>
+      @if (errors['brand_id']) {
+        <span class="error-message">{{ errors['brand_id'] }}</span>
       }
     </div>
 
@@ -33,19 +40,26 @@
       </label>
       <select 
         class="form-select"
-        [class.error]="errors['category']"
-        [(ngModel)]="formData.category" 
-        name="category"
-        (change)="clearError('category')"
+        [class.error]="errors['brand_category_id']"
+        [(ngModel)]="formData.brand_category_id" 
+        name="brand_category_id"
+        (change)="onCategoryChange()"
+        [disabled]="isLoadingCategories"
         required
       >
-        <option value="">Select Category</option>
-        @for (category of categories; track category) {
-          <option [value]="category">{{ category }}</option>
+        <option [ngValue]="null">
+          @if (isLoadingCategories) {
+            Loading categories...
+          } @else {
+            Select Category
+          }
+        </option>
+        @for (category of categories; track category.id) {
+          <option [ngValue]="category.id">{{ category.name }}</option>
         }
       </select>
-      @if (errors['category']) {
-        <span class="error-message">{{ errors['category'] }}</span>
+      @if (errors['brand_category_id']) {
+        <span class="error-message">{{ errors['brand_category_id'] }}</span>
       }
     </div>
 
@@ -56,184 +70,146 @@
       </label>
       <select 
         class="form-select" 
-        [(ngModel)]="formData.subcategory" 
-        name="subcategory"
+        [(ngModel)]="formData.brand_subcategory_id" 
+        name="brand_subcategory_id"
       >
-        <option value="">Select Subcategory</option>
-        @for (subcategory of subcategories; track subcategory) {
-          <option [value]="subcategory">{{ subcategory }}</option>
+        <option [ngValue]="null">Select Subcategory</option>
+        @for (subcategory of subcategories; track subcategory.id) {
+          <option [ngValue]="subcategory.id">{{ subcategory.name }}</option>
         }
       </select>
     </div>
 
-    <!-- SKU Code -->
+    <!-- Product Code -->
     <div class="form-group">
       <label class="form-label">
-        SKU Code
+        Code
         <span class="required">*</span>
       </label>
       <input 
         type="text" 
         class="form-input"
-        [class.error]="errors['skuCode']"
-        [(ngModel)]="formData.skuCode" 
-        name="skuCode"
-        placeholder="Enter SKU code"
-        (input)="clearError('skuCode')"
+        [class.error]="errors['code']"
+        [(ngModel)]="formData.code" 
+        name="code"
+        placeholder="Enter product code"
+        (input)="clearError('code')"
         required
       />
-      @if (errors['skuCode']) {
-        <span class="error-message">{{ errors['skuCode'] }}</span>
+      @if (errors['code']) {
+        <span class="error-message">{{ errors['code'] }}</span>
       }
     </div>
 
     <!-- Product Name (Full Width) -->
     <div class="form-group full-width">
       <label class="form-label">
-        PRD Name / Product as New
+        Product Name
         <span class="required">*</span>
       </label>
       <input 
         type="text" 
         class="form-input"
-        [class.error]="errors['productName']"
-        [(ngModel)]="formData.productName" 
-        name="productName"
+        [class.error]="errors['name']"
+        [(ngModel)]="formData.name" 
+        name="name"
         placeholder="Enter product name"
-        (input)="clearError('productName')"
+        (input)="clearError('name')"
         required
       />
-      @if (errors['productName']) {
-        <span class="error-message">{{ errors['productName'] }}</span>
+      @if (errors['name']) {
+        <span class="error-message">{{ errors['name'] }}</span>
       }
     </div>
 
-    <!-- Organic Whole Grain Energy Bar (Static Text) -->
-    <div class="form-group full-width">
-      <input 
-        type="text" 
-        class="form-input" 
-        value="Organic Whole Grain Energy Bar" 
-        readonly
-      />
-    </div>
-
-    <!-- Short Description (Full Width) -->
+    <!-- Description (Full Width) -->
     <div class="form-group full-width">
       <label class="form-label">
-        Short Description
-        <span class="required">*</span>
+        Description <span class="optional">(Optional)</span>
       </label>
       <textarea 
         class="form-textarea"
-        [class.error]="errors['shortDescription']"
-        [(ngModel)]="formData.shortDescription" 
-        name="shortDescription"
-        placeholder="A delicious and wholesome organic energy bar, packed with whole grains, nuts, and dried fruits for sustained energy, perfect for on the go activities."
-        rows="3"
-        (input)="clearError('shortDescription')"
-        required
-      ></textarea>
-      @if (errors['shortDescription']) {
-        <span class="error-message">{{ errors['shortDescription'] }}</span>
-      }
-    </div>
-
-    <!-- Product Images (Full Width) -->
-    <div class="form-group full-width">
-      <label class="form-label">Product Images</label>
-      <div class="image-upload-section">
-        <div class="upload-area" (click)="fileInput.click()">
-          <div class="upload-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="upload-text">Drop a file image here or click to browse</div>
-          <div class="upload-hint">PNG, JPG or GIF (max. 800x400px)</div>
-          <input 
-            #fileInput
-            type="file" 
-            accept="image/*" 
-            multiple
-            (change)="onImageSelect($event)"
-            style="display: none"
-          />
-        </div>
-
-        @if (imagePreviews.length > 0) {
-          <div class="image-preview-grid">
-            @for (preview of imagePreviews; track $index) {
-              <div class="image-preview-item">
-                <img [src]="preview" alt="Product image" />
-                <button 
-                  type="button" 
-                  class="remove-image-btn" 
-                  (click)="removeImage($index)"
-                >
-                  ✕
-                </button>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Ingredients & Compliance (Full Width) -->
-    <div class="form-group full-width">
-      <label class="form-label">Ingredients & Compliance (Optional)</label>
-      <textarea 
-        class="form-textarea" 
-        [(ngModel)]="formData.ingredientsCompliance" 
-        name="ingredientsCompliance"
-        placeholder="The product bag contains a protein based (30%) consisting of premium concentrate, organic isolate, premier, grass fed BCI, allergen soy milk, essential, organic vitamins and minerals, and well as acids."
+        [(ngModel)]="formData.description" 
+        name="description"
+        placeholder="Enter product description"
         rows="3"
       ></textarea>
     </div>
 
-    <!-- Height & Width -->
+    <!-- Barcode -->
     <div class="form-group">
       <label class="form-label">
-        Height & Width <span class="optional">(Optional)</span>
+        Barcode <span class="optional">(Optional)</span>
       </label>
-      <div class="dimension-inputs">
-        <input 
-          type="number" 
-          class="form-input" 
-          [(ngModel)]="formData.height" 
-          name="height"
-          placeholder="45"
-        />
-        <span class="dimension-separator">x</span>
-        <input 
-          type="number" 
-          class="form-input" 
-          [(ngModel)]="formData.width" 
-          name="width"
-          placeholder="45"
-        />
-        <span class="dimension-unit">CM</span>
-      </div>
+      <input 
+        type="text" 
+        class="form-input"
+        [(ngModel)]="formData.barcode" 
+        name="barcode"
+        placeholder="Enter barcode"
+      />
     </div>
 
     <!-- HSN Code -->
     <div class="form-group">
       <label class="form-label">
-        HSN Code (Optional)
+        HSN Code <span class="optional">(Optional)</span>
+      </label>
+      <input 
+        type="text" 
+        class="form-input"
+        [(ngModel)]="formData.hsn_code" 
+        name="hsn_code"
+        placeholder="Enter HSN code"
+      />
+    </div>
+
+    <!-- GST Category -->
+    <div class="form-group">
+      <label class="form-label">
+        GST Category
+        <span class="required">*</span>
       </label>
       <select 
-        class="form-select" 
-        [(ngModel)]="formData.hsnCode" 
-        name="hsnCode"
+        class="form-select"
+        [class.error]="errors['gst_category']"
+        [(ngModel)]="formData.gst_category" 
+        name="gst_category"
+        (change)="clearError('gst_category')"
+        required
       >
-        <option value="">Select HSN Code</option>
-        <option value="HSN001">HSN001</option>
-        <option value="HSN002">HSN002</option>
-        <option value="HSN003">HSN003</option>
+        <option value="">Select GST Category</option>
+        @for (gstCat of gstCategories; track gstCat) {
+          <option [value]="gstCat">{{ gstCat }}</option>
+        }
       </select>
+      @if (errors['gst_category']) {
+        <span class="error-message">{{ errors['gst_category'] }}</span>
+      }
+    </div>
+
+    <!-- GST Rate -->
+    <div class="form-group">
+      <label class="form-label">
+        GST Rate (%)
+        <span class="required">*</span>
+      </label>
+      <select 
+        class="form-select"
+        [class.error]="errors['gst_rate']"
+        [(ngModel)]="formData.gst_rate" 
+        name="gst_rate"
+        (change)="clearError('gst_rate')"
+        required
+      >
+        <option [ngValue]="null">Select GST Rate</option>
+        @for (rate of gstRates; track rate) {
+          <option [ngValue]="rate">{{ rate }}%</option>
+        }
+      </select>
+      @if (errors['gst_rate']) {
+        <span class="error-message">{{ errors['gst_rate'] }}</span>
+      }
     </div>
   </div>
 
@@ -255,4 +231,3 @@
     </app-button>
   </div>
 </form>
-

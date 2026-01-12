@@ -43,8 +43,11 @@
             <tr>
               <th class="col-actions">Actions</th>
               <th class="col-name">Company Name</th>
-              <th class="col-active">Is Active</th>
+              <th class="col-roles">Assigned Roles</th>
+              <th class="col-admins">Assigned Admin</th>
+              <th class="col-role">Role</th>
               <th class="col-assign">Assign</th>
+              <th class="col-active">Is Active</th>
             </tr>
           </thead>
           <tbody>
@@ -80,6 +83,68 @@
                   </div>
                 </td>
                 <td class="col-name">{{ company.name }}</td>
+                <td class="col-roles">
+                  @if (isLoadingRoles[company.id || '']) {
+                    <span class="loading-text">Loading...</span>
+                  } @else if (company.roles && company.roles.length > 0) {
+                    <div class="roles-list">
+                      @for (role of company.roles; track role.id || role.name) {
+                        <span class="role-badge">{{ role.name }}</span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="no-data">No roles</span>
+                  }
+                </td>
+                <td class="col-admins">
+                  @if (isLoadingAdmins[company.id || '']) {
+                    <span class="loading-text">Loading...</span>
+                  } @else if (company.admins && company.admins.length > 0) {
+                    <div class="admins-list">
+                      @for (admin of company.admins; track admin.id || admin.username) {
+                        <span class="admin-badge">{{ admin.name || admin.username }}</span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="no-data">No admins</span>
+                  }
+                </td>
+                <td class="col-role">
+                  <app-button
+                    variant="outline"
+                    size="sm"
+                    (click)="onAssignRole(company)"
+                  >
+                    Assign Roles
+                  </app-button>
+                </td>
+                <td class="col-assign">
+                  @if (isLoadingAdmins[company.id || '']) {
+                    <span class="loading-text">Checking...</span>
+                  } @else if (company.hasAdmin) {
+                    <div class="assigned-actions">
+                      <span class="assigned-badge">Assigned</span>
+                      <button
+                        type="button"
+                        class="add-admin-btn"
+                        (click)="onAssignAdmin(company)"
+                        title="Assign more admins"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  } @else {
+                    <app-button
+                      variant="primary"
+                      size="sm"
+                      (click)="onAssignAdmin(company)"
+                    >
+                      Assign Admin
+                    </app-button>
+                  }
+                </td>
                 <td class="col-active">
                   <button 
                     class="status-button"
@@ -89,15 +154,6 @@
                   >
                     {{ company.is_active ? 'True' : 'False' }}
                   </button>
-                </td>
-                <td class="col-assign">
-                  <app-button
-                    variant="primary"
-                    size="sm"
-                    (click)="onAssignAdmin(company)"
-                  >
-                    Assign Admin
-                  </app-button>
                 </td>
               </tr>
             }
@@ -142,28 +198,44 @@
 
       <div class="form-group">
         <label for="gst_no" class="form-label">GST Number <span class="required">*</span></label>
-        <app-input
+        <input
           id="gst_no"
           type="text"
+          class="form-input"
+          [class.error]="formErrors['gst_no']"
           [(ngModel)]="companyForm.gst_no"
           name="gst_no"
-          placeholder="Enter GST number"
-          [required]="true"
-          [error]="formErrors['gst_no']"
-        ></app-input>
+          placeholder="Enter 15-digit GST number"
+          maxlength="15"
+          required
+          (input)="onGstInput($event)"
+        />
+        @if (formErrors['gst_no']) {
+          <div class="error-message">{{ formErrors['gst_no'] }}</div>
+        } @else {
+          <small class="form-hint">Must be exactly 15 digits</small>
+        }
       </div>
 
       <div class="form-group">
         <label for="cin_no" class="form-label">CIN Number <span class="required">*</span></label>
-        <app-input
+        <input
           id="cin_no"
           type="text"
+          class="form-input"
+          [class.error]="formErrors['cin_no']"
           [(ngModel)]="companyForm.cin_no"
           name="cin_no"
-          placeholder="Enter CIN number"
-          [required]="true"
-          [error]="formErrors['cin_no']"
-        ></app-input>
+          placeholder="Enter 21-digit CIN number"
+          maxlength="21"
+          required
+          (input)="onCinInput($event)"
+        />
+        @if (formErrors['cin_no']) {
+          <div class="error-message">{{ formErrors['cin_no'] }}</div>
+        } @else {
+          <small class="form-hint">Must be exactly 21 digits</small>
+        }
       </div>
 
       <div class="form-group">
@@ -283,6 +355,23 @@
           }
         </div>
 
+        <div class="form-group">
+          <label class="form-label">Active Status</label>
+          <div class="toggle-container">
+            <label class="toggle-switch">
+              <input
+                type="checkbox"
+                [(ngModel)]="companyForm.is_active"
+                name="edit_is_active"
+                (change)="onActiveToggleChange()"
+              >
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">{{ companyForm.is_active ? 'Active' : 'Inactive' }}</span>
+          </div>
+          <small class="form-hint">Toggle to set company as active or inactive</small>
+        </div>
+
         <div class="form-actions">
           <app-button
             type="button"
@@ -389,6 +478,125 @@
     }
   </app-modal>
 
+  <!-- Assign Role Modal -->
+  <app-modal
+    [isOpen]="isRoleModalOpen"
+    title="Assign Role"
+    width="600px"
+    (close)="closeRoleModal()"
+  >
+    <form (ngSubmit)="onRoleSubmit()" class="company-form">
+      @if (selectedCompanyForRole) {
+        <div class="form-group">
+          <label class="form-label">Company</label>
+          <div class="selected-company">{{ selectedCompanyForRole.name }}</div>
+        </div>
+      }
+
+      @if (roleErrorMessage) {
+        <div class="alert alert-error">
+          <strong>Error:</strong>
+          <pre class="error-pre">{{ roleErrorMessage }}</pre>
+        </div>
+      }
+      @if (roleSuccessMessage) {
+        <div class="alert alert-success">
+          {{ roleSuccessMessage }}
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="role_name" class="form-label">Role Name <span class="required">*</span></label>
+        <app-input
+          id="role_name"
+          type="text"
+          [(ngModel)]="roleForm.name"
+          name="role_name"
+          placeholder="Enter role name"
+          [required]="true"
+          [error]="roleFormErrors['name']"
+        ></app-input>
+      </div>
+
+      <div class="form-group">
+        <label for="role_description" class="form-label">Description <span class="optional">(Optional)</span></label>
+        <textarea
+          id="role_description"
+          class="form-textarea"
+          [(ngModel)]="roleForm.description"
+          name="role_description"
+          placeholder="Enter role description"
+          rows="4"
+        ></textarea>
+        @if (roleFormErrors['description']) {
+          <div class="error-message">{{ roleFormErrors['description'] }}</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Permissions <span class="optional">(Optional)</span></label>
+        <div class="permissions-container">
+          <div class="permission-input-group">
+            <app-input
+              type="text"
+              [(ngModel)]="newPermission"
+              name="new_permission"
+              placeholder="Enter permission"
+              (keyup.enter)="addPermission()"
+            ></app-input>
+            <app-button
+              type="button"
+              variant="primary"
+              size="sm"
+              (click)="addPermission()"
+            >
+              Add
+            </app-button>
+          </div>
+          @if (roleForm.permissions.length > 0) {
+            <div class="permissions-list">
+              @for (permission of roleForm.permissions; track $index) {
+                <div class="permission-tag">
+                  <span>{{ permission }}</span>
+                  <button
+                    type="button"
+                    class="remove-permission"
+                    (click)="removePermission($index)"
+                    title="Remove permission"
+                  >
+                    ×
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        @if (roleFormErrors['permissions']) {
+          <div class="error-message">{{ roleFormErrors['permissions'] }}</div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <app-button
+          type="button"
+          variant="outline"
+          (click)="closeRoleModal()"
+          [disabled]="isRoleAssigning"
+        >
+          Cancel
+        </app-button>
+        <app-button
+          type="submit"
+          variant="primary"
+          [disabled]="isRoleAssigning"
+          [loading]="isRoleAssigning"
+        >
+          Create Role
+        </app-button>
+      </div>
+    </form>
+  </app-modal>
+
   <!-- Assign Admin Modal -->
   <app-modal
     [isOpen]="isAssignModalOpen"
@@ -446,16 +654,23 @@
 
       <div class="form-group">
         <label for="assign_contact_no" class="form-label">Contact Number <span class="required">*</span></label>
-        <app-input
+        <input
           id="assign_contact_no"
           type="tel"
+          class="form-input"
+          [class.error]="assignFormErrors['contact_no']"
           [(ngModel)]="assignAdminForm.contact_no"
           name="assign_contact_no"
-          placeholder="Enter contact number"
-          [required]="true"
-          [error]="assignFormErrors['contact_no']"
-        ></app-input>
-        <small class="form-hint">1-20 characters</small>
+          placeholder="Enter 10-digit contact number"
+          maxlength="10"
+          required
+          (input)="onContactNoInput($event)"
+        />
+        @if (assignFormErrors['contact_no']) {
+          <div class="error-message">{{ assignFormErrors['contact_no'] }}</div>
+        } @else {
+          <small class="form-hint">Must be exactly 10 digits</small>
+        }
       </div>
 
       <div class="form-group">
