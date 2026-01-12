@@ -119,7 +119,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/ai-chat',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/ai-chatbot/ai-chatbot.component').then(m => m.AiChatbotComponent),
     canActivate: [authGuard]
   },
   {
@@ -197,11 +197,6 @@ export const routes: Routes = [
         loadChildren: () => import('./features/tally/tally.routes').then(m => m.tallyRoutes)
       }
     ]
-  },
-  {
-    path: 'dms/ai-chatbot',
-    loadComponent: () => import('./features/dms/ai-chatbot/ai-chatbot.component').then(m => m.AiChatbotComponent),
-    canActivate: [dmsAuthGuard]
   },
   {
     path: '**',

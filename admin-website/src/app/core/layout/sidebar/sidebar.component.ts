@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../services/auth.service';
 
 interface SubMenuItem {
   label: string;
@@ -24,7 +25,7 @@ interface NavItem {
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   companyName = 'Company Name';
   currentRoute = '';
   isCollapsed = false;
@@ -60,7 +61,10 @@ export class SidebarComponent {
     { label: 'Settings', route: '/admin/settings', iconImage: 'assets/images/settings.png' },
   ];
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.currentRoute = this.router.url;
     // Initialize CSS variable
     document.documentElement.style.setProperty('--sidebar-width', '220px');
@@ -77,6 +81,11 @@ export class SidebarComponent {
           }
         });
       });
+  }
+
+  ngOnInit(): void {
+    // Load company name from auth service
+    this.companyName = this.authService.getCompanyName();
   }
 
   isParentRouteActive(item: NavItem): boolean {

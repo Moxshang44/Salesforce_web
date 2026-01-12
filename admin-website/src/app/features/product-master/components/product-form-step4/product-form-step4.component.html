@@ -1,121 +1,146 @@
 <form class="product-form-step4">
-  <!-- Step Header -->
-  <div class="step-header">
-    <div class="step-indicator">
-      <span class="step-dot active"></span>
-      <span class="step-label">Step 4 of 6</span>
-    </div>
-    <div class="step-title">Visibility & Access Controls</div>
-  </div>
+  <!-- Images Section -->
+  <div class="images-section">
+    <h3 class="section-title">Product Images <span class="optional">(Optional)</span></h3>
+    <div class="image-upload-section">
+      <div class="upload-area" (click)="fileInput.click()">
+        <div class="upload-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="upload-text">Drop image files here or click to browse</div>
+        <div class="upload-hint">PNG, JPG or GIF (max. 800x400px)</div>
+        <input 
+          #fileInput
+          type="file" 
+          accept="image/*" 
+          multiple
+          (change)="onImageSelect($event)"
+          style="display: none"
+        />
+      </div>
 
-  <!-- Territory Selection -->
-  <div class="territory-section">
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Select Country</label>
-        <select class="form-select" name="selectCountry">
-          <option value="">2 Selected</option>
-          @for (country of countries; track country) {
-            <option [value]="country">{{ country }}</option>
+      @if (imagePreviews.length > 0) {
+        <div class="image-preview-grid">
+          @for (preview of imagePreviews; track $index) {
+            <div class="image-preview-item">
+              <img [src]="preview" alt="Product image" />
+              <button 
+                type="button" 
+                class="remove-image-btn" 
+                (click)="removeImage($index)"
+              >
+                ✕
+              </button>
+            </div>
           }
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Select Zone</label>
-        <select class="form-select" name="selectZone">
-          <option value="">All Selected</option>
-          @for (zone of zones; track zone) {
-            <option [value]="zone">{{ zone }}</option>
-          }
-        </select>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Select Areas</label>
-        <select class="form-select" name="selectAreas">
-          <option value="">Select Areas</option>
-          @for (area of areas; track area) {
-            <option [value]="area">{{ area }}</option>
-          }
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Select Regions</label>
-        <select class="form-select" name="selectRegions">
-          <option value="">Select Regions</option>
-        </select>
-      </div>
+        </div>
+      }
     </div>
   </div>
 
-  <!-- Channel Visibility -->
+  <!-- Visibility Section -->
   <div class="visibility-section">
-    <h3 class="section-title">Channel Visibility</h3>
-    <div class="checkbox-grid">
-      <label class="checkbox-label">
-        <input 
-          type="checkbox" 
-          class="checkbox" 
-          [(ngModel)]="formData.channelVisibility.generalTrade" 
-          name="generalTrade"
-        />
-        <span>General Trade</span>
-      </label>
-      <label class="checkbox-label">
-        <input 
-          type="checkbox" 
-          class="checkbox" 
-          [(ngModel)]="formData.channelVisibility.modernTrade" 
-          name="modernTrade"
-        />
-        <span>Modern Trade</span>
-      </label>
-      <label class="checkbox-label">
-        <input 
-          type="checkbox" 
-          class="checkbox" 
-          [(ngModel)]="formData.channelVisibility.horeca" 
-          name="horeca"
-        />
-        <span>HORECA Trade</span>
-      </label>
+    <div class="visibility-header">
+      <h3 class="section-title">
+        Visibility
+        <span class="required">*</span>
+      </h3>
+      <button type="button" class="add-visibility-btn" (click)="addVisibility()">
+        + Add Visibility
+      </button>
     </div>
-  </div>
+    @if (errors['visibility']) {
+      <span class="error-message">{{ errors['visibility'] }}</span>
+    }
 
-  <!-- Retailer Type Visibility -->
-  <div class="visibility-section">
-    <h3 class="section-title">Retailer Type Visibility</h3>
-    <div class="checkbox-grid">
-      <label class="checkbox-label">
-        <input 
-          type="checkbox" 
-          class="checkbox" 
-          [(ngModel)]="formData.channelVisibility.typeA" 
-          name="typeA"
-        />
-        <span>Type A</span>
-      </label>
-      <label class="checkbox-label">
-        <input 
-          type="checkbox" 
-          class="checkbox" 
-          [(ngModel)]="formData.channelVisibility.typeB" 
-          name="typeB"
-        />
-        <span>Type B</span>
-      </label>
-      <label class="checkbox-label">
-        <input 
-          type="checkbox" 
-          class="checkbox" 
-          [(ngModel)]="formData.channelVisibility.typeC" 
-          name="typeC"
-        />
-        <span>Type C</span>
-      </label>
-    </div>
+    @for (vis of formData.visibility; track $index) {
+        <div class="visibility-card">
+          <div class="visibility-card-header">
+            <h4>Visibility Entry {{ $index + 1 }}</h4>
+            <button type="button" class="remove-visibility-btn" (click)="removeVisibility($index)">
+              Remove
+            </button>
+          </div>
+
+          <div class="form-grid">
+            <!-- Area -->
+            <div class="form-group">
+              <label class="form-label">Area <span class="optional">(Optional)</span></label>
+              <select class="form-select" [(ngModel)]="vis.area_id" [name]="'visibility_area_' + $index">
+                <option [ngValue]="null">Select Area</option>
+                @for (area of areas; track area.id) {
+                  <option [ngValue]="area.id">{{ area.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Channel Visibility Checkboxes -->
+          <div class="checkbox-section">
+            <h5>Channel Visibility</h5>
+            <div class="checkbox-grid">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  class="checkbox" 
+                  [(ngModel)]="vis.for_general" 
+                  [name]="'visibility_general_' + $index"
+                />
+                <span>General Trade</span>
+              </label>
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  class="checkbox" 
+                  [(ngModel)]="vis.for_modern" 
+                  [name]="'visibility_modern_' + $index"
+                />
+                <span>Modern Trade</span>
+              </label>
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  class="checkbox" 
+                  [(ngModel)]="vis.for_horeca" 
+                  [name]="'visibility_horeca_' + $index"
+                />
+                <span>HORECA Trade</span>
+              </label>
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  class="checkbox" 
+                  [(ngModel)]="vis.for_type_a" 
+                  [name]="'visibility_type_a_' + $index"
+                />
+                <span>Type A</span>
+              </label>
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  class="checkbox" 
+                  [(ngModel)]="vis.for_type_b" 
+                  [name]="'visibility_type_b_' + $index"
+                />
+                <span>Type B</span>
+              </label>
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  class="checkbox" 
+                  [(ngModel)]="vis.for_type_c" 
+                  [name]="'visibility_type_c_' + $index"
+                />
+                <span>Type C</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      }
   </div>
 
   <!-- Form Actions -->
@@ -132,8 +157,7 @@
       type="button"
       (click)="onSave()"
     >
-      Save & Next
+      Save & Finish
     </app-button>
   </div>
 </form>
-

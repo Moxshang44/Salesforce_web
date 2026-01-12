@@ -2,8 +2,7 @@ import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, OnIni
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-
-const API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1';
+import { ApiService } from '../../../../core/services/api.service';
 
 interface AreaOption {
   id: number;
@@ -27,6 +26,7 @@ interface RouteFormData {
   newZone: string;
   newRegion: string;
   newArea: string;
+  newDivision: string;
 }
 
 @Component({
@@ -59,7 +59,8 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
     newCountry: '',
     newZone: '',
     newRegion: '',
-    newArea: ''
+    newArea: '',
+    newDivision: ''
   };
 
   isSubmitting = false;
@@ -85,8 +86,12 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
   isLoadingZone = false;
   isLoadingRegion = false;
   isLoadingArea = false;
+  isLoadingDivision = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private apiService: ApiService
+  ) {}
 
   ngOnInit(): void {
     // Fetch all areas when component initializes if company is already selected
@@ -153,7 +158,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
   loadAreaHierarchy(areaId: number): void {
     if (!this.selectedCompanyId || !areaId) return;
     
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas/${areaId}`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas/${areaId}`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -190,7 +195,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
   loadRegionHierarchy(regionId: number): void {
     if (!this.selectedCompanyId || !regionId) return;
     
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas/${regionId}`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas/${regionId}`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -219,7 +224,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
   loadZoneHierarchy(zoneId: number): void {
     if (!this.selectedCompanyId || !zoneId) return;
     
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas/${zoneId}`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas/${zoneId}`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -250,7 +255,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
 
     this.isLoadingAllAreas = true;
     this.isLoadingNations = true;
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -317,7 +322,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
     }
 
     this.isLoadingZones = true;
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -358,7 +363,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
     }
 
     this.isLoadingRegions = true;
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -399,7 +404,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
     }
 
     this.isLoadingAreas = true;
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -440,7 +445,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
     }
 
     this.isLoadingDivisions = true;
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -508,7 +513,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
       type: 'NATION'
     };
 
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -581,7 +586,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
       nation_id: this.formData.selectedCountryId
     };
 
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -648,7 +653,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
       zone_id: this.formData.selectedZoneId
     };
 
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -715,7 +720,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
       region_id: this.formData.selectedRegionId
     };
 
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/areas`;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -745,6 +750,69 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
           this.errors['newArea'] = error.error.errors[0]?.message || 'Failed to create area';
         } else {
           this.errors['newArea'] = 'Failed to create area. Please try again.';
+        }
+      }
+    });
+  }
+
+  // Create DIVISION (requires area_id)
+  addDivision(): void {
+    if (!this.selectedCompanyId) {
+      this.errors['newDivision'] = 'Please select a company first';
+      return;
+    }
+
+    if (!this.formData.selectedAreaId) {
+      this.errors['newDivision'] = 'Please select an area first';
+      return;
+    }
+
+    if (!this.formData.newDivision || this.formData.newDivision.trim().length === 0) {
+      this.errors['newDivision'] = 'Division name is required';
+      return;
+    }
+
+    if (this.formData.newDivision.trim().length < 1 || this.formData.newDivision.trim().length > 64) {
+      this.errors['newDivision'] = 'Division name must be between 1 and 64 characters';
+      return;
+    }
+
+    this.isLoadingDivision = true;
+    this.clearError('newDivision');
+
+    // For DIVISION, only send name, type, and area_id (parent)
+    const payload: any = {
+      name: this.formData.newDivision.trim(),
+      type: 'DIVISION',
+      area_id: this.formData.selectedAreaId
+    };
+
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/areas`);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    this.http.post<any>(url, payload, { headers }).subscribe({
+      next: (response) => {
+        this.isLoadingDivision = false;
+        const responseData = response.data || response;
+        // Refresh division options to include the newly created division
+        this.updateDivisionOptions();
+        // Select the newly created division
+        this.formData.selectedDivisionId = responseData.id;
+        this.formData.newDivision = '';
+      },
+      error: (error) => {
+        this.isLoadingDivision = false;
+        console.error('Error creating division:', error);
+        if (error.error?.message) {
+          this.errors['newDivision'] = error.error.message;
+        } else if (error.error?.detail) {
+          this.errors['newDivision'] = error.error.detail;
+        } else if (error.error?.errors && Array.isArray(error.error.errors)) {
+          this.errors['newDivision'] = error.error.errors[0]?.message || 'Failed to create division';
+        } else {
+          this.errors['newDivision'] = 'Failed to create division. Please try again.';
         }
       }
     });
@@ -818,7 +886,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
         is_horeca: this.formData.is_horeca
       };
 
-      const url = `${API_URL}/companies/${this.selectedCompanyId}/routes/${this.routeId}`;
+      const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/routes/${this.routeId}`);
 
       this.http.patch<any>(url, payload, { headers }).subscribe({
         next: (response) => {
@@ -860,7 +928,7 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
         is_active: this.formData.is_active
       };
 
-      const url = `${API_URL}/companies/${this.selectedCompanyId}/routes`;
+      const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/routes`);
 
       this.http.post<any>(url, payload, { headers }).subscribe({
         next: (response) => {
@@ -978,6 +1046,12 @@ export class RouteFormStep1Component implements OnInit, OnChanges {
     
     // Update divisions from cached data
     this.updateDivisionOptions();
+  }
+
+  onDivisionChange(value: any): void {
+    const divisionId = this.toNumber(value);
+    this.formData.selectedDivisionId = divisionId;
+    this.clearError('selectedDivisionId');
   }
 
   onCancel(): void {

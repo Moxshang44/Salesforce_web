@@ -28,21 +28,6 @@
       </div>
 
       <div class="table-controls">
-        <div class="company-selector">
-          <label class="selector-label">Select Company:</label>
-          <select 
-            class="company-select"
-            [(ngModel)]="selectedCompanyForRoutes"
-            (change)="onCompanyChange()"
-            [disabled]="isLoadingRoutes || isLoadingCompanies"
-          >
-            <option value="">-- Select Company --</option>
-            @for (company of companies; track company.id) {
-              <option [value]="company.id">{{ company.name }}</option>
-            }
-          </select>
-        </div>
-
         <div class="pagination-controls">
           <button 
             class="page-btn" 
@@ -189,58 +174,12 @@
       width="1400px"
       (close)="closeAddModal()"
     >
-      <!-- Company Selection (shown before step 1) -->
-      @if (currentStep === 0) {
-        <div class="company-selection-container">
-          <div class="form-group">
-            <label class="form-label">Select Company <span class="required">*</span></label>
-            @if (isLoadingCompanies) {
-              <p>Loading companies...</p>
-            } @else if (companyError) {
-              <div class="error-message">{{ companyError }}</div>
-            } @else {
-              <select 
-                class="form-input"
-                [(ngModel)]="selectedCompanyId"
-                name="selectedCompanyId"
-                style="width: 100%; padding: 12px; margin-top: 8px;"
-                (change)="onCompanySelected()"
-              >
-                <option value="">-- Select a Company --</option>
-                @for (company of companies; track company.id) {
-                  <option [value]="company.id">{{ company.name }}</option>
-                }
-              </select>
-              <div class="form-actions" style="margin-top: 24px;">
-                <button 
-                  type="button" 
-                  class="btn-cancel"
-                  (click)="closeAddModal()"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="button" 
-                  class="btn-save"
-                  (click)="onCompanySelected()"
-                  [disabled]="!selectedCompanyId"
-                >
-                  Next
-                </button>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      @if (currentStep === 1) {
         <app-route-form-step1
           [selectedCompanyId]="selectedCompanyId"
           [isEditMode]="false"
           (save)="onSaveStep1($event)"
           (cancel)="closeAddModal()"
         ></app-route-form-step1>
-      }
     </app-modal>
 
     <!-- Edit Route Modal -->

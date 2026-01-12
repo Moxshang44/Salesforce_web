@@ -7,8 +7,8 @@ import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { RouteFormStep1Component } from './components/route-form-step1/route-form-step1.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
-
-const API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1';
+import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface Company {
   id: string;
@@ -56,17 +56,14 @@ export class RoutesComponent implements OnInit {
   currentPage = 1;
   isAddModalOpen = false;
   isEditModalOpen = false;
-  currentStep = 0; // Start with company selection (0)
+  currentStep = 1; // Always start at step 1 (no company selection needed)
   isEditMode = false;
   editingRouteId: number | null = null;
   editingCompanyId: string = '';
 
-  // Company selection
-  companies: Company[] = [];
+  // Company selection - using logged-in company
   selectedCompanyId: string = '';
-  selectedCompanyForRoutes: string = ''; // Company selected for loading routes
-  isLoadingCompanies = false;
-  companyError = '';
+  selectedCompanyForRoutes: string = ''; // Company ID from logged-in user
   isDeleting = false;
 
   // Routes data
@@ -83,54 +80,23 @@ export class RoutesComponent implements OnInit {
   viewErrorMessage = '';
   isLoadingView = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private apiService: ApiService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.loadCompanies();
-    // Load routes after companies are loaded, using first company if available
-    // Or wait for user to select a company
-  }
-
-  loadCompanies(): void {
-    this.isLoadingCompanies = true;
-    this.companyError = '';
-    const url = `${API_URL}/companies`;
-
-    this.http.get<any>(url).subscribe({
-      next: (response) => {
-        this.isLoadingCompanies = false;
-        // Handle different response formats
-        if (Array.isArray(response)) {
-          this.companies = response.map((item: any) => ({
-            id: item.id || item.company_id || '',
-            name: item.name || ''
-          })).filter((c: Company) => c.id && c.name);
-        } else if (response.data && Array.isArray(response.data)) {
-          this.companies = response.data.map((item: any) => ({
-            id: item.id || item.company_id || '',
-            name: item.name || ''
-          })).filter((c: Company) => c.id && c.name);
-        } else if (response.companies && Array.isArray(response.companies)) {
-          this.companies = response.companies.map((item: any) => ({
-            id: item.id || item.company_id || '',
-            name: item.name || ''
-          })).filter((c: Company) => c.id && c.name);
-        }
-        
-        if (this.companies.length === 0) {
-          this.companyError = 'No companies found. Please create a company first.';
+    // Get logged-in company from AuthService
+    const companyInfo = this.authService.getCompanyInfo();
+    if (companyInfo && companyInfo.company_id) {
+      this.selectedCompanyForRoutes = companyInfo.company_id;
+      this.selectedCompanyId = companyInfo.company_id;
+      this.loadRoutes(companyInfo.company_id);
         } else {
-          // Auto-select first company and load routes
-          this.selectedCompanyForRoutes = this.companies[0].id;
-          this.loadRoutes(this.companies[0].id);
-        }
-      },
-      error: (error) => {
-        this.isLoadingCompanies = false;
-        console.error('Error loading companies:', error);
-        this.companyError = 'Failed to load companies. Please try again.';
+      console.error('No company information found. Please login again.');
+      this.routesError = 'No company information found. Please login again.';
       }
-    });
   }
 
   loadRoutes(companyId: string, page: number = 1): void {
@@ -142,7 +108,7 @@ export class RoutesComponent implements OnInit {
     this.isLoadingRoutes = true;
     this.routesError = '';
     this.selectedCompanyForRoutes = companyId;
-    const url = `${API_URL}/companies/${companyId}/routes`;
+    const url = this.apiService.getApiUrl(`companies/${companyId}/routes`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -236,42 +202,35 @@ export class RoutesComponent implements OnInit {
   }
 
   onAdd(): void {
-    if (this.companies.length === 0) {
-      alert('Please ensure at least one company exists before adding a route.');
-      this.loadCompanies();
+    // Get logged-in company ID
+    const companyInfo = this.authService.getCompanyInfo();
+    if (!companyInfo || !companyInfo.company_id) {
+      alert('No company information found. Please login again.');
       return;
     }
-    this.selectedCompanyId = '';
-    this.currentStep = 0; // Start with company selection
+    this.selectedCompanyId = companyInfo.company_id;
+    this.currentStep = 1; // Start directly at step 1 (no company selection)
     this.isAddModalOpen = true;
   }
 
   closeAddModal(): void {
     this.isAddModalOpen = false;
-    this.currentStep = 0;
-    this.selectedCompanyId = '';
+    this.currentStep = 1;
+    // Keep selectedCompanyId as it's the logged-in company
   }
 
   closeEditModal(): void {
     this.isEditModalOpen = false;
     this.isEditMode = false;
-    this.currentStep = 0;
-    this.selectedCompanyId = '';
+    this.currentStep = 1;
+    // Keep selectedCompanyId as it's the logged-in company
     this.editingRouteId = null;
     this.editingCompanyId = '';
     this.routeDataForEdit = null;
   }
 
-  onCompanySelected(): void {
-    if (this.selectedCompanyId) {
-      this.currentStep = 1;
-    }
-  }
-
   getModalTitle(): string {
     switch (this.currentStep) {
-      case 0:
-        return 'Add Route — Select Company';
       case 1:
         return 'Add Route — Step 1: Basic Route Adding Info';
       case 2:
@@ -309,32 +268,22 @@ export class RoutesComponent implements OnInit {
     this.editingRouteId = route.id;
     this.isEditMode = true;
     
-    // Determine company ID - use from route if available, otherwise use first company
-    // In production, routes should have company_id
-    const companyId = route.company_id || (this.companies.length > 0 ? this.companies[0].id : '');
+    // Use logged-in company ID
+    const companyInfo = this.authService.getCompanyInfo();
+    const companyId = companyInfo?.company_id || route.company_id || '';
     
     if (companyId) {
       this.editingCompanyId = companyId;
       this.selectedCompanyId = companyId;
+      this.currentStep = 1;
       this.loadRouteForEdit(route.id, companyId);
     } else {
-      // Load companies first, then fetch route
-      this.loadCompanies();
-      setTimeout(() => {
-        if (this.companies.length > 0) {
-          const firstCompanyId = this.companies[0].id;
-          this.editingCompanyId = firstCompanyId;
-          this.selectedCompanyId = firstCompanyId;
-          this.loadRouteForEdit(route.id, firstCompanyId);
-        } else {
-          alert('No companies found. Please ensure at least one company exists.');
-        }
-      }, 500);
+      alert('No company information found. Please login again.');
     }
   }
 
   loadRouteForEdit(routeId: number, companyId: string): void {
-    const url = `${API_URL}/companies/${companyId}/routes/${routeId}`;
+    const url = this.apiService.getApiUrl(`companies/${companyId}/routes/${routeId}`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -344,24 +293,14 @@ export class RoutesComponent implements OnInit {
         const routeData = response.data || response;
         this.editingCompanyId = companyId;
         this.selectedCompanyId = companyId;
-        this.currentStep = 1;
+        this.currentStep = 1; // Start at step 1 (no company selection)
         this.isEditModalOpen = true;
         this.routeDataForEdit = routeData;
       },
       error: (error) => {
         console.error('Error loading route for edit:', error);
-        // Try the next company if available
-        if (error.status === 404 && this.companies.length > 1) {
-          const currentIndex = this.companies.findIndex(c => c.id === companyId);
-          if (currentIndex < this.companies.length - 1) {
-            const nextCompanyId = this.companies[currentIndex + 1].id;
-            this.loadRouteForEdit(routeId, nextCompanyId);
-          } else {
-            alert('Route not found. Please check the route ID and company.');
-          }
-        } else {
+        // Route not found with this company (no need to try other companies as we only have one logged-in company)
           alert('Failed to load route details. Please try again.');
-        }
       }
     });
   }
@@ -375,11 +314,12 @@ export class RoutesComponent implements OnInit {
         return;
       }
 
-      // Determine company ID - use from route if available, otherwise use first company
-      const companyId = route.company_id || (this.companies.length > 0 ? this.companies[0].id : '');
+      // Use logged-in company ID
+      const companyInfo = this.authService.getCompanyInfo();
+      const companyId = companyInfo?.company_id || route.company_id || '';
       
       if (!companyId) {
-        alert('Company ID is required to delete the route. Please ensure at least one company exists.');
+        alert('No company information found. Please login again.');
         return;
       }
 
@@ -389,7 +329,7 @@ export class RoutesComponent implements OnInit {
 
   deleteRoute(route: Route, companyId: string, companyIndex: number = 0): void {
     this.isDeleting = true;
-    const deleteUrl = `${API_URL}/companies/${companyId}/routes/${route.id}`;
+    const deleteUrl = this.apiService.getApiUrl(`companies/${companyId}/routes/${route.id}`);
 
     console.log('Deleting route:', route.routeName);
     console.log('Delete URL:', deleteUrl);
@@ -409,13 +349,8 @@ export class RoutesComponent implements OnInit {
         console.error('Error status:', error.status);
         console.error('Error body:', error.error);
         
-        // If 404 and we haven't tried all companies, try the next one
-        if (error.status === 404 && this.companies.length > companyIndex + 1) {
-          const nextCompanyId = this.companies[companyIndex + 1].id;
-          console.log(`Route not found with company ${companyId}, trying next company: ${nextCompanyId}`);
-          this.deleteRoute(route, nextCompanyId, companyIndex + 1);
-          return;
-        }
+        // If 404, route not found with this company
+        // (No need to try other companies as we only have one logged-in company)
         
         this.isDeleting = false;
         let errorMessage = 'Failed to delete route. Please try again.';
@@ -444,11 +379,12 @@ export class RoutesComponent implements OnInit {
       return;
     }
 
-    // Determine company ID - use from route if available, otherwise use first company
-    const companyId = route.company_id || (this.companies.length > 0 ? this.companies[0].id : '');
+    // Use logged-in company ID
+    const companyInfo = this.authService.getCompanyInfo();
+    const companyId = companyInfo?.company_id || route.company_id || '';
     
     if (!companyId) {
-      alert('Company ID is required to view the route. Please ensure at least one company exists.');
+      alert('No company information found. Please login again.');
       return;
     }
 
@@ -461,7 +397,7 @@ export class RoutesComponent implements OnInit {
   }
 
   loadRouteForView(routeId: number, companyId: string, companyIndex: number = 0): void {
-    const viewUrl = `${API_URL}/companies/${companyId}/routes/${routeId}`;
+    const viewUrl = this.apiService.getApiUrl(`companies/${companyId}/routes/${routeId}`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -485,13 +421,8 @@ export class RoutesComponent implements OnInit {
         console.error('Error status:', error.status);
         console.error('Error body:', error.error);
         
-        // If 404 and we haven't tried all companies, try the next one
-        if (error.status === 404 && this.companies.length > companyIndex + 1) {
-          const nextCompanyId = this.companies[companyIndex + 1].id;
-          console.log(`Route not found with company ${companyId}, trying next company: ${nextCompanyId}`);
-          this.loadRouteForView(routeId, nextCompanyId, companyIndex + 1);
-          return;
-        }
+        // If 404, route not found with this company
+        // (No need to try other companies as we only have one logged-in company)
         
         this.isLoadingView = false;
         if (error.error) {
@@ -525,16 +456,7 @@ export class RoutesComponent implements OnInit {
     route.active = !route.active;
   }
 
-  onCompanyChange(): void {
-    if (this.selectedCompanyForRoutes) {
-      this.loadRoutes(this.selectedCompanyForRoutes, 1);
-    } else {
-      this.routes = [];
-      this.totalCount = 0;
-      this.totalPages = 1;
-      this.currentPage = 1;
-    }
-  }
+  // Removed onCompanyChange - no longer needed as company is always the logged-in one
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages && page !== this.currentPage && this.selectedCompanyForRoutes) {

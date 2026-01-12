@@ -1,65 +1,107 @@
 <form class="product-form-step2">
-  <!-- Step Header -->
-  <div class="step-header">
-    <div class="step-indicator">
-      <span class="step-dot active"></span>
-      <span class="step-label">Step 2 of 3</span>
-    </div>
-    <div class="step-title">Physical & Technical Details</div>
-  </div>
-
   <!-- Form Grid -->
   <div class="form-grid">
     <!-- Packaging Type -->
     <div class="form-group">
-      <label class="form-label">Packaging Type</label>
-      <select class="form-select" [(ngModel)]="formData.packagingType" name="packagingType">
+      <label class="form-label">
+        Packaging Type
+        <span class="required">*</span>
+      </label>
+      <select 
+        class="form-select"
+        [class.error]="errors['packaging_type']"
+        [(ngModel)]="formData.packaging_type" 
+        name="packaging_type"
+        required
+      >
+        <option [ngValue]="null">Select Packaging Type</option>
         @for (type of packagingTypes; track type) {
           <option [value]="type">{{ type }}</option>
         }
       </select>
+      @if (errors['packaging_type']) {
+        <span class="error-message">{{ errors['packaging_type'] }}</span>
+      }
     </div>
 
-    <!-- Measure Type -->
+    <!-- Dimensions - Length -->
     <div class="form-group">
-      <label class="form-label">Measure Type</label>
-      <select class="form-select" [(ngModel)]="formData.measureType" name="measureType">
+      <label class="form-label">Length <span class="optional">(Optional)</span></label>
+      <div class="input-group">
+        <input 
+          type="number" 
+          class="form-input" 
+          [(ngModel)]="formData.dimensions.length" 
+          name="dimensions.length"
+          placeholder="0"
+        />
+        <select class="form-select-addon" [(ngModel)]="formData.dimensions.unit" name="dimensions.unit">
+          @for (unit of dimensionUnits; track unit) {
+            <option [value]="unit">{{ unit }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Dimensions - Width -->
+    <div class="form-group">
+      <label class="form-label">Width <span class="optional">(Optional)</span></label>
+      <input 
+        type="number" 
+        class="form-input" 
+        [(ngModel)]="formData.dimensions.width" 
+        name="dimensions.width"
+        placeholder="0"
+      />
+    </div>
+
+    <!-- Dimensions - Height -->
+    <div class="form-group">
+      <label class="form-label">Height <span class="optional">(Optional)</span></label>
+      <input 
+        type="number" 
+        class="form-input" 
+        [(ngModel)]="formData.dimensions.height" 
+        name="dimensions.height"
+        placeholder="0"
+      />
+    </div>
+
+    <!-- Dimensions - Weight -->
+    <div class="form-group">
+      <label class="form-label">Weight <span class="optional">(Optional)</span></label>
+      <input 
+        type="number" 
+        class="form-input" 
+        [(ngModel)]="formData.dimensions.weight" 
+        name="dimensions.weight"
+        placeholder="0"
+      />
+    </div>
+
+    <!-- Measurement Type -->
+    <div class="form-group">
+      <label class="form-label">Measurement Type <span class="optional">(Optional)</span></label>
+      <select class="form-select" [(ngModel)]="formData.measurement_details.type" name="measurement_details.type">
+        <option value="">Select Type</option>
         @for (type of measureTypes; track type) {
           <option [value]="type">{{ type }}</option>
         }
       </select>
     </div>
 
-    <!-- Shelf Life / Expiry Duration -->
+    <!-- Net Weight/Volume -->
     <div class="form-group">
-      <label class="form-label">Shelf Life / Expiry Duration</label>
+      <label class="form-label">Net <span class="optional">(Optional)</span></label>
       <div class="input-group">
         <input 
-          type="text" 
+          type="number" 
           class="form-input" 
-          [(ngModel)]="formData.shelfLife" 
-          name="shelfLife"
-          placeholder="Select Units"
+          [(ngModel)]="formData.measurement_details.net" 
+          name="measurement_details.net"
+          placeholder="0"
         />
-        <select class="form-select-addon" [(ngModel)]="formData.shelfLifeUnit" name="shelfLifeUnit">
-          @for (unit of shelfLifeUnits; track unit) {
-            <option [value]="unit">{{ unit }}</option>
-          }
-        </select>
-      </div>
-    </div>
-
-    <!-- Net Weight -->
-    <div class="form-group">
-      <label class="form-label">Net Weight</label>
-      <div class="input-group">
-        <input 
-          type="text" 
-          class="form-input" 
-          [(ngModel)]="formData.netWeight" 
-          name="netWeight"
-        />
-        <select class="form-select-addon" [(ngModel)]="formData.weightUnit" name="weightUnit">
+        <select class="form-select-addon" [(ngModel)]="formData.measurement_details.net_unit" name="measurement_details.net_unit">
           @for (unit of weightUnits; track unit) {
             <option [value]="unit">{{ unit }}</option>
           }
@@ -67,118 +109,168 @@
       </div>
     </div>
 
-    <!-- Gross Weight -->
+    <!-- Gross Weight/Volume -->
     <div class="form-group">
-      <label class="form-label">Gross Weight</label>
+      <label class="form-label">Gross <span class="optional">(Optional)</span></label>
       <div class="input-group">
         <input 
-          type="text" 
+          type="number" 
           class="form-input" 
-          [(ngModel)]="formData.grossWeight" 
-          name="grossWeight"
+          [(ngModel)]="formData.measurement_details.gross" 
+          name="measurement_details.gross"
+          placeholder="0"
         />
-        <select class="form-select-addon" [(ngModel)]="formData.grossWeightUnit" name="grossWeightUnit">
+        <select class="form-select-addon" [(ngModel)]="formData.measurement_details.gross_unit" name="measurement_details.gross_unit">
           @for (unit of weightUnits; track unit) {
             <option [value]="unit">{{ unit }}</option>
           }
         </select>
       </div>
+    </div>
+
+    <!-- Shelf Life -->
+    <div class="form-group">
+      <label class="form-label">Shelf Life <span class="optional">(Optional)</span></label>
+      <div class="input-group">
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="formData.measurement_details.shelf_life" 
+          name="measurement_details.shelf_life"
+          placeholder="Enter shelf life"
+        />
+      </div>
+    </div>
+
+    <!-- Compliance (Full Width) -->
+    <div class="form-group full-width">
+      <label class="form-label">Compliance <span class="optional">(Optional)</span></label>
+      <textarea 
+        class="form-textarea"
+        [(ngModel)]="formData.compliance" 
+        name="compliance"
+        placeholder="Enter compliance information"
+        rows="3"
+      ></textarea>
     </div>
   </div>
 
-  <!-- UDM Section -->
-  <div class="udm-section">
-    <div class="udm-header">
-      <h3 class="udm-title">UDM Section</h3>
-    </div>
-
-    <!-- UDM Add Row -->
-    <div class="udm-add-row">
-      <div class="udm-add-grid">
-        <div class="form-group">
-          <label class="form-label">Select Parent UOM</label>
-          <select class="form-select" [(ngModel)]="formData.selectParentUOM" name="selectParentUOM">
-            @for (type of packagingTypes; track type) {
-              <option [value]="type">{{ type }}</option>
-            }
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">UOM Name</label>
-          <input 
-            type="text" 
-            class="form-input" 
-            [(ngModel)]="formData.uomName" 
-            name="uomName"
-            placeholder="Box"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Quantity</label>
-          <input 
-            type="text" 
-            class="form-input" 
-            [(ngModel)]="formData.quantity" 
-            name="quantity"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Price</label>
-          <div class="price-input">
-            <span class="currency">₹</span>
-            <input 
-              type="text" 
-              class="form-input" 
-              [(ngModel)]="formData.price" 
-              name="price"
-            />
-          </div>
-        </div>
-      </div>
-      <button type="button" class="add-udm-btn" (click)="addUDMItem()">
-        + Add UDM
+  <!-- Packaging Details Section -->
+  <div class="packaging-section">
+    <div class="packaging-header">
+      <h3 class="packaging-title">
+        Packaging Details
+        <span class="required">*</span>
+      </h3>
+      <button type="button" class="add-packaging-btn" (click)="addPackagingDetail()">
+        + Add Packaging Detail
       </button>
     </div>
+    @if (errors['packaging_details']) {
+      <span class="error-message">{{ errors['packaging_details'] }}</span>
+    }
 
-    <!-- UDM Table -->
-    <div class="udm-table-wrapper">
-      <table class="udm-table">
-        <thead>
-          <tr>
-            <th>Level</th>
-            <th>UOM Name</th>
-            <th>Contains</th>
-            <th>Total Base Unit</th>
-            <th>Default</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of formData.udmItems; track $index) {
+    <div class="packaging-table-wrapper">
+        <table class="packaging-table">
+          <thead>
             <tr>
-              <td>{{ item.level }}</td>
-              <td>{{ item.parentUOM }}</td>
-              <td>{{ item.contains || '-' }}</td>
-              <td>{{ item.totalBaseUnit }}</td>
-              <td>
-                <input 
-                  type="checkbox" 
-                  class="checkbox" 
-                  [(ngModel)]="item.default"
-                  [name]="'default-' + $index"
-                />
-              </td>
-              <td>
-                <div class="action-icons">
-                  <button type="button" class="icon-btn edit" title="Edit">✏️</button>
-                  <button type="button" class="icon-btn delete" (click)="removeUDMItem($index)" title="Delete">🗑️</button>
-                </div>
-              </td>
+              <th>Name</th>
+              <th>Quantity</th>
+              <th>Parent</th>
+              <th>Base Qty</th>
+              <th>Base Unit</th>
+              <th>Default</th>
+              <th>Action</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            @for (detail of formData.packaging_details; track $index) {
+              <tr>
+                <td>
+                  <input 
+                    type="text" 
+                    class="form-input-small"
+                    [class.error]="errors['packaging_detail_' + $index + '_name']"
+                    [(ngModel)]="detail.name" 
+                    [name]="'packaging_name_' + $index"
+                    placeholder="Name *"
+                    required
+                  />
+                  @if (errors['packaging_detail_' + $index + '_name']) {
+                    <span class="error-message">{{ errors['packaging_detail_' + $index + '_name'] }}</span>
+                  }
+                </td>
+                <td>
+                  <input 
+                    type="number" 
+                    class="form-input-small"
+                    [class.error]="errors['packaging_detail_' + $index + '_qty']"
+                    [(ngModel)]="detail.qty" 
+                    [name]="'packaging_qty_' + $index"
+                    placeholder="0 *"
+                    min="0"
+                    required
+                  />
+                  @if (errors['packaging_detail_' + $index + '_qty']) {
+                    <span class="error-message">{{ errors['packaging_detail_' + $index + '_qty'] }}</span>
+                  }
+                </td>
+                <td>
+                  <input 
+                    type="text" 
+                    class="form-input-small" 
+                    [(ngModel)]="detail.parent" 
+                    [name]="'packaging_parent_' + $index"
+                    placeholder="Parent (Optional)"
+                  />
+                </td>
+                <td>
+                  <input 
+                    type="number" 
+                    class="form-input-small"
+                    [class.error]="errors['packaging_detail_' + $index + '_base_qty']"
+                    [(ngModel)]="detail.base_qty" 
+                    [name]="'packaging_base_qty_' + $index"
+                    placeholder="0 *"
+                    min="0"
+                    required
+                  />
+                  @if (errors['packaging_detail_' + $index + '_base_qty']) {
+                    <span class="error-message">{{ errors['packaging_detail_' + $index + '_base_qty'] }}</span>
+                  }
+                </td>
+                <td>
+                  <input 
+                    type="text" 
+                    class="form-input-small"
+                    [class.error]="errors['packaging_detail_' + $index + '_base_unit']"
+                    [(ngModel)]="detail.base_unit" 
+                    [name]="'packaging_base_unit_' + $index"
+                    placeholder="Unit *"
+                    required
+                  />
+                  @if (errors['packaging_detail_' + $index + '_base_unit']) {
+                    <span class="error-message">{{ errors['packaging_detail_' + $index + '_base_unit'] }}</span>
+                  }
+                </td>
+                <td>
+                  <input 
+                    type="checkbox" 
+                    class="checkbox" 
+                    [(ngModel)]="detail.is_default"
+                    [name]="'packaging_default_' + $index"
+                  />
+                </td>
+                <td>
+                  <button type="button" class="icon-btn delete" (click)="removePackagingDetail($index)" title="Delete">
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
   </div>
 
   <!-- Form Actions -->
@@ -199,4 +291,3 @@
     </app-button>
   </div>
 </form>
-
