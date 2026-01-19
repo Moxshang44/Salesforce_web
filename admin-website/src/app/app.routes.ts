@@ -109,7 +109,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/tasks',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/tasks/tasks.component').then(m => m.TasksComponent),
     canActivate: [authGuard]
   },
   {
@@ -134,7 +134,32 @@ export const routes: Routes = [
   },
   {
     path: 'admin/live-view',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/live-view/live-view.component').then(m => m.LiveViewComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/live-view/:nsmName',
+    loadComponent: () => import('./features/live-view/live-view.component').then(m => m.LiveViewComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/live-view/:nsmName/:zsmName',
+    loadComponent: () => import('./features/live-view/live-view.component').then(m => m.LiveViewComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/live-view/:nsmName/:zsmName/:rsmName',
+    loadComponent: () => import('./features/live-view/live-view.component').then(m => m.LiveViewComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/live-view/:nsmName/:zsmName/:rsmName/:asmName',
+    loadComponent: () => import('./features/live-view/live-view.component').then(m => m.LiveViewComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/live-view/:nsmName/:zsmName/:rsmName/:asmName/:soName',
+    loadComponent: () => import('./features/live-view/live-view.component').then(m => m.LiveViewComponent),
     canActivate: [authGuard]
   },
   {

@@ -1,0 +1,9 @@
+[build]
+  command = "cd admin-website && npm install && npm run build"
+  publish = "admin-website/dist/admin-website/browser"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+

@@ -1,0 +1,391 @@
+<div class="tasks-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <app-header></app-header>
+
+    <div class="tasks-content">
+      <!-- Page Title -->
+      <h1 class="page-title">Task Management</h1>
+
+      <!-- Tabs -->
+      <div class="tabs-header">
+        <div class="tabs-section">
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'my-tasks'"
+            (click)="setActiveTab('my-tasks')"
+          >
+            My Tasks
+          </button>
+          <button 
+            class="tab-btn"
+            [class.active]="activeTab === 'given-task'"
+            (click)="setActiveTab('given-task')"
+          >
+            Given Task
+          </button>
+        </div>
+        
+        @if (activeTab === 'given-task') {
+          <button class="add-task-btn" (click)="openAddTaskModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+            </svg>
+            Add New Task
+          </button>
+        }
+      </div>
+
+      <!-- Task Grid -->
+      <div class="tasks-grid">
+        @for (task of getTasks(); track task.id) {
+          <div class="task-card">
+            <div class="task-header">
+              <h3 class="task-title">{{ task.title }}</h3>
+              <span class="task-status" [class]="'status-' + task.status">
+                @if (task.status === 'pending') {
+                  Pending
+                } @else if (task.status === 'done') {
+                  Done
+                } @else if (task.status === 'in-progress') {
+                  In Progress
+                }
+              </span>
+            </div>
+
+            <div class="task-details">
+              @if (task.location) {
+                <div class="task-detail-item">
+                  <svg class="detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+                  </svg>
+                  <span class="detail-text">{{ task.location }}</span>
+                </div>
+              }
+              
+              <div class="task-detail-item">
+                <svg class="detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z" fill="currentColor"/>
+                </svg>
+                <span class="detail-text">{{ task.date }}, {{ task.time }}</span>
+              </div>
+
+              @if (task.assignee) {
+                <div class="task-detail-item">
+                  <span class="detail-text">Assigned To: {{ task.assignee }}</span>
+                </div>
+              }
+            </div>
+
+            @if (activeTab === 'my-tasks') {
+              <div class="task-footer">
+                <span class="reported-to">Reported Back To: {{ task.reportedTo }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <app-modal
+    [isOpen]="isAddTaskModalOpen"
+    title="Add Task - Step 1: Add Details"
+    [stepIndicator]="'Step 1 of 2'"
+    width="900px"
+    (close)="closeAddTaskModal()"
+  >
+    <div class="add-task-form">
+      <!-- Task Type -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Task Type</label>
+          <select class="form-select" [(ngModel)]="taskType" name="taskType">
+            <option value="India">India</option>
+            <option value="Dubai">Dubai</option>
+            <option value="London">London</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Task Title -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Task Title</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="e.g: Co-work with SR"
+            [(ngModel)]="taskTitle"
+            name="taskTitle"
+          >
+        </div>
+      </div>
+
+      <!-- Assign To and Report Back To -->
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label class="form-label">Assign To</label>
+          <select class="form-select" [(ngModel)]="assignTo" name="assignTo">
+            <option value="">Select Region</option>
+            <option value="region1">Region 1</option>
+            <option value="region2">Region 2</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Report Back To (Optional)</label>
+          <select class="form-select" [(ngModel)]="reportBackTo" name="reportBackTo">
+            <option value="">Select Area</option>
+            <option value="area1">Area 1</option>
+            <option value="area2">Area 2</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Date Range -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Select Start and End Dates</label>
+          <div class="date-range-input">
+            <input 
+              type="date" 
+              class="form-input" 
+              [(ngModel)]="startDate"
+              name="startDate"
+              placeholder="Start Date"
+            >
+            <span class="date-separator">to</span>
+            <input 
+              type="date" 
+              class="form-input" 
+              [(ngModel)]="endDate"
+              name="endDate"
+              placeholder="End Date"
+            >
+            <svg class="calendar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Day Task Checkbox -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              class="form-checkbox"
+              [(ngModel)]="isFullDayTask"
+              name="isFullDayTask"
+            >
+            <span>Mark as Full - Day Task</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Time Slot -->
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label class="form-label">Select Time Slot</label>
+          <div class="time-inputs">
+            <div class="time-input-group">
+              <input 
+                type="time" 
+                class="form-input time-input"
+                [(ngModel)]="startTime"
+                name="startTime"
+                [disabled]="isFullDayTask"
+              >
+              <svg class="clock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="time-separator">to</span>
+            <div class="time-input-group">
+              <input 
+                type="time" 
+                class="form-input time-input"
+                [(ngModel)]="endTime"
+                name="endTime"
+                [disabled]="isFullDayTask"
+              >
+              <svg class="clock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Link This Task To -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Link This Task To</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input 
+                type="radio" 
+                name="linkTaskTo" 
+                value="route"
+                [(ngModel)]="linkTaskTo"
+              >
+              <span>Route</span>
+            </label>
+            <label class="radio-label">
+              <input 
+                type="radio" 
+                name="linkTaskTo" 
+                value="retailer"
+                [(ngModel)]="linkTaskTo"
+              >
+              <span>Retailer</span>
+            </label>
+            <label class="radio-label">
+              <input 
+                type="radio" 
+                name="linkTaskTo" 
+                value="distributor"
+                [(ngModel)]="linkTaskTo"
+              >
+              <span>Distributor</span>
+            </label>
+            <label class="radio-label">
+              <input 
+                type="radio" 
+                name="linkTaskTo" 
+                value="employee"
+                [(ngModel)]="linkTaskTo"
+              >
+              <span>Employee</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search And Add -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Search And Add</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="Search Route By Name or Code"
+            [(ngModel)]="searchRoute"
+            name="searchRoute"
+          >
+        </div>
+      </div>
+
+      <!-- Objective -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Objective</label>
+          <textarea 
+            class="form-textarea" 
+            placeholder="Add notes for example Understand 20% sales drop and coach SR on order mix."
+            [(ngModel)]="objective"
+            name="objective"
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Checklist (Optional) -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Checklist (Optional)</label>
+          <div class="checklist-items">
+            @for (item of checklistItems; track $index) {
+              <div class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">{{ item }}</span>
+                <button 
+                  type="button" 
+                  class="checklist-delete-btn"
+                  (click)="removeChecklistItem($index)"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#dc2626"/>
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+          <div class="add-checklist-wrapper">
+            <input 
+              type="text" 
+              class="form-input checklist-input"
+              placeholder="Enter new checklist item"
+              [(ngModel)]="newChecklistItem"
+              name="newChecklistItem"
+              (keyup.enter)="addChecklistItem()"
+            >
+            <button 
+              type="button" 
+              class="add-checklist-btn"
+              (click)="addChecklistItem()"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+              </svg>
+              Add Checklist Item
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Documents -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Upload Documents</label>
+          <div 
+            class="file-upload-area"
+            (drop)="onFileDrop($event)"
+            (dragover)="onFileDragOver($event)"
+            (click)="$event.preventDefault()"
+          >
+            <input 
+              type="file" 
+              id="file-upload"
+              class="file-input"
+              multiple
+              accept=".png,.jpg,.jpeg,.pdf"
+              (change)="onFileSelected($event)"
+              style="display: none;"
+            >
+            <label for="file-upload" class="file-upload-label">
+              <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" fill="currentColor"/>
+              </svg>
+              <p class="upload-text">Drag & drop images here or click to browse</p>
+              <p class="upload-hint">PNG, JPG, PDF (max up to 5MB)</p>
+            </label>
+          </div>
+          @if (uploadedFiles.length > 0) {
+            <div class="uploaded-files">
+              @for (file of uploadedFiles; track file.name) {
+                <div class="uploaded-file-item">
+                  <span>{{ file.name }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Modal Footer Buttons -->
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeAddTaskModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn-save" (click)="saveTask()">
+          Save Task
+        </button>
+      </div>
+    </div>
+  </app-modal>
+</div>
+

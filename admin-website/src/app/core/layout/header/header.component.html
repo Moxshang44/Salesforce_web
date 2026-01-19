@@ -14,9 +14,13 @@
   </div>
 
   <div class="header-right">
-    <button class="ai-button" (click)="onAiClick()">
+    <button class="ai-button" (click)="onAiClick()" [class.disabled]="!aiAssistantEnabled">
       <img src="assets/images/talktoai.png" alt="AI" class="ai-icon">
-      AI Assistant
+      <span>AI Assistant</span>
+      <label class="ai-toggle-switch" (click)="$event.stopPropagation()">
+        <input type="checkbox" [checked]="aiAssistantEnabled" (change)="onAiToggle($event)">
+        <span class="toggle-slider"></span>
+      </label>
     </button>
     
     <button class="notification-button" (click)="onNotificationClick()">
