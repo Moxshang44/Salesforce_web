@@ -1,0 +1,193 @@
+<div class="sales-layout" [class.sidebar-open]="isSidebarOpen">
+  <!-- Main Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <!-- Breadcrumbs -->
+      <div class="breadcrumbs">
+        @for (crumb of breadcrumbs; track crumb.label; let i = $index; let last = $last) {
+          <span 
+            class="breadcrumb-item" 
+            [class.active]="last"
+            (click)="!last && navigateToBreadcrumb(i)"
+          >
+            {{ crumb.label }}@if (crumb.role !== 'Company') {<span class="role-tag">({{ crumb.role }})</span>}
+          </span>
+          @if (!last) {
+            <span class="separator">/</span>
+          }
+        }
+      </div>
+
+      <!-- Set Sales Targets Section -->
+      <section class="sales-targets-section">
+        <div class="section-header">
+          <div class="section-info">
+            <h2 class="section-title">Set Sales Targets</h2>
+            <p class="section-description">Define the total sales goal. The system will auto-distribute it.</p>
+          </div>
+          
+          <div class="target-controls">
+            <div class="target-input-wrapper">
+              <span class="currency-symbol">₹</span>
+              <input 
+                type="text" 
+                class="target-input"
+                [value]="totalSalesTarget"
+                (input)="formatInputCurrency($any($event.target).value)"
+                placeholder="Enter target amount"
+              >
+            </div>
+            
+            <button class="auto-split-btn" (click)="autoSplitTarget()">
+              <svg class="sparkle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L14.09 8.26L20 9.27L15.5 14.14L16.18 20.02L12 17.77L7.82 20.02L8.5 14.14L4 9.27L9.91 8.26L12 2Z" fill="currentColor"/>
+              </svg>
+              Auto-Split Target
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Company Allocation Section -->
+      <section class="allocation-section">
+        <h2 class="allocation-title">{{ getAllocationTitle() }}</h2>
+        
+        <div class="allocation-grid">
+          @for (manager of currentManagers; track manager.id) {
+            <div class="allocation-card" (click)="openSidebar(manager, $event)" [class.selected]="selectedManager?.id === manager.id">
+              <div class="card-header">
+                <span class="role-badge">{{ manager.role }}</span>
+                <div class="vs-last-year">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>+ {{ manager.vsLastYear }}%</span>
+                  <span class="vs-label">vs Last Year</span>
+                </div>
+              </div>
+              
+              <div class="card-body">
+                <h3 class="manager-name">{{ manager.name }}</h3>
+                <p class="manager-location">{{ manager.location }}</p>
+                
+                <div class="target-amount">
+                  <span class="amount">{{ formatCurrency(manager.targetAmount) }}</span>
+                </div>
+                
+                <div class="progress-section">
+                  <div class="progress-bar">
+                    <div 
+                      class="progress-fill" 
+                      [style.width.%]="manager.percentage"
+                    ></div>
+                  </div>
+                  <div class="progress-info">
+                    <button class="edit-btn" title="Edit target" (click)="openSidebar(manager, $event)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                    <span class="percentage">{{ manager.percentage }}%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card-footer">
+                @if (manager.subordinates && manager.subordinates.length > 0) {
+                  <button class="drill-down-btn" (click)="drillDown(manager); $event.stopPropagation()">
+                    Drill Down
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Right Sidebar for Monthly Targets -->
+  @if (isSidebarOpen && selectedManager) {
+    <aside class="target-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title-section">
+          <h3 class="sidebar-manager-name">{{ selectedManager.name }}</h3>
+          <p class="sidebar-annual-target">Annual Target : <span class="highlight">₹{{ formatCrores(selectedManager.targetAmount) }} Cr</span></p>
+        </div>
+        <button class="close-sidebar-btn" (click)="closeSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="allocation-summary">
+        <div class="summary-item">
+          <span class="summary-label">Allocated</span>
+          <span class="summary-value allocated">₹{{ formatCrores(allocatedAmount) }} Cr</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Rem:</span>
+          <span class="summary-value remaining">₹{{ formatCrores(remainingAmount) }} Cr</span>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="action-btn auto-split" (click)="autoSplitMonthly()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L14.09 8.26L20 9.27L15.5 14.14L16.18 20.02L12 17.77L7.82 20.02L8.5 14.14L4 9.27L9.91 8.26L12 2Z" fill="currentColor"/>
+          </svg>
+          Auto-Split
+        </button>
+        <button class="action-btn match-ly" (click)="matchWithLastYear()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Match with LY
+        </button>
+      </div>
+
+      <div class="monthly-targets-list">
+        @for (monthTarget of selectedManager.monthlyTargets; track monthTarget.month; let i = $index) {
+          <div class="month-row">
+            <span class="month-label">{{ monthTarget.shortMonth }}</span>
+            <div class="month-input-wrapper">
+              <span class="input-prefix">₹</span>
+              <input 
+                type="number" 
+                class="month-input"
+                [value]="monthTarget.target"
+                (input)="updateMonthlyTarget(i, $event)"
+                placeholder="00.00"
+                step="0.01"
+              >
+            </div>
+            <span class="ly-value">LY: {{ monthTarget.lastYear }}L</span>
+          </div>
+        }
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="footer-btn reset-btn" (click)="resetMonthlyTargets()">Reset</button>
+        <button class="footer-btn save-btn" (click)="saveTargets()">Save Targets</button>
+      </div>
+    </aside>
+  }
+
+  <!-- Overlay -->
+  @if (isSidebarOpen) {
+    <div class="sidebar-overlay" (click)="closeSidebar()"></div>
+  }
+</div>
+

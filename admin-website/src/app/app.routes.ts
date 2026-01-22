@@ -129,7 +129,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/sales',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/sales/sales.component').then(m => m.SalesComponent),
     canActivate: [authGuard]
   },
   {

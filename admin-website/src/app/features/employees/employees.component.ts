@@ -8,6 +8,7 @@ import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { EmployeeFormStep1Component, EmployeeFormData } from './components/employee-form-step1/employee-form-step1.component';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
+import { forkJoin } from 'rxjs';
 
 interface Employee {
   id: string;
@@ -24,6 +25,19 @@ interface Employee {
   contact_no?: string;
   company_id?: string;
   area_id?: number;
+}
+
+interface RouteAssignment {
+  id: number;
+  route_id: number;
+  route_name: string;
+  route_code: string;
+  user_id: string;
+  user_name: string;
+  from_date: string;
+  to_date: string;
+  day: number;
+  is_active: boolean;
 }
 
 @Component({
@@ -57,6 +71,7 @@ export class EmployeesComponent implements OnInit {
   employeeDataForEdit: any = null;
 
   employees: Employee[] = [];
+  routeAssignments: RouteAssignment[] = [];
 
   constructor(
     private http: HttpClient,
@@ -86,38 +101,48 @@ export class EmployeesComponent implements OnInit {
     this.employeesError = '';
     this.currentPage = page;
 
-    const url = this.apiService.getApiUrl(`users/companies/${this.selectedCompanyId}/users`);
+    const employeesUrl = this.apiService.getApiUrl(`users/companies/${this.selectedCompanyId}/users`);
+    const routeAssignmentsUrl = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/route-assignments`);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
     const offset = (page - 1) * this.recordsPerPage;
-    const params = new HttpParams()
+    const employeesParams = new HttpParams()
       .set('is_active', 'true')
       .set('limit', this.recordsPerPage.toString())
       .set('offset', offset.toString());
 
-    this.http.get<any>(url, { headers, params }).subscribe({
-      next: (response: any) => {
+    // Fetch both employees and route assignments in parallel
+    forkJoin({
+      employees: this.http.get<any>(employeesUrl, { headers, params: employeesParams }),
+      routeAssignments: this.http.get<any>(routeAssignmentsUrl, { headers })
+    }).subscribe({
+      next: (responses: any) => {
         this.isLoadingEmployees = false;
-        console.log('Employees loaded:', response);
+        console.log('Employees loaded:', responses.employees);
+        console.log('Route assignments loaded:', responses.routeAssignments);
 
-        // Handle different response formats
-        if (response.data && Array.isArray(response.data)) {
-          this.employees = response.data.map((emp: any) => this.mapApiEmployeeToEmployee(emp));
-        } else if (Array.isArray(response)) {
-          this.employees = response.map((emp: any) => this.mapApiEmployeeToEmployee(emp));
+        // Process route assignments first
+        this.processRouteAssignments(responses.routeAssignments);
+
+        // Handle different response formats for employees
+        const employeesResponse = responses.employees;
+        if (employeesResponse.data && Array.isArray(employeesResponse.data)) {
+          this.employees = employeesResponse.data.map((emp: any) => this.mapApiEmployeeToEmployee(emp));
+        } else if (Array.isArray(employeesResponse)) {
+          this.employees = employeesResponse.map((emp: any) => this.mapApiEmployeeToEmployee(emp));
         } else {
           this.employees = [];
         }
 
         // Update pagination info
-        if (response.total_count !== undefined) {
-          this.totalCount = response.total_count;
+        if (employeesResponse.total_count !== undefined) {
+          this.totalCount = employeesResponse.total_count;
           this.totalPages = Math.ceil(this.totalCount / this.recordsPerPage);
-        } else if (response.records_per_page !== undefined) {
-          this.recordsPerPage = response.records_per_page;
-          this.totalCount = response.total_count || this.employees.length;
+        } else if (employeesResponse.records_per_page !== undefined) {
+          this.recordsPerPage = employeesResponse.records_per_page;
+          this.totalCount = employeesResponse.total_count || this.employees.length;
           this.totalPages = Math.ceil(this.totalCount / this.recordsPerPage);
         } else {
           this.totalCount = this.employees.length;
@@ -126,7 +151,7 @@ export class EmployeesComponent implements OnInit {
       },
       error: (error: any) => {
         this.isLoadingEmployees = false;
-        console.error('Error loading employees:', error);
+        console.error('Error loading data:', error);
         
         if (error.error) {
           if (error.error.message) {
@@ -144,9 +169,25 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
+  processRouteAssignments(response: any): void {
+    if (response.data && Array.isArray(response.data)) {
+      this.routeAssignments = response.data;
+    } else if (Array.isArray(response)) {
+      this.routeAssignments = response;
+    } else {
+      this.routeAssignments = [];
+    }
+    console.log('Processed route assignments:', this.routeAssignments);
+  }
+
+  getRouteCountForUser(userId: string): number {
+    return this.routeAssignments.filter(ra => ra.user_id === userId && ra.is_active).length;
+  }
+
   mapApiEmployeeToEmployee(apiEmployee: any): Employee {
+    const employeeId = apiEmployee.id || '';
     return {
-      id: apiEmployee.id || '',
+      id: employeeId,
       name: apiEmployee.name || 'N/A',
       username: apiEmployee.username,
       code: apiEmployee.code || `#EMP${apiEmployee.id?.substring(0, 8) || 'N/A'}`,
@@ -154,7 +195,7 @@ export class EmployeesComponent implements OnInit {
       reportingTo: apiEmployee.reporting_to || '-',
       assignedArea: apiEmployee.area_name || 'N/A',
       area_name: apiEmployee.area_name,
-      routesCount: apiEmployee.routes_count || 0,
+      routesCount: this.getRouteCountForUser(employeeId),
       isActive: apiEmployee.is_active !== undefined ? apiEmployee.is_active : true,
       is_active: apiEmployee.is_active,
       contact_no: apiEmployee.contact_no,
