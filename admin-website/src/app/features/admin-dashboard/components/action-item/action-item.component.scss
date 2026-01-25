@@ -39,13 +39,30 @@
 .action-button {
   flex-shrink: 0;
   
+  ::ng-deep app-button {
+    button {
+      background-color: transparent !important;
+      border: 1px solid #D0D0D0 !important;
+      color: #333333 !important;
+      border-radius: 6px !important;
+      
+      &:hover {
+        background-color: transparent !important;
+        border-color: #A0A0A0 !important;
+        color: #333333 !important;
+      }
+    }
+  }
+  
+  // Red buttons (Extend?, Order Now) - red border
   ::ng-deep app-button.red-button {
     button {
       color: #DC3545 !important;
       border-color: #DC3545 !important;
+      background-color: transparent !important;
       
       &:hover {
-        background-color: #fff5f5 !important;
+        background-color: transparent !important;
         border-color: #DC3545 !important;
         color: #DC3545 !important;
       }

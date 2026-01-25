@@ -9,270 +9,51 @@
 
     <!-- Dashboard Content -->
     <div class="dashboard-content">
-      <!-- Page Header with Title and Date Filters -->
-      <div class="page-header">
-        <h1 class="page-title">Sales Insights</h1>
-        <div class="date-filters">
-          <button 
-            class="period-btn" 
-            [class.active]="selectedPeriod === 'FTD'"
-            (click)="selectPeriod('FTD')"
-          >
-            FTD
-          </button>
-          <button 
-            class="period-btn" 
-            [class.active]="selectedPeriod === 'MTD'"
-            (click)="selectPeriod('MTD')"
-          >
-            MTD
-          </button>
-          <button 
-            class="period-btn" 
-            [class.active]="selectedPeriod === 'YTD'"
-            (click)="selectPeriod('YTD')"
-          >
-            YTD
-          </button>
-          <button class="date-select-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Select date
-          </button>
-        </div>
+      <!-- Dashboard Title -->
+      <h1 class="dashboard-title">Dashboard</h1>
+      
+      <!-- Stats Cards Section -->
+      <div class="stats-section">
+        <app-stats-card
+          title="Total Sales (Today)"
+          value="₹ 4,50,000"
+          [trend]="{ value: '12% vs yesterday', isPositive: true }"
+        ></app-stats-card>
+        
+        <app-stats-card
+          title="Active Workers"
+          value="124"
+          subtitle="Last Update 5 minutes ago."
+        ></app-stats-card>
+        
+        <app-stats-card
+          title="Active Routes"
+          value="8 Routes Live"
+          subtitle="3 Sales Reps currently active"
+        ></app-stats-card>
       </div>
 
-      <!-- Top Section: ZSM Profile and KPIs -->
-      <div class="top-section">
-        <!-- ZSM Profile Card -->
-        <div class="zsm-profile-card">
-          <div class="zsm-title">Zonal Sales Manager: {{ zsmZone }}</div>
-          <div class="zsm-name">{{ zsmName }}</div>
-          <div class="zsm-stats">
-            <div class="zsm-stat-item">
-              <span class="stat-number">{{ zsmStats.regions }}</span>
-              <span class="stat-label">Regions</span>
-            </div>
-            <div class="zsm-stat-item">
-              <span class="stat-number">{{ zsmStats.areas }}</span>
-              <span class="stat-label">Areas</span>
-            </div>
-            <div class="zsm-stat-item">
-              <span class="stat-number">{{ zsmStats.distributors }}</span>
-              <span class="stat-label">Distributors</span>
-            </div>
-            <div class="zsm-stat-item">
-              <span class="stat-number">{{ zsmStats.retailers }}</span>
-              <span class="stat-label">Retailers</span>
-            </div>
-          </div>
+      <!-- Main Content Grid: Chart and Actions -->
+      <div class="main-grid">
+        <!-- Sales Chart Section -->
+        <div class="chart-section">
+          <app-sales-chart></app-sales-chart>
         </div>
 
-        <!-- KPI Cards -->
-        <div class="kpi-section">
-          @for (kpi of kpis; track $index) {
-            <div class="kpi-card">
-              <div class="kpi-label">{{ kpi.label }}</div>
-              <div class="kpi-value">{{ kpi.value }}</div>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Middle Section: RSM Performance and Category Chart -->
-      <div class="middle-section">
-        <!-- RSM Performance Table -->
-        <div class="rsm-performance-card">
-          <div class="card-header">
-            <h2 class="card-title">RSM Performance (Under ZSM)</h2>
-            <div class="card-filters">
-              <select class="filter-select" [(ngModel)]="selectedRegion">
-                <option value="All">Region: All</option>
-                <option value="Indian">Indian</option>
-              </select>
-              <select class="filter-select" [(ngModel)]="selectedSort">
-                <option value="Sales +">Sort: Sales +</option>
-                <option value="Sales -">Sort: Sales -</option>
-                <option value="Growth +">Sort: Growth +</option>
-                <option value="Growth -">Sort: Growth -</option>
-              </select>
-              <button class="excel-btn" (click)="exportExcel()">Excel</button>
-            </div>
+        <!-- Actions Required Section -->
+        <div class="actions-section">
+          <div class="actions-header">
+            <h3 class="actions-title">Actions Required</h3>
           </div>
-          <div class="table-wrapper">
-            <table class="rsm-table">
-              <thead>
-                <tr>
-                  <th>RSM</th>
-                  <th>Region</th>
-                  <th>Sales (₹)</th>
-                  <th>TC</th>
-                  <th>PC</th>
-                  <th>Avg Sales</th>
-                  <th>Growth %</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (rsm of rsmData; track rsm.name) {
-                  <tr>
-                    <td>{{ rsm.name }}</td>
-                    <td>{{ rsm.region }}</td>
-                    <td>{{ rsm.sales }}</td>
-                    <td>{{ rsm.tc }}</td>
-                    <td>{{ rsm.pc }}</td>
-                    <td>{{ rsm.avgSales }}</td>
-                    <td [class.positive]="rsm.growth > 0" [class.negative]="rsm.growth < 0">
-                      {{ rsm.growth > 0 ? '+' : '' }}{{ rsm.growth }}%
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+          <div class="actions-list">
+            @for (action of actionItems; track action.id) {
+              <app-action-item
+                [action]="action"
+                (actionClick)="onActionClick($event)"
+              ></app-action-item>
+            }
           </div>
         </div>
-
-        <!-- Category-wise Sales Chart -->
-        <div class="category-chart-card">
-          <div class="card-header">
-            <h2 class="card-title">Category-wise Sales</h2>
-            <div class="chart-tabs">
-              <button 
-                class="tab-btn" 
-                [class.active]="categoryTab === 'Value'"
-                (click)="categoryTab = 'Value'"
-              >
-                Value
-              </button>
-              <button 
-                class="tab-btn" 
-                [class.active]="categoryTab === 'Qty'"
-                (click)="categoryTab = 'Qty'"
-              >
-                Qty
-              </button>
-            </div>
-          </div>
-          <div class="chart-container">
-            <div class="donut-chart">
-              <svg width="160" height="160" viewBox="0 0 160 160">
-                @for (segment of getCategoryChartSegments(); track segment.name) {
-                  <circle 
-                    cx="80" 
-                    cy="80" 
-                    r="60" 
-                    fill="none" 
-                    [attr.stroke]="segment.color" 
-                    stroke-width="30" 
-                    [attr.stroke-dasharray]="segment.strokeDasharray"
-                    [attr.stroke-dashoffset]="segment.strokeDashoffset"
-                    transform="rotate(-90 80 80)" />
-                }
-              </svg>
-            </div>
-            <div class="chart-legend">
-              @for (cat of categoryData; track cat.name) {
-                <div class="legend-item">
-                  <span class="legend-color" [style.background-color]="cat.color"></span>
-                  <span class="legend-label">{{ cat.name }}</span>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Section: Product-wise Sales and Product Mix -->
-      <div class="bottom-section">
-        <!-- Product-wise Sales Table -->
-        <div class="product-sales-card">
-          <div class="card-header">
-            <h2 class="card-title">Product-wise Sales</h2>
-            <div class="card-filters">
-              <select class="filter-select" [(ngModel)]="selectedBrand">
-                <option value="All">Brand</option>
-              </select>
-              <select class="filter-select" [(ngModel)]="selectedCategory">
-                <option value="All">Category</option>
-              </select>
-              <select class="filter-select" [(ngModel)]="selectedProduct">
-                <option value="All">Product</option>
-              </select>
-              <input 
-                type="text" 
-                class="search-input" 
-                placeholder="Search product..." 
-                [(ngModel)]="searchProduct"
-              />
-              <button class="excel-btn" (click)="exportExcel()">Excel</button>
-            </div>
-          </div>
-          <div class="table-wrapper">
-            <table class="product-table">
-              <thead>
-                <tr>
-                  <th>Brand</th>
-                  <th>Category</th>
-                  <th>Product</th>
-                  <th>Total Qty</th>
-                  <th>Total Sales (₹)</th>
-                  <th>Contribution %</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (product of productData; track product.product) {
-                  <tr>
-                    <td>{{ product.brand }}</td>
-                    <td>{{ product.category }}</td>
-                    <td>{{ product.product }}</td>
-                    <td>{{ product.totalQty | number }}</td>
-                    <td>{{ product.totalSales }}</td>
-                    <td>{{ product.contribution }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Product Mix Chart -->
-        <div class="product-mix-card">
-          <div class="card-header">
-            <h2 class="card-title">Product Mix (Top SKUs)</h2>
-          </div>
-          <div class="chart-container">
-            <div class="donut-chart">
-              <svg width="160" height="160" viewBox="0 0 160 160">
-                @for (segment of getCategoryChartSegments(); track segment.name) {
-                  <circle 
-                    cx="80" 
-                    cy="80" 
-                    r="60" 
-                    fill="none" 
-                    [attr.stroke]="segment.color" 
-                    stroke-width="30" 
-                    [attr.stroke-dasharray]="segment.strokeDasharray"
-                    [attr.stroke-dashoffset]="segment.strokeDashoffset"
-                    transform="rotate(-90 80 80)" />
-                }
-              </svg>
-            </div>
-            <div class="chart-legend">
-              @for (cat of categoryData; track cat.name) {
-                <div class="legend-item">
-                  <span class="legend-color" [style.background-color]="cat.color"></span>
-                  <span class="legend-label">{{ cat.name }}</span>
-                </div>
-              }
-            </div>
-            <div class="chart-label">Top 8 SKUs + Others</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="dashboard-footer">
-        <p class="footer-text">Copyright © 2025. All rights reserved | Version: 1.0</p>
       </div>
     </div>
   </div>

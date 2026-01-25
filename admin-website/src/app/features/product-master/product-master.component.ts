@@ -13,8 +13,6 @@ import { ProductFormStep4Component, ProductFormStep4Data } from './components/pr
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
 
-const API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1';
-
 interface Product {
   id: string;
   brand: string;

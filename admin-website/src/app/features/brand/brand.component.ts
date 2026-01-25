@@ -11,8 +11,6 @@ import { BrandFormStep2Component, BrandFormStep2Data } from './components/brand-
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 
-const API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1';
-
 interface Company {
   id: string;
   name: string;
@@ -365,7 +363,7 @@ export class BrandComponent implements OnInit {
       }
       // Note: area_id and margins are NOT included in PATCH (only in POST)
 
-      const url = `${API_URL}/companies/${this.editingCompanyId}/brands/${this.editingBrandId}`;
+      const url = `${this.apiService.getApiUrl('companies')}/${this.editingCompanyId}/brands/${this.editingBrandId}`;
       const headers = new HttpHeaders({
         'Content-Type': 'application/json'
       });
@@ -442,7 +440,7 @@ export class BrandComponent implements OnInit {
         payload.margins = this.step2Data.margins;
       }
 
-      const url = `${API_URL}/companies/${this.selectedCompanyId}/brands`;
+      const url = `${this.apiService.getApiUrl('companies')}/${this.selectedCompanyId}/brands`;
       const headers = new HttpHeaders({
         'Content-Type': 'application/json'
       });

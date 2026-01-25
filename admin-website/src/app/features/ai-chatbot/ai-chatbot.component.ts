@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
+import { ChatService } from './services/chat.service';
 
 interface ChatMessage {
   id: number;
@@ -17,6 +18,7 @@ interface ChatHistory {
   title: string;
   timestamp: Date;
   preview: string;
+  sessionId?: string;
 }
 
 type ChatMode = 'ask' | 'do' | 'plan';
@@ -54,8 +56,12 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
   @ViewChild('modeDropdownContainer', { static: false }) modeDropdownContainer?: ElementRef;
 
   modes: ModeItem[] = [];
+  currentSessionId: string = '';
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(
+    private sanitizer: DomSanitizer,
+    private chatService: ChatService
+  ) {}
 
   ngOnInit() {
     // Initialize modes with sanitized SVG icons
@@ -108,40 +114,47 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
 
   loadChatHistory(): void {
     // Load chat history (mock data - replace with actual storage/API)
+    const initialSessionId = this.chatService.generateSessionId();
     this.chatHistory = [
       {
         id: 1,
         title: 'New Chat',
         timestamp: new Date(),
-        preview: 'Hello! I\'m your AI assistant...'
+        preview: 'Hello! I\'m your AI assistant...',
+        sessionId: initialSessionId
       }
     ];
     if (this.chatHistory.length > 0) {
       this.currentChatId = this.chatHistory[0].id;
+      this.currentSessionId = initialSessionId;
     }
   }
 
   createNewChat(): void {
+    const newSessionId = this.chatService.generateSessionId();
     const newChat: ChatHistory = {
       id: Date.now(),
       title: 'New Chat',
       timestamp: new Date(),
-      preview: ''
+      preview: '',
+      sessionId: newSessionId
     };
     this.chatHistory.unshift(newChat);
     this.currentChatId = newChat.id;
+    this.currentSessionId = newSessionId;
     this.chatMessages = [];
     this.initializeChatbot();
   }
 
   selectChat(chatId: number): void {
     this.currentChatId = chatId;
-    // In a real app, load messages for this chat
-    // For now, just reset to welcome message
-    this.chatMessages = [];
-    this.initializeChatbot();
     const chat = this.chatHistory.find(c => c.id === chatId);
     if (chat) {
+      this.currentSessionId = chat.sessionId || this.chatService.generateSessionId();
+      // In a real app, load messages for this chat
+      // For now, just reset to welcome message
+      this.chatMessages = [];
+      this.initializeChatbot();
       chat.preview = this.chatMessages.length > 0 
         ? this.chatMessages[this.chatMessages.length - 1].content.substring(0, 50) + '...'
         : '';
@@ -199,7 +212,7 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
     }
 
     // Create new chat if none exists
-    if (this.currentChatId === null) {
+    if (this.currentChatId === null || !this.currentSessionId) {
       this.createNewChat();
     }
 
@@ -211,26 +224,82 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
       timestamp: new Date()
     };
     this.chatMessages.push(userMessage);
-    const currentInput = this.chatInput;
+    const currentInput = this.chatInput.trim();
     this.chatInput = '';
     this.isTyping = true;
 
     // Update chat history preview
     this.updateChatPreview(currentInput);
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const assistantMessage: ChatMessage = {
+    // Call the API
+    try {
+      this.chatService.sendMessage(currentInput, this.currentSessionId).subscribe({
+        next: (response) => {
+          // Update session ID from response (in case it changed)
+          if (response.session_id) {
+            this.currentSessionId = response.session_id;
+            // Update session ID in chat history
+            if (this.currentChatId) {
+              const chat = this.chatHistory.find(c => c.id === this.currentChatId);
+              if (chat) {
+                chat.sessionId = response.session_id;
+              }
+            }
+          }
+
+          // Add assistant response
+          const assistantMessage: ChatMessage = {
+            id: Date.now() + 1,
+            role: 'assistant',
+            content: response.message || 'No response received.',
+            timestamp: new Date()
+          };
+          this.chatMessages.push(assistantMessage);
+          this.isTyping = false;
+          this.scrollToBottom();
+          this.updateChatPreview(assistantMessage.content);
+
+          // Handle follow-up question if needed
+          if (response.needs_followup && response.followup_question) {
+            // Optionally show follow-up question or handle it
+            console.log('Follow-up question:', response.followup_question);
+          }
+        },
+        error: (error) => {
+          console.error('Error sending message:', error);
+          this.isTyping = false;
+          
+          // Show error message to user
+          let errorContent = 'Sorry, I encountered an error processing your request. Please try again.';
+          if (error.error?.message) {
+            errorContent = error.error.message;
+          } else if (error.message) {
+            errorContent = error.message;
+          }
+          
+          const errorMessage: ChatMessage = {
+            id: Date.now() + 1,
+            role: 'assistant',
+            content: errorContent,
+            timestamp: new Date()
+          };
+          this.chatMessages.push(errorMessage);
+          this.scrollToBottom();
+        }
+      });
+    } catch (error: any) {
+      console.error('Error initializing chat request:', error);
+      this.isTyping = false;
+      
+      const errorMessage: ChatMessage = {
         id: Date.now() + 1,
         role: 'assistant',
-        content: this.generateResponse(currentInput, this.selectedMode),
+        content: error.message || 'Unable to send message. Please ensure you are logged in and try again.',
         timestamp: new Date()
       };
-      this.chatMessages.push(assistantMessage);
-      this.isTyping = false;
+      this.chatMessages.push(errorMessage);
       this.scrollToBottom();
-      this.updateChatPreview(assistantMessage.content);
-    }, 1000);
+    }
   }
 
   updateChatPreview(content: string): void {

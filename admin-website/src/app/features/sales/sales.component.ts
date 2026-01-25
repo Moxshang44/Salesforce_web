@@ -54,6 +54,11 @@ export class SalesComponent implements OnInit {
   allocatedAmount: number = 0;
   remainingAmount: number = 0;
 
+  // Popup state for percentage adjustment
+  popupOpenFor: string | null = null;
+  tempPercentage: number = 0;
+  isLocked: boolean = false;
+
   // Default monthly targets template
   getDefaultMonthlyTargets(annualTarget: number): MonthlyTarget[] {
     const months = [
@@ -472,6 +477,44 @@ export class SalesComponent implements OnInit {
     console.log('Saving targets for:', this.selectedManager?.name);
     console.log('Monthly targets:', this.selectedManager?.monthlyTargets);
     this.closeSidebar();
+  }
+
+  // Popup methods for percentage adjustment
+  openPercentagePopup(manager: SalesManager, event: Event): void {
+    event.stopPropagation();
+    this.popupOpenFor = manager.id;
+    this.tempPercentage = manager.percentage;
+    this.isLocked = false;
+  }
+
+  closePercentagePopup(): void {
+    this.popupOpenFor = null;
+    this.tempPercentage = 0;
+    this.isLocked = false;
+  }
+
+  applyPercentage(): void {
+    if (this.popupOpenFor) {
+      const manager = this.currentManagers.find(m => m.id === this.popupOpenFor);
+      if (manager) {
+        manager.percentage = this.tempPercentage;
+        // Recalculate target amount based on percentage
+        const totalTarget = this.currentManagers.reduce((sum, m) => {
+          if (m.id === this.popupOpenFor) {
+            return sum;
+          }
+          return sum + m.targetAmount;
+        }, 0);
+        manager.targetAmount = (this.totalSalesTargetNumber * manager.percentage) / 100;
+        // Recalculate other managers' percentages if not locked
+        this.recalculatePercentages();
+      }
+    }
+    this.closePercentagePopup();
+  }
+
+  toggleLock(): void {
+    this.isLocked = !this.isLocked;
   }
 }
 

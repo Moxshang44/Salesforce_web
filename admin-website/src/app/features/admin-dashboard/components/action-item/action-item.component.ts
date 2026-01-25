@@ -26,8 +26,8 @@ export class ActionItemComponent {
   }
 
   get isButtonRed(): boolean {
-    return this.action.actionLabel === 'Extend' || 
-           this.action.actionLabel === 'Order New';
+    return this.action.actionLabel === 'Extend?' || 
+           this.action.actionLabel === 'Order Now';
   }
 
   onActionClick() {

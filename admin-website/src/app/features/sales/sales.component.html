@@ -9,22 +9,6 @@
 
     <!-- Page Content -->
     <div class="page-content">
-      <!-- Breadcrumbs -->
-      <div class="breadcrumbs">
-        @for (crumb of breadcrumbs; track crumb.label; let i = $index; let last = $last) {
-          <span 
-            class="breadcrumb-item" 
-            [class.active]="last"
-            (click)="!last && navigateToBreadcrumb(i)"
-          >
-            {{ crumb.label }}@if (crumb.role !== 'Company') {<span class="role-tag">({{ crumb.role }})</span>}
-          </span>
-          @if (!last) {
-            <span class="separator">/</span>
-          }
-        }
-      </div>
-
       <!-- Set Sales Targets Section -->
       <section class="sales-targets-section">
         <div class="section-header">
@@ -56,7 +40,7 @@
       </section>
 
       <!-- Company Allocation Section -->
-      <section class="allocation-section">
+      <section class="allocation-section" (click)="closePercentagePopup()">
         <h2 class="allocation-title">{{ getAllocationTitle() }}</h2>
         
         <div class="allocation-grid">
@@ -89,12 +73,48 @@
                     ></div>
                   </div>
                   <div class="progress-info">
-                    <button class="edit-btn" title="Edit target" (click)="openSidebar(manager, $event)">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
+                    <div class="edit-btn-wrapper">
+                      <button class="edit-btn" title="Edit percentage" (click)="openPercentagePopup(manager, $event)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <!-- Percentage Adjustment Popup -->
+                      @if (popupOpenFor === manager.id) {
+                        <div class="percentage-popup" (click)="$event.stopPropagation()">
+                          <div class="popup-header">
+                            <span class="popup-title">Adjust Weight</span>
+                            <span class="popup-percentage">{{ tempPercentage }}%</span>
+                          </div>
+                          <div class="popup-slider-container">
+                            <input 
+                              type="range" 
+                              class="percentage-slider"
+                              [value]="tempPercentage"
+                              (input)="tempPercentage = +$any($event.target).value"
+                              [style.--value]="tempPercentage + '%'"
+                              min="0"
+                              max="100"
+                              step="1"
+                            />
+                          </div>
+                          <div class="popup-footer">
+                            <button class="lock-btn" (click)="toggleLock()" [class.locked]="isLocked">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                @if (isLocked) {
+                                  <path d="M6 10V8a6 6 0 1112 0v2M6 10H4a2 2 0 00-2 2v8a2 2 0 002 2h16a2 2 0 002-2v-8a2 2 0 00-2-2h-2M6 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                } @else {
+                                  <path d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2zM7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                }
+                              </svg>
+                              Lock
+                            </button>
+                            <button class="apply-btn" (click)="applyPercentage()">Apply</button>
+                          </div>
+                        </div>
+                      }
+                    </div>
                     <span class="percentage">{{ manager.percentage }}%</span>
                   </div>
                 </div>

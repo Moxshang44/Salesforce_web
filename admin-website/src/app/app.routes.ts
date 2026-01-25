@@ -128,8 +128,13 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'admin/sales',
+    path: 'admin/targets',
     loadComponent: () => import('./features/sales/sales.component').then(m => m.SalesComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin/sales-insights',
+    loadComponent: () => import('./features/sales-insights/sales-insights.component').then(m => m.SalesInsightsComponent),
     canActivate: [authGuard]
   },
   {

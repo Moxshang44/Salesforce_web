@@ -136,9 +136,6 @@ export class CompaniesComponent implements OnInit {
 
   newPermission: string = '';
 
-  private readonly API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1/companies';
-  private readonly USERS_API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1/users';
-
   constructor(
     private http: HttpClient,
     private authService: AuthService,
@@ -160,7 +157,7 @@ export class CompaniesComponent implements OnInit {
     this.isLoading = true;
     this.listErrorMessage = '';
 
-    this.http.get<Company[]>(this.API_URL).subscribe({
+    this.http.get<Company[]>(this.apiService.getApiUrl('companies')).subscribe({
       next: (response: any) => {
         this.isLoading = false;
         // Handle different response formats
@@ -464,9 +461,9 @@ export class CompaniesComponent implements OnInit {
     };
 
     console.log('Sending payload:', payload);
-    console.log('API URL:', this.API_URL);
+    console.log('API URL:', this.apiService.getApiUrl('companies'));
 
-    this.http.post(this.API_URL, payload, { headers }).subscribe({
+    this.http.post(this.apiService.getApiUrl('companies'), payload, { headers }).subscribe({
       next: (response: any) => {
         console.log('Success response:', response);
         this.isSubmitting = false;
@@ -523,7 +520,7 @@ export class CompaniesComponent implements OnInit {
     this.isLoadingEdit = true;
 
     // Fetch full company details to ensure all fields are available
-    const viewUrl = `${this.API_URL}/${company.id}`;
+    const viewUrl = `${this.apiService.getApiUrl('companies')}/${company.id}`;
 
     console.log('Fetching company details for edit:', company.name);
     console.log('View URL:', viewUrl);
@@ -612,7 +609,7 @@ export class CompaniesComponent implements OnInit {
       is_active: this.companyForm.is_active === true
     };
 
-    const updateUrl = `${this.API_URL}/${this.editingCompany.id}`;
+    const updateUrl = `${this.apiService.getApiUrl('companies')}/${this.editingCompany.id}`;
 
     console.log('Sending update payload:', payload);
     console.log('Update URL:', updateUrl);
@@ -670,7 +667,7 @@ export class CompaniesComponent implements OnInit {
     this.isViewModalOpen = true;
     this.isLoadingView = true;
 
-    const viewUrl = `${this.API_URL}/${company.id}`;
+    const viewUrl = `${this.apiService.getApiUrl('companies')}/${company.id}`;
 
     console.log('Fetching company details:', company.name);
     console.log('View URL:', viewUrl);
@@ -724,7 +721,7 @@ export class CompaniesComponent implements OnInit {
       }
 
       this.isDeleting = true;
-      const deleteUrl = `${this.API_URL}/${company.id}`;
+      const deleteUrl = `${this.apiService.getApiUrl('companies')}/${company.id}`;
 
       console.log('Deleting company:', company.name);
       console.log('Delete URL:', deleteUrl);
@@ -866,9 +863,9 @@ export class CompaniesComponent implements OnInit {
     };
 
     console.log('Sending assign admin payload:', payload);
-    console.log('Users API URL:', this.USERS_API_URL);
+    console.log('Users API URL:', this.apiService.getApiUrl('users'));
 
-    this.http.post(this.USERS_API_URL, payload, { headers }).subscribe({
+    this.http.post(this.apiService.getApiUrl('users'), payload, { headers }).subscribe({
       next: (response: any) => {
         console.log('Success response:', response);
         this.isAssigning = false;

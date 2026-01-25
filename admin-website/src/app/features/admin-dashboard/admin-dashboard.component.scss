@@ -6,13 +6,19 @@
   background: #F5F5F5;
 }
 
-// Light beige background as per snapshot
 .dashboard-content {
   flex: 1;
   margin-top: 56px;
-  padding: 20px 24px 24px;
+  padding: 24px;
   background: #FFF9F3;
   min-height: calc(100vh - 56px);
+}
+
+.dashboard-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 24px 0;
 }
 
 .main-content {
@@ -23,394 +29,61 @@
   transition: margin-left 0.3s ease;
 }
 
-
-// Page Header
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-.date-filters {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.period-btn {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #333;
-
-  &:hover {
-    background: #f5f5f5;
-  }
-
-  &.active {
-    background: #664423;
-    color: white;
-    border-color: #664423;
-  }
-}
-
-.date-select-btn {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #333;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #f5f5f5;
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-// Top Section: ZSM Profile and KPIs
-.top-section {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-// ZSM Profile Card
-.zsm-profile-card {
-  background: #8B4513;
-  border-radius: 12px;
-  padding: 16px 20px;
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.zsm-title {
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 6px;
-  opacity: 0.9;
-}
-
-.zsm-name {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.zsm-stats {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.zsm-stat-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.stat-number {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.stat-label {
-  font-size: 11px;
-  opacity: 0.9;
-}
-
-// KPI Section
-.kpi-section {
+// Stats Cards Section
+.stats-section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
-.kpi-card {
-  background: #FFF9F3;
-  border-radius: 12px;
-  padding: 12px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.kpi-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.kpi-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1a1a1a;
-}
-
-// Middle Section: RSM Performance and Category Chart
-.middle-section {
+// Main Grid: Chart and Actions
+.main-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
+  grid-template-columns: 0.8fr 1.7fr;
+  gap: 24px;
+  align-items: start;
 }
 
-// Card Styles
-.rsm-performance-card,
-.category-chart-card,
-.product-sales-card,
-.product-mix-card {
-  background: white;
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+.chart-section {
+  width: 100%;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
+.actions-section {
+  background: #ffffff;
+  border: 1px solid #e8e5e1;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xl);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.card-title {
-  font-size: 16px;
+.actions-header {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.actions-title {
+  font-size: 18px;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
 }
 
-.card-filters {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.filter-select {
-  padding: 6px 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
-  background: white;
-  cursor: pointer;
-  min-width: 110px;
-  color: #333;
-}
-
-.search-input {
-  padding: 6px 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 13px;
-  min-width: 160px;
-  color: #333;
-
-  &::placeholder {
-    color: #999;
-  }
-}
-
-.excel-btn {
-  padding: 6px 14px;
-  border: 1px solid #664423;
-  border-radius: 6px;
-  background: white;
-  color: #664423;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #664423;
-    color: white;
-  }
-}
-
-// Chart Tabs
-.chart-tabs {
-  display: flex;
-  gap: 6px;
-}
-
-.tab-btn {
-  padding: 5px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: white;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #333;
-
-  &:hover {
-    background: #f5f5f5;
-  }
-
-  &.active {
-    background: #664423;
-    color: white;
-    border-color: #664423;
-  }
-}
-
-// Table Styles
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.rsm-table,
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-
-  thead {
-    background: #f8f9fa;
-  }
-
-  th {
-    padding: 10px 8px;
-    text-align: left;
-    font-weight: 600;
-    color: #333;
-    border-bottom: 2px solid #e0e0e0;
-    font-size: 12px;
-  }
-
-  td {
-    padding: 10px 8px;
-    border-bottom: 1px solid #e0e0e0;
-    color: #333;
-  }
-
-  tbody tr {
-    &:hover {
-      background: #f8f9fa;
-    }
-  }
-
-  .positive {
-    color: #16a34a;
-    font-weight: 600;
-  }
-
-  .negative {
-    color: #de3b40;
-    font-weight: 600;
-  }
-}
-
-// Chart Container
-.chart-container {
+.actions-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-
-.donut-chart {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.chart-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.legend-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-
-.legend-label {
-  font-size: 12px;
-  color: #333;
-}
-
-.chart-label {
-  font-size: 11px;
-  color: #666;
-  text-align: center;
-  margin-top: 6px;
-}
-
-// Bottom Section
-.bottom-section {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-// Footer
-.dashboard-footer {
-  text-align: center;
-  padding: 16px 0;
-  border-top: 1px solid #e0e0e0;
-  margin-top: 20px;
-}
-
-.footer-text {
-  font-size: 12px;
-  color: #666;
-  margin: 0;
+  gap: var(--spacing-md);
 }
 
 // Responsive Design
 @media (max-width: $breakpoint-desktop) {
-  .top-section {
-    grid-template-columns: 1fr;
-  }
-
-  .middle-section,
-  .bottom-section {
-    grid-template-columns: 1fr;
-  }
-
-  .kpi-section {
+  .stats-section {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .main-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -419,23 +92,7 @@
     padding: 16px;
   }
 
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .kpi-section {
+  .stats-section {
     grid-template-columns: 1fr;
-  }
-
-  .card-filters {
-    flex-direction: column;
-    width: 100%;
-
-    .filter-select,
-    .search-input {
-      width: 100%;
-    }
   }
 }

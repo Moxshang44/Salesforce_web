@@ -58,7 +58,8 @@ export class SidebarComponent implements OnInit {
     { label: 'Assign Task', route: '/admin/tasks', iconImage: 'assets/images/assigntask.png' },
     { label: 'AI chat bot', route: '/admin/ai-chat', iconImage: 'assets/images/aichatbot.png' },
     { label: 'Assets', route: '/admin/assets', iconImage: 'assets/images/assets.png' },
-    { label: 'Sales', route: '/admin/sales', iconImage: 'assets/images/finance.png' },
+    { label: 'Targets', route: '/admin/targets', iconImage: 'assets/images/finance.png' },
+    { label: 'Sales Insights', route: '/admin/sales-insights', iconImage: 'assets/images/dashboard.png' },
     { label: 'Live View', route: '/admin/live-view', iconImage: 'assets/images/dashboard.png' },
     { label: 'Settings', route: '/admin/settings', iconImage: 'assets/images/settings.png' },
   ];
