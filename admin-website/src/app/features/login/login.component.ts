@@ -193,35 +193,33 @@ export class LoginComponent implements OnDestroy {
         console.log('OTP verification response:', response);
         
         // Check if OTP verification was successful
-        // The API might return different response formats, adjust based on actual response
         if (response.status_code === 200 || response.status_code === 1 || response.success || response.data) {
           // OTP verified successfully
           
-          // Store token and company info from response
+          // Store temporary token from verify-otp
+          let tempToken = null;
           if (response.data) {
             if (response.data.token) {
+              tempToken = response.data.token;
               this.authService.setAuthToken(response.data.token);
             }
             if (response.data.companies && Array.isArray(response.data.companies) && response.data.companies.length > 0) {
               this.authService.setCompanyInfo(response.data.companies);
-            }
-          }
-          
-          // Now login using auth service
-          const loginResult = this.authService.loginWithOtp(this.mobileNumber, this.otp);
-          
-          if (loginResult.success) {
-            // Route based on mobile number (admin or DMS)
-            // You might want to check the API response to determine if it's DMS or Admin
-            // For now, using the mobile number logic
-            if (loginResult.isDms) {
-              this.router.navigate(['/dms/dashboard']);
+              
+              // Get the first company_id to authenticate with
+              const firstCompanyId = response.data.companies[0].company_id;
+              
+              // Now call auth-user-to-company API
+              if (tempToken && firstCompanyId) {
+                this.authenticateUserToCompany(tempToken, firstCompanyId);
+              } else {
+                this.errorMessage = 'Missing token or company information. Please try again.';
+              }
             } else {
-              this.router.navigate(['/admin/dashboard']);
+              this.errorMessage = 'No companies found. Please contact administrator.';
             }
           } else {
-            this.errorMessage = 'Login failed. Please try again.';
-            this.otp = '';
+            this.errorMessage = 'Invalid response format. Please try again.';
           }
         } else {
           this.errorMessage = response.message || 'Invalid OTP. Please try again.';
@@ -294,6 +292,79 @@ export class LoginComponent implements OnDestroy {
         this.onSendOtp();
       }
     }
+  }
+
+  authenticateUserToCompany(tempToken: string, companyId: string): void {
+    const authUrl = this.apiService.getApiUrl('auth/auth-user-to-company');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${tempToken}`
+    });
+
+    const payload = {
+      company_id: companyId
+    };
+
+    this.http.post<any>(authUrl, payload, { headers }).subscribe({
+      next: (authResponse: any) => {
+        console.log('Auth user to company response:', authResponse);
+        
+        // Since HTTP 200 means success, process the response if it has data
+        // Accept any status_code (1, 200, or undefined) as long as we have data
+        if (authResponse.data) {
+          // Store user_id and access_token
+          if (authResponse.data.user) {
+            this.authService.setUserInfo(authResponse.data.user);
+          }
+          
+          if (authResponse.data.access_token) {
+            this.authService.setAccessToken(authResponse.data.access_token);
+            // Update the main auth token with access_token
+            this.authService.setAuthToken(authResponse.data.access_token);
+          }
+          
+          // Now login using auth service
+          const loginResult = this.authService.loginWithOtp(this.mobileNumber, this.otp);
+          
+          if (loginResult.success) {
+            // Route based on mobile number (admin or DMS)
+            if (loginResult.isDms) {
+              this.router.navigate(['/dms/dashboard']);
+            } else {
+              this.router.navigate(['/admin/dashboard']);
+            }
+          } else {
+            this.errorMessage = 'Login failed. Please try again.';
+            this.otp = '';
+          }
+        } else {
+          // Log the actual response for debugging
+          console.error('Unexpected response structure - no data field:', authResponse);
+          this.errorMessage = authResponse.message || 'Authentication failed. Invalid response format.';
+          this.otp = '';
+        }
+      },
+      error: (error: any) => {
+        console.error('Error authenticating user to company:', error);
+        this.isSubmitting = false;
+        
+        if (error.error) {
+          if (error.error.message) {
+            this.errorMessage = error.error.message;
+          } else if (typeof error.error === 'string') {
+            this.errorMessage = error.error;
+          } else {
+            this.errorMessage = 'Failed to authenticate. Please try again.';
+          }
+        } else if (error.message) {
+          this.errorMessage = error.message;
+        } else {
+          this.errorMessage = 'Failed to authenticate. Please check your connection and try again.';
+        }
+        
+        this.otp = '';
+      }
+    });
   }
 
   ngOnDestroy(): void {
