@@ -47,25 +47,16 @@
       <div class="top-section">
         <!-- ZSM Profile Card -->
         <div class="zsm-profile-card">
-          <div class="zsm-title">Zonal Sales Manager: {{ zsmZone }}</div>
           <div class="zsm-name">{{ zsmName }}</div>
+          <div class="zsm-title">Zonal Sales Manager: {{ zsmZone }}</div>
           <div class="zsm-stats">
-            <div class="zsm-stat-item">
-              <span class="stat-number">{{ zsmStats.regions }}</span>
-              <span class="stat-label">Regions</span>
-            </div>
-            <div class="zsm-stat-item">
-              <span class="stat-number">{{ zsmStats.areas }}</span>
-              <span class="stat-label">Areas</span>
-            </div>
-            <div class="zsm-stat-item">
-              <span class="stat-number">{{ zsmStats.distributors }}</span>
-              <span class="stat-label">Distributors</span>
-            </div>
-            <div class="zsm-stat-item">
-              <span class="stat-number">{{ zsmStats.retailers }}</span>
-              <span class="stat-label">Retailers</span>
-            </div>
+            <span class="stat-item">{{ zsmStats.regions }} Regions</span>
+            <span class="stat-separator">|</span>
+            <span class="stat-item">{{ zsmStats.areas }} Areas</span>
+            <span class="stat-separator">|</span>
+            <span class="stat-item">{{ zsmStats.distributors }} Distributors</span>
+            <span class="stat-separator">|</span>
+            <span class="stat-item">{{ zsmStats.retailers }} Retailers</span>
           </div>
         </div>
 
@@ -74,7 +65,15 @@
           @for (kpi of kpis; track $index) {
             <div class="kpi-card">
               <div class="kpi-label">{{ kpi.label }}</div>
-              <div class="kpi-value">{{ kpi.value }}</div>
+              <div class="kpi-value-row">
+                <div class="kpi-value">{{ kpi.value }}</div>
+                @if (kpi.trend) {
+                  <div class="kpi-trend" [class.positive]="kpi.trend.isPositive" [class.negative]="!kpi.trend.isPositive">
+                    <span class="trend-arrow">{{ kpi.trend.isPositive ? '↑' : '↓' }}</span>
+                    <span class="trend-value">{{ kpi.trend.value }}</span>
+                  </div>
+                }
+              </div>
             </div>
           }
         </div>
@@ -106,7 +105,7 @@
                 <tr>
                   <th>RSM</th>
                   <th>Region</th>
-                  <th>Sales (₹)</th>
+                  <th>Sales</th>
                   <th>TC</th>
                   <th>PC</th>
                   <th>Avg Sales</th>
@@ -114,7 +113,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (rsm of rsmData; track rsm.name) {
+                @for (rsm of displayedRSMData; track rsm.name) {
                   <tr>
                     <td>{{ rsm.name }}</td>
                     <td>{{ rsm.region }}</td>
@@ -136,6 +135,8 @@
         <div class="category-chart-card">
           <div class="card-header">
             <h2 class="card-title">Category-wise Sales</h2>
+          </div>
+          <div class="chart-tabs-row">
             <div class="chart-tabs">
               <button 
                 class="tab-btn" 
@@ -215,12 +216,12 @@
                   <th>Category</th>
                   <th>Product</th>
                   <th>Total Qty</th>
-                  <th>Total Sales (₹)</th>
+                  <th>Total Sales</th>
                   <th>Contribution %</th>
                 </tr>
               </thead>
               <tbody>
-                @for (product of productData; track product.product) {
+                @for (product of displayedProductData; track product.product) {
                   <tr>
                     <td>{{ product.brand }}</td>
                     <td>{{ product.category }}</td>
@@ -265,15 +266,11 @@
                 </div>
               }
             </div>
-            <div class="chart-label">Top 8 SKUs + Others</div>
           </div>
+          <div class="chart-label">Top 8 SKUs + Others</div>
         </div>
       </div>
 
-      <!-- Footer -->
-      <div class="dashboard-footer">
-        <p class="footer-text">Copyright © 2025. All rights reserved | Version: 1.0</p>
-      </div>
     </div>
   </div>
 </div>

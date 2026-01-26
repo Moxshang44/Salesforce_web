@@ -28,6 +28,8 @@ interface Retailer {
 export class RetailersComponent {
   currentPage = 1;
   totalPages = 2;
+  totalCount = 15;
+  recordsPerPage = 9;
   isAddModalOpen = false;
   currentStep = 1;
   pendingApprovalsCount = 5;
@@ -242,5 +244,14 @@ export class RetailersComponent {
 
   isPhoneNumber(text: string): boolean {
     return text.includes('+91') || /^\d/.test(text.trim());
+  }
+
+  getStartEntry(): number {
+    if (this.totalCount === 0) return 0;
+    return (this.currentPage - 1) * this.recordsPerPage + 1;
+  }
+
+  getEndEntry(): number {
+    return Math.min(this.currentPage * this.recordsPerPage, this.totalCount);
   }
 }

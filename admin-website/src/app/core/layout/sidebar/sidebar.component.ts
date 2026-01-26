@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -26,11 +26,15 @@ interface NavItem {
   styleUrl: './sidebar.component.scss'
 })
 
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('sidebarElement', { static: false }) sidebarElement!: ElementRef;
+  
   companyName = 'Company Name';
 
   currentRoute = '';
   isCollapsed = false;
+  showProductMasterPopup = false;
+  popupPosition = { top: 0, left: 0 };
   
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/admin/dashboard', iconImage: 'assets/images/dashboard.png' },
@@ -59,14 +63,15 @@ export class SidebarComponent implements OnInit {
     { label: 'AI chat bot', route: '/admin/ai-chat', iconImage: 'assets/images/aichatbot.png' },
     { label: 'Assets', route: '/admin/assets', iconImage: 'assets/images/assets.png' },
     { label: 'Targets', route: '/admin/targets', iconImage: 'assets/images/finance.png' },
-    { label: 'Sales Insights', route: '/admin/sales-insights', iconImage: 'assets/images/dashboard.png' },
-    { label: 'Live View', route: '/admin/live-view', iconImage: 'assets/images/dashboard.png' },
+    { label: 'Sales Insights', route: '/admin/sales-insights', iconImage: 'assets/images/sales-insights.svg' },
+    { label: 'Live View', route: '/admin/live-view', iconImage: 'assets/images/live-view.svg' },
     { label: 'Settings', route: '/admin/settings', iconImage: 'assets/images/settings.png' },
   ];
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private elementRef: ElementRef
   ) {
     this.currentRoute = this.router.url;
     // Initialize CSS variable
@@ -91,6 +96,10 @@ export class SidebarComponent implements OnInit {
     this.companyName = this.authService.getCompanyName();
   }
 
+  ngAfterViewInit(): void {
+    // ViewChild is now available
+  }
+
   isParentRouteActive(item: NavItem): boolean {
     if (!item.route || !item.subItems) return false;
     
@@ -99,10 +108,45 @@ export class SidebarComponent implements OnInit {
            item.subItems.some(subItem => this.currentRoute === subItem.route || this.currentRoute.startsWith(subItem.route + '/'));
   }
 
-  toggleSubMenu(item: NavItem): void {
-    if (item.subItems && !this.isCollapsed) {
-      item.isExpanded = !item.isExpanded;
+  toggleSubMenu(item: NavItem, event?: MouseEvent): void {
+    if (item.subItems) {
+      if (this.isCollapsed) {
+        // When collapsed, show popup for Product Master
+        if (item.label === 'Product Master') {
+          this.openProductMasterPopup(item, event);
+        }
+      } else {
+        item.isExpanded = !item.isExpanded;
+      }
     }
+  }
+
+  openProductMasterPopup(item: NavItem, event?: MouseEvent): void {
+    if (!item.subItems) return;
+    
+    // Find the clicked element to position the popup
+    if (event) {
+      const target = event.target as HTMLElement;
+      const navItem = target?.closest('.nav-item') as HTMLElement;
+      
+      if (navItem) {
+        const rect = navItem.getBoundingClientRect();
+        this.popupPosition = {
+          top: rect.bottom + 5,
+          left: rect.left + rect.width + 5
+        };
+        this.showProductMasterPopup = true;
+      }
+    }
+  }
+
+  closeProductMasterPopup(): void {
+    this.showProductMasterPopup = false;
+  }
+
+  navigateToSubItem(subItem: SubMenuItem): void {
+    this.router.navigate([subItem.route]);
+    this.closeProductMasterPopup();
   }
 
   toggleSidebar(): void {
@@ -117,6 +161,42 @@ export class SidebarComponent implements OnInit {
     }
     // Update CSS variable for main content margin
     document.documentElement.style.setProperty('--sidebar-width', this.isCollapsed ? '70px' : '220px');
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Get the sidebar element
+    const sidebarEl = this.sidebarElement?.nativeElement || 
+                     this.elementRef.nativeElement.querySelector('.sidebar') ||
+                     this.elementRef.nativeElement;
+    
+    // Check if click is on popup
+    const popup = document.querySelector('.product-master-popup');
+    const clickedOnPopup = popup && popup.contains(event.target as Node);
+    
+    if (sidebarEl && !sidebarEl.contains(event.target as Node) && !clickedOnPopup) {
+      // Close popup if open
+      if (this.showProductMasterPopup) {
+        this.closeProductMasterPopup();
+      }
+      
+      // Click is outside the sidebar, collapse it if it's not already collapsed
+      if (!this.isCollapsed) {
+        this.isCollapsed = true;
+        // Close all sub-menus when collapsing
+        this.navItems.forEach(item => {
+          if (item.subItems) {
+            item.isExpanded = false;
+          }
+        });
+        // Update CSS variable for main content margin
+        document.documentElement.style.setProperty('--sidebar-width', '70px');
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup if needed
   }
 }
 

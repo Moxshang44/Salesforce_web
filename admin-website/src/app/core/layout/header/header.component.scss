@@ -116,8 +116,19 @@
   }
 
   &.disabled {
-    opacity: 0.5;
     cursor: not-allowed;
+    background: #F5F5F5;
+    border-color: #e0e0e0;
+    
+    .ai-icon {
+      opacity: 1;
+      filter: none;
+    }
+    
+    span {
+      opacity: 1;
+      color: #666666;
+    }
   }
 }
 

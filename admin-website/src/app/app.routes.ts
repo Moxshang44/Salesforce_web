@@ -89,7 +89,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/super-stockist',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/coming-soon/coming-soon.component').then(m => m.ComingSoonComponent),
     canActivate: [authGuard]
   },
   {
@@ -99,12 +99,12 @@ export const routes: Routes = [
   },
   {
     path: 'admin/finance',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/coming-soon/coming-soon.component').then(m => m.ComingSoonComponent),
     canActivate: [authGuard]
   },
   {
     path: 'admin/marketing',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/coming-soon/coming-soon.component').then(m => m.ComingSoonComponent),
     canActivate: [authGuard]
   },
   {
@@ -124,7 +124,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/assets',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/coming-soon/coming-soon.component').then(m => m.ComingSoonComponent),
     canActivate: [authGuard]
   },
   {
@@ -169,7 +169,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/settings',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/coming-soon/coming-soon.component').then(m => m.ComingSoonComponent),
     canActivate: [authGuard]
   },
   {

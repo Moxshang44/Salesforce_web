@@ -46,6 +46,16 @@
     .sub-menu {
       display: none;
     }
+
+    .nav-item {
+      position: relative;
+
+      &:hover .nav-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+      }
+    }
   }
 }
 
@@ -287,5 +297,123 @@
 
 .sidebar::-webkit-scrollbar-thumb:hover {
   background: rgba(102, 68, 35, 0.3);
+}
+
+// Tooltip for collapsed sidebar
+.nav-tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-10px);
+  background: #664423;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  // Arrow pointing to the icon
+  &::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: #664423;
+  }
+}
+
+// Product Master Popup (when sidebar is collapsed)
+.product-master-popup {
+  position: fixed;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 200px;
+  overflow: hidden;
+  animation: popupFadeIn 0.2s ease-out;
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #664423;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popup-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.popup-item {
+  display: block;
+  padding: 10px 16px;
+  color: #4a3a2a;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(102, 68, 35, 0.08);
+    color: #664423;
+  }
+
+  &.active {
+    background: rgba(102, 68, 35, 0.15);
+    color: #664423;
+    font-weight: 600;
+  }
 }
 

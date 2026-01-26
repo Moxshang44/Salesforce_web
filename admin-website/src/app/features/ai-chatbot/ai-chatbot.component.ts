@@ -10,6 +10,7 @@ interface ChatMessage {
   id: number;
   role: 'user' | 'assistant';
   content: string;
+  formattedContent?: SafeHtml;
   timestamp: Date;
 }
 
@@ -102,11 +103,13 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
 
   initializeChatbot(): void {
     // Add welcome message
+    const welcomeContent = 'Hello! I\'m your AI assistant. How can I help you with your admin tasks, product management, routes, distributors, employees, or any questions about the admin system?';
     this.chatMessages = [
       {
         id: 1,
         role: 'assistant',
-        content: 'Hello! I\'m your AI assistant. How can I help you with your admin tasks, product management, routes, distributors, employees, or any questions about the admin system?',
+        content: welcomeContent,
+        formattedContent: this.formatMessageContent(welcomeContent),
         timestamp: new Date()
       }
     ];
@@ -247,11 +250,13 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
             }
           }
 
-          // Add assistant response
+          // Format and add assistant response
+          const responseContent = response.message || 'No response received.';
           const assistantMessage: ChatMessage = {
             id: Date.now() + 1,
             role: 'assistant',
-            content: response.message || 'No response received.',
+            content: responseContent,
+            formattedContent: this.formatMessageContent(responseContent),
             timestamp: new Date()
           };
           this.chatMessages.push(assistantMessage);
@@ -281,6 +286,7 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
             id: Date.now() + 1,
             role: 'assistant',
             content: errorContent,
+            formattedContent: this.formatMessageContent(errorContent),
             timestamp: new Date()
           };
           this.chatMessages.push(errorMessage);
@@ -291,15 +297,320 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
       console.error('Error initializing chat request:', error);
       this.isTyping = false;
       
+      const errorContent = error.message || 'Unable to send message. Please ensure you are logged in and try again.';
       const errorMessage: ChatMessage = {
         id: Date.now() + 1,
         role: 'assistant',
-        content: error.message || 'Unable to send message. Please ensure you are logged in and try again.',
+        content: errorContent,
+        formattedContent: this.formatMessageContent(errorContent),
         timestamp: new Date()
       };
       this.chatMessages.push(errorMessage);
       this.scrollToBottom();
     }
+  }
+
+  // Format message content to detect and render tables
+  formatMessageContent(content: string): SafeHtml {
+    // Check if content already contains HTML table tags
+    if (content.includes('<table') || content.includes('<TABLE') || content.includes('<Table')) {
+      // Wrap existing HTML table with our styling wrapper
+      let wrapped = content;
+      
+      // Remove rows that contain only dashes, dots, or separator characters
+      wrapped = wrapped.replace(
+        /<tr[^>]*>[\s\S]*?<\/tr>/gi,
+        (match) => {
+          // Check if all cells in this row contain only dashes, dots, or separators
+          const cellContent = match.replace(/<[^>]+>/g, '').trim();
+          if (cellContent.match(/^[\s\-\.:]+$/)) {
+            return ''; // Remove separator rows
+          }
+          return match;
+        }
+      );
+      
+      // Wrap each table with our wrapper
+      wrapped = wrapped.replace(
+        /<table([^>]*)>/gi, 
+        '<div class="chat-table-wrapper"><table class="chat-table"$1>'
+      );
+      wrapped = wrapped.replace(
+        /<\/table>/gi,
+        '</table></div>'
+      );
+      
+      // Also ensure proper styling for existing tables
+      wrapped = wrapped.replace(
+        /<th([^>]*)>/gi,
+        '<th class="chat-table-header"$1>'
+      );
+      
+      // Preserve line breaks for non-table content
+      wrapped = wrapped.replace(/\n/g, '<br>');
+      
+      return this.sanitizer.bypassSecurityTrustHtml(wrapped);
+    }
+    
+    // Check if content contains table-like structures
+    // Pattern 1: Markdown table (| separated with --- separator)
+    if (content.includes('|') && (content.includes('---') || content.includes('|--'))) {
+      return this.sanitizer.bypassSecurityTrustHtml(this.formatMarkdownTable(content));
+    }
+    
+    // Pattern 2: Pipe-separated table without markdown
+    if (content.includes('|') && this.looksLikeTable(content)) {
+      return this.sanitizer.bypassSecurityTrustHtml(this.formatPipeTable(content));
+    }
+    
+    // Pattern 3: Line-separated data that could be a table
+    if (this.looksLikeDataTable(content)) {
+      return this.sanitizer.bypassSecurityTrustHtml(this.formatDataTable(content));
+    }
+    
+    // Default: return as plain text with line breaks preserved
+    const formatted = content
+      .replace(/\n/g, '<br>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+    return this.sanitizer.bypassSecurityTrustHtml(formatted);
+  }
+
+  looksLikeTable(content: string): boolean {
+    const lines = content.split('\n').filter(line => line.trim());
+    if (lines.length < 2) return false;
+    
+    // Check if multiple lines contain pipes
+    const linesWithPipes = lines.filter(line => {
+      const trimmed = line.trim();
+      if (!trimmed.includes('|')) return false;
+      const cells = trimmed.split('|').filter(c => c.trim());
+      return cells.length >= 2; // At least 2 columns
+    });
+    
+    // Need at least 2 rows with pipes to be considered a table
+    if (linesWithPipes.length >= 2) {
+      // Check if columns are consistent (similar number of cells)
+      const firstRowCells = linesWithPipes[0].split('|').filter(c => c.trim()).length;
+      const consistentRows = linesWithPipes.filter(line => {
+        const cellCount = line.split('|').filter(c => c.trim()).length;
+        return Math.abs(cellCount - firstRowCells) <= 1; // Allow 1 column difference
+      });
+      return consistentRows.length >= 2;
+    }
+    
+    return false;
+  }
+
+  looksLikeDataTable(content: string): boolean {
+    // Check for patterns like "Route Name: value" or structured data
+    const lines = content.split('\n').filter(line => line.trim());
+    if (lines.length < 3) return false;
+    
+    // Check for colon-separated key-value pairs or structured format
+    const structuredLines = lines.filter(line => 
+      line.includes(':') || 
+      line.match(/^\s*\w+\s+\w+/) // Pattern like "test 423DFKA"
+    );
+    
+    return structuredLines.length >= 3;
+  }
+
+  formatMarkdownTable(content: string): string {
+    const lines = content.split('\n');
+    let inTable = false;
+    let tableHtml = '';
+    let result = '';
+    let headerProcessed = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Check if it's a table separator line (skip it completely, don't render)
+      if (line.match(/^\|[\s\-:]+\|$/) || line.match(/^[\s\-:|]+$/)) {
+        if (inTable && !headerProcessed) {
+          headerProcessed = true;
+          // Convert the last row to header
+          tableHtml = tableHtml.replace(/<tr>(.*?)<\/tr>/, '<thead><tr>$1</tr></thead><tbody>');
+        }
+        continue; // Skip separator line completely
+      }
+      
+      if (line.includes('|') && line.split('|').filter(c => c.trim()).length > 1) {
+        // Extract cells from the row
+        const cells = line.split('|')
+          .map(cell => cell.trim())
+          .filter(cell => cell.length > 0);
+        
+        // Skip rows where all cells are only dashes, dots, or separator characters
+        if (this.isSeparatorRow(cells)) {
+          if (inTable && !headerProcessed) {
+            headerProcessed = true;
+            // Convert the last row to header
+            tableHtml = tableHtml.replace(/<tr>(.*?)<\/tr>/, '<thead><tr>$1</tr></thead><tbody>');
+          }
+          continue; // Skip separator row
+        }
+        
+        // Table row
+        if (!inTable) {
+          inTable = true;
+          tableHtml = '<div class="chat-table-wrapper"><table class="chat-table">';
+          headerProcessed = false;
+        }
+        
+        if (cells.length > 0) {
+          tableHtml += `<tr>${cells.map(cell => `<td>${this.escapeHtml(cell)}</td>`).join('')}</tr>`;
+        }
+      } else {
+        // End of table
+        if (inTable) {
+          if (!headerProcessed) {
+            // No header separator found, treat first row as header
+            tableHtml = tableHtml.replace(/<tr>(.*?)<\/tr>/, '<thead><tr>$1</tr></thead><tbody>');
+          } else {
+            tableHtml += '</tbody>';
+          }
+          tableHtml += '</table></div>';
+          result += tableHtml;
+          tableHtml = '';
+          inTable = false;
+          headerProcessed = false;
+        }
+        if (line.trim()) {
+          result += this.escapeHtml(line) + '<br>';
+        }
+      }
+    }
+    
+    if (inTable) {
+      if (!headerProcessed) {
+        tableHtml = tableHtml.replace(/<tr>(.*?)<\/tr>/, '<thead><tr>$1</tr></thead><tbody>');
+      } else {
+        tableHtml += '</tbody>';
+      }
+      tableHtml += '</table></div>';
+      result += tableHtml;
+    }
+    
+    return result || this.escapeHtml(content).replace(/\n/g, '<br>');
+  }
+
+  formatPipeTable(content: string): string {
+    const lines = content.split('\n');
+    const result: string[] = [];
+    let tableLines: string[] = [];
+    let inTable = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const hasPipes = line.includes('|');
+      const cellCount = line.split('|').filter(c => c.trim()).length;
+      
+      if (hasPipes && cellCount > 1) {
+        // This is a table row
+        if (!inTable) {
+          inTable = true;
+          tableLines = [];
+        }
+        tableLines.push(line);
+      } else {
+        // End of table or non-table line
+        if (inTable && tableLines.length > 0) {
+          result.push(this.buildTableFromLines(tableLines));
+          tableLines = [];
+          inTable = false;
+        }
+        if (line) {
+          result.push(this.escapeHtml(line) + '<br>');
+        }
+      }
+    }
+    
+    // Handle table at end of content
+    if (inTable && tableLines.length > 0) {
+      result.push(this.buildTableFromLines(tableLines));
+    }
+    
+    return result.join('');
+  }
+  
+  buildTableFromLines(lines: string[]): string {
+    if (lines.length === 0) return '';
+    
+    let tableHtml = '<div class="chat-table-wrapper"><table class="chat-table">';
+    let firstRow = true;
+    
+    for (const line of lines) {
+      const cells = line.split('|')
+        .map(cell => cell.trim())
+        .filter(cell => cell.length > 0);
+      
+      // Skip rows where all cells are only dashes, dots, or separator characters
+      if (this.isSeparatorRow(cells)) {
+        if (firstRow) {
+          // If first row is a separator, treat next row as header
+          continue;
+        } else {
+          // Skip separator rows in body
+          continue;
+        }
+      }
+      
+      if (cells.length > 0) {
+        if (firstRow) {
+          // First row is header
+          tableHtml += `<thead><tr>${cells.map(cell => `<th>${this.escapeHtml(cell)}</th>`).join('')}</tr></thead><tbody>`;
+          firstRow = false;
+        } else {
+          tableHtml += `<tr>${cells.map(cell => `<td>${this.escapeHtml(cell)}</td>`).join('')}</tr>`;
+        }
+      }
+    }
+    
+    tableHtml += '</tbody></table></div>';
+    return tableHtml;
+  }
+
+  formatDataTable(content: string): string {
+    // For structured data like "Route Name: test, Code: 423DFKA"
+    const lines = content.split('\n').filter(line => line.trim());
+    let result = '';
+    
+    // Try to detect if it's a list format
+    if (lines.some(line => line.includes(':'))) {
+      result = '<div class="chat-data-list">';
+      for (const line of lines) {
+        if (line.includes(':')) {
+          const [key, ...valueParts] = line.split(':');
+          const value = valueParts.join(':').trim();
+          result += `<div class="chat-data-item"><strong>${this.escapeHtml(key.trim())}:</strong> <span>${this.escapeHtml(value)}</span></div>`;
+        } else {
+          result += `<div class="chat-data-item">${this.escapeHtml(line)}</div>`;
+        }
+      }
+      result += '</div>';
+    } else {
+      result = this.escapeHtml(content).replace(/\n/g, '<br>');
+    }
+    
+    return result;
+  }
+
+  escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Check if a row contains only separator characters (dashes, dots, etc.)
+  isSeparatorRow(cells: string[]): boolean {
+    if (cells.length === 0) return true;
+    
+    // Check if all cells are only dashes, dots, colons, spaces, or empty
+    return cells.every(cell => {
+      const trimmed = cell.trim();
+      return trimmed.length === 0 || trimmed.match(/^[\s\-\.:]+$/);
+    });
   }
 
   updateChatPreview(content: string): void {

@@ -3,7 +3,7 @@
 .ai-chatbot-layout {
   display: flex;
   min-height: 100vh;
-  background: #F5F5F5;
+  background: #FFF9F3;
 }
 
 .main-content {
@@ -324,6 +324,198 @@
 
 .message-text {
   white-space: pre-wrap;
+  
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 12px;
+  }
+  
+  // Ensure tables are visible and properly styled
+  ::ng-deep {
+    .chat-table-wrapper {
+      margin: 16px 0;
+      overflow-x: auto;
+      width: 100%;
+      display: block;
+      -webkit-overflow-scrolling: touch;
+      
+      &::-webkit-scrollbar {
+        height: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+        
+        &:hover {
+          background: #999;
+        }
+      }
+    }
+    
+    .chat-table,
+    table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: table;
+      
+      thead {
+        background: #f8f9fa;
+        display: table-header-group;
+      }
+      
+      tbody {
+        display: table-row-group;
+      }
+      
+      th {
+        padding: 12px 14px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+        font-size: 13px;
+        white-space: nowrap;
+        background: #f8f9fa;
+        
+        &:last-child {
+          border-right: none;
+        }
+      }
+      
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+        color: #333;
+        font-size: 13px;
+        
+        &:last-child {
+          border-right: none;
+        }
+      }
+      
+      tbody tr {
+        display: table-row;
+        
+        &:hover {
+          background: #f8f9fa;
+        }
+        
+        &:last-child td {
+          border-bottom: none;
+        }
+      }
+      
+      // Handle tables without thead
+      tr:first-child {
+        th, td {
+          font-weight: 600;
+          background: #f8f9fa;
+          border-bottom: 2px solid #e0e0e0;
+        }
+      }
+    }
+  }
+}
+
+.chat-table-wrapper {
+  margin: 16px 0;
+  overflow-x: auto;
+  width: 100%;
+  display: block;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chat-table {
+  width: 100%;
+  min-width: 500px;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: table;
+  
+  thead {
+    background: #f8f9fa;
+    display: table-header-group;
+  }
+  
+  tbody {
+    display: table-row-group;
+  }
+  
+  th {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    font-size: 13px;
+    white-space: nowrap;
+    background: #f8f9fa;
+    
+    &:last-child {
+      border-right: none;
+    }
+  }
+  
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    color: #333;
+    font-size: 13px;
+    
+    &:last-child {
+      border-right: none;
+    }
+  }
+  
+  tbody tr:hover {
+    background: #f8f9fa;
+  }
+  
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.chat-data-list {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.chat-data-item {
+  padding: 6px 0;
+  font-size: 13px;
+  
+  strong {
+    color: #664423;
+    margin-right: 8px;
+  }
 }
 
 .typing-indicator {

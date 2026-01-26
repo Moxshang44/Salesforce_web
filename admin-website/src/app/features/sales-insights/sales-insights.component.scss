@@ -101,63 +101,67 @@
 
 // ZSM Profile Card
 .zsm-profile-card {
-  background: #8B4513;
+  background: #664423;
   border-radius: 12px;
   padding: 16px 20px;
   color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.zsm-name {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
 .zsm-title {
   font-size: 13px;
   font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 16px;
   opacity: 0.9;
-}
-
-.zsm-name {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 12px;
 }
 
 .zsm-stats {
   display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
 }
 
-.zsm-stat-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.stat-item {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-.stat-number {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.stat-label {
-  font-size: 11px;
-  opacity: 0.9;
+.stat-separator {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  padding: 0 4px;
 }
 
 // KPI Section
 .kpi-section {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 20px;
 }
 
 .kpi-card {
-  background: #FFF9F3;
-  border-radius: 12px;
-  padding: 12px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: var(--color-background);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: 10px 12px;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 4px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
 }
 
 .kpi-label {
@@ -168,16 +172,49 @@
   letter-spacing: 0.5px;
 }
 
+.kpi-value-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .kpi-value {
   font-size: 18px;
   font-weight: 700;
   color: #1a1a1a;
+  flex: 1;
+}
+
+.kpi-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+  
+  &.positive {
+    color: var(--color-success);
+  }
+  
+  &.negative {
+    color: var(--color-error);
+  }
+}
+
+.trend-arrow {
+  font-size: 14px;
+}
+
+.trend-value {
+  font-size: var(--font-size-sm);
 }
 
 // Middle Section: RSM Performance and Category Chart
 .middle-section {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 2fr 0.8fr;
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -191,6 +228,23 @@
   border-radius: 12px;
   padding: 16px 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.category-chart-card {
+  justify-content: flex-start;
+}
+
+.category-chart-card .chart-container {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  min-height: 200px;
 }
 
 .card-header {
@@ -242,20 +296,25 @@
   padding: 6px 14px;
   border: 1px solid #664423;
   border-radius: 6px;
-  background: white;
-  color: #664423;
+  background: #664423;
+  color: white;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #664423;
-    color: white;
+    background: white;
+    color: #664423;
+    border: 2px solid #664423;
   }
 }
 
 // Chart Tabs
+.chart-tabs-row {
+  margin-bottom: 14px;
+}
+
 .chart-tabs {
   display: flex;
   gap: 6px;
@@ -286,6 +345,30 @@
 // Table Styles
 .table-wrapper {
   overflow-x: auto;
+}
+
+.view-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+  margin-top: 8px;
+}
+
+.view-more-btn {
+  padding: 8px 20px;
+  border: 1px solid #664423;
+  border-radius: 6px;
+  background: white;
+  color: #664423;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #664423;
+    color: white;
+  }
 }
 
 .rsm-table,
@@ -333,9 +416,12 @@
 // Chart Container
 .chart-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
+  min-height: 200px;
 }
 
 .donut-chart {
@@ -348,7 +434,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 100%;
+  width: auto;
 }
 
 .legend-item {
@@ -379,7 +465,7 @@
 // Bottom Section
 .bottom-section {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 2fr 0.8fr;
   gap: 16px;
   margin-bottom: 16px;
 }

@@ -83,7 +83,7 @@
                 }
               </div>
               <div class="message-content">
-                <div class="message-text">{{ message.content }}</div>
+                <div class="message-text" [innerHTML]="message.formattedContent || message.content"></div>
               </div>
             </div>
           }

@@ -3,7 +3,7 @@
 .page-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #FFF9F3;
 }
 
 .main-content {
@@ -385,10 +385,7 @@
 
 .pagination-bottom {
   text-align: center;
-  padding: 15px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 15px 0;
 }
 
 .pagination-text {
@@ -449,6 +446,60 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
+  }
+}
+
+// Loading, Error, and Empty States
+.loading-state-container,
+.error-state-container,
+.empty-state-container {
+  padding: 60px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.loading-state-container {
+  p {
+    font-size: 16px;
+    color: #666;
+  }
+}
+
+.error-state-container {
+  .error-text {
+    font-size: 16px;
+    color: #dc3545;
+    margin-bottom: 12px;
+  }
+
+  .retry-btn {
+    padding: 10px 20px;
+    background: #664423;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #4a3119;
+    }
+  }
+}
+
+.empty-state-container {
+  p {
+    font-size: 16px;
+    color: #666;
   }
 }
 

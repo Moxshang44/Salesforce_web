@@ -9,7 +9,7 @@
 .dashboard-content {
   flex: 1;
   margin-top: 56px;
-  padding: 24px;
+  padding: 16px 24px 24px;
   background: #FFF9F3;
   min-height: calc(100vh - 56px);
 }
@@ -18,7 +18,7 @@
   font-size: 28px;
   font-weight: 700;
   color: #1a1a1a;
-  margin: 0 0 24px 0;
+  margin: 0 0 12px 0;
 }
 
 .main-content {
@@ -42,7 +42,7 @@
   display: grid;
   grid-template-columns: 0.8fr 1.7fr;
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .chart-section {
@@ -55,6 +55,9 @@
   border-radius: var(--radius-lg);
   padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xl);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .actions-header {
