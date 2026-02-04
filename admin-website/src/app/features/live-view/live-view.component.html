@@ -1,0 +1,686 @@
+<div class="live-view-layout">
+  <!-- Main Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Header -->
+    <app-header></app-header>
+
+    <!-- NSM Panel -->
+    <aside class="nsm-panel">
+      <div class="nsm-content">
+        @if (clickedSO) {
+          <h2 class="nsm-title">Sales Representatives (SR)</h2>
+          <div class="managers-list">
+            @for (sr of salesRepresentatives; track sr.name) {
+              <div class="manager-item">
+                <span class="manager-name">{{ sr.name }}</span>
+              </div>
+            }
+          </div>
+        } @else if (clickedASM) {
+          <h2 class="nsm-title">Sales Officers (SO)</h2>
+          <div class="managers-list">
+            @for (soItem of salesOfficers; track soItem.name) {
+              <div 
+                class="manager-item"
+                [class.selected]="isSOItemSelected(soItem)"
+                (click)="selectSO(soItem, $event)"
+              >
+                <span class="manager-name">{{ soItem.name }}</span>
+              </div>
+            }
+          </div>
+        } @else if (clickedRSM) {
+          <h2 class="nsm-title">Area Sales Managers (ASM)</h2>
+          <div class="managers-list">
+            @for (asmItem of areaSalesManagers; track asmItem.name) {
+              <div 
+                class="manager-item"
+                [class.selected]="isASMItemSelected(asmItem)"
+                (click)="selectASM(asmItem, $event)"
+              >
+                <span class="manager-name">{{ asmItem.name }}</span>
+              </div>
+            }
+          </div>
+        } @else if (clickedZSM) {
+          <h2 class="nsm-title">Regional Managers (RSM)</h2>
+          <div class="managers-list">
+            @for (rsmItem of regionalManagers; track rsmItem.name) {
+              <div 
+                class="manager-item"
+                [class.selected]="isRSMItemSelected(rsmItem)"
+                (click)="selectRSM(rsmItem, $event)"
+              >
+                <span class="manager-name">{{ rsmItem.name }}</span>
+              </div>
+            }
+          </div>
+        } @else if (selectedManager) {
+          <h2 class="nsm-title">Zonal Managers (ZSM)</h2>
+          <div class="managers-list">
+            @for (zsmItem of zonalManagers; track zsmItem.name) {
+              <div 
+                class="manager-item"
+                [class.selected]="isZSMItemSelected(zsmItem)"
+                (click)="selectZSM(zsmItem)"
+              >
+                <span class="manager-name">{{ zsmItem.name }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <h2 class="nsm-title">National Sales Managers (NSM)</h2>
+          <div class="managers-list">
+            @for (manager of salesManagers; track manager.name) {
+              <div 
+                class="manager-item" 
+                [class.selected]="isManagerSelected(manager)"
+                (click)="selectManager(manager)"
+              >
+                <span class="manager-name">{{ manager.name }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </aside>
+
+    <!-- Content Area - Shows Map or Manager Details -->
+    @if (!selectedManager) {
+      <!-- Map Container -->
+      <div class="map-container">
+      <div class="map-wrapper">
+        <!-- Map will be embedded here -->
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15084.123456789!2d72.8273!3d19.1364!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce0e6e8b8b8b%3A0x1234567890abcdef!2sAndheri%20West%2C%20Mumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
+          width="100%"
+          height="100%"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+        
+        <!-- Map Markers Overlay -->
+        <div class="route-overlay">
+          @for (marker of mapMarkers; track marker.id) {
+            <div class="map-marker" [class]="'marker-' + marker.role.toLowerCase()" [style.left.%]="getMarkerX(marker.position)" [style.top.%]="getMarkerY(marker.position)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" [attr.fill]="marker.color"/>
+              </svg>
+              <span class="marker-label">{{ marker.name }} ({{ marker.role }})</span>
+            </div>
+          }
+        </div>
+
+        <!-- Legend Card -->
+        <div class="map-legend">
+          <h3 class="legend-title">Role Legend</h3>
+          <div class="legend-items">
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #FF0000;"></div>
+              <span class="legend-text">National Sales Manager (NSM)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #0000FF;"></div>
+              <span class="legend-text">Zonal Sales Manager (ZSM)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #00FF00;"></div>
+              <span class="legend-text">Region Sales Manager (RSM)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #FFA500;"></div>
+              <span class="legend-text">Area Sales Manager (ASM)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #800080;"></div>
+              <span class="legend-text">Sales Officer (SO)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #FF00FF;"></div>
+              <span class="legend-text">Sales Representative (SR)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map Controls -->
+        <div class="map-controls">
+          <button class="map-control-btn" title="Car">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z" fill="currentColor"/>
+            </svg>
+          </button>
+          <button class="map-control-btn" title="Zoom In">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+            </svg>
+          </button>
+          <button class="map-control-btn" title="Zoom Out">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 13H5v-2h14v2z" fill="currentColor"/>
+            </svg>
+          </button>
+          <button class="map-control-btn" title="Compass">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L4 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-8-3zm0 2.18l6 2.25v4.81c0 4.67-3.13 9.19-6 10.18-2.87-.99-6-5.51-6-10.18V6.18l6-2.25zM12 7c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
+            </svg>
+            <span class="compass-n">N</span>
+          </button>
+          <button class="map-control-btn" title="Full Screen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Design Credit -->
+        <div class="map-credit">
+          <span>Design By Krutik Shah | Version: 1.0</span>
+        </div>
+      </div>
+    </div>
+    } @else {
+      <!-- Manager Details View -->
+      <div class="manager-details-container" [class.timeline-open]="isTimelineOpen">
+        <!-- Selected Manager Details Section -->
+        @if (!clickedZSM) {
+          <div class="selected-manager-section">
+            <div class="manager-profile-section">
+              <div class="manager-avatar">
+                <div class="avatar-circle">
+                  <span class="avatar-initials">{{ getManagerInitials(selectedManager.name) }}</span>
+                </div>
+              </div>
+              <div class="manager-info">
+                <h3 class="manager-full-name">{{ selectedManager.name }} - ASM</h3>
+                <div class="manager-tags">
+                  <span class="tag">{{ selectedManager.zones }} Zones</span>
+                  <span class="tag">{{ selectedManager.regions }} Regions</span>
+                </div>
+              </div>
+              <div class="manager-metrics">
+                <div class="metric-item">
+                  <span class="metric-value">{{ selectedManager.totalCall }}</span>
+                  <span class="metric-label">Total Call</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value">{{ selectedManager.productive }}</span>
+                  <span class="metric-label">Productive</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-value">{{ selectedManager.telephonic }}</span>
+                  <span class="metric-label">Telephonic</span>
+                </div>
+              </div>
+              <button class="info-preview-btn">Info / Preview</button>
+            </div>
+          </div>
+        }
+
+        <!-- Zonal Managers Section -->
+        <div class="zsm-section">
+          @if (!clickedZSM) {
+            <h2 class="zsm-title">Zonal Managers (ZSM)</h2>
+          }
+          @if (clickedZSM && !clickedRSM) {
+            <!-- Breadcrumbs -->
+            <div class="breadcrumbs">
+              <span class="breadcrumb-item" (click)="navigateToHome()">NSM</span>
+              <span class="separator">/</span>
+              <span class="breadcrumb-item" (click)="navigateToNSM()">{{ selectedManager.name }} (NSM)</span>
+              <span class="separator">/</span>
+              <span class="breadcrumb-item active">{{ clickedZSM.name }} (ZSM)</span>
+            </div>
+
+            <!-- Selected ZSM Details -->
+            <div class="selected-zsm-section">
+              <div class="zsm-profile-section">
+                <div class="zsm-avatar-large">
+                  <span class="zsm-initials-large">{{ getInitials(clickedZSM.name) }}</span>
+                </div>
+                <div class="zsm-info">
+                  <h3 class="zsm-full-name">{{ clickedZSM.name }} (ZSM)</h3>
+                  <div class="zsm-tags">
+                    <span class="zsm-tag">{{ clickedZSM.regions }} Regions</span>
+                    <span class="zsm-tag">{{ clickedZSM.areas }} Areas</span>
+                  </div>
+                </div>
+                <div class="zsm-metrics-horizontal">
+                  <div class="zsm-metric-horizontal">
+                    <span class="zsm-metric-value-horizontal">{{ clickedZSM.totalCall }}</span>
+                    <span class="zsm-metric-label-horizontal">Total Call</span>
+                  </div>
+                  <div class="zsm-metric-horizontal">
+                    <span class="zsm-metric-value-horizontal">{{ clickedZSM.productive }}</span>
+                    <span class="zsm-metric-label-horizontal">Productive</span>
+                  </div>
+                  <div class="zsm-metric-horizontal">
+                    <span class="zsm-metric-value-horizontal">{{ clickedZSM.telephonic }}</span>
+                    <span class="zsm-metric-label-horizontal">Telephonic</span>
+                  </div>
+                </div>
+                <button class="info-preview-btn">Info / Preview</button>
+              </div>
+            </div>
+
+            <!-- Regional Managers Section -->
+            <h2 class="rsm-title">Regional Managers (RSM)</h2>
+          }
+            @if (clickedRSM && !clickedASM && clickedZSM && selectedManager) {
+              <!-- Breadcrumbs -->
+              <div class="breadcrumbs">
+                <span class="breadcrumb-item" (click)="navigateToHome()">NSM</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item" (click)="navigateToNSM()">{{ selectedManager.name }} (NSM)</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item" (click)="navigateToZSM()">{{ clickedZSM.name }} (ZSM)</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item active">{{ clickedRSM.name }} (RSM)</span>
+              </div>
+
+              <!-- Selected RSM Details -->
+              <div class="selected-zsm-section">
+                <div class="zsm-profile-section">
+                  <div class="zsm-avatar-large">
+                    <span class="zsm-initials-large">{{ getInitials(clickedRSM.name) }}</span>
+                  </div>
+                  <div class="zsm-info">
+                    <h3 class="zsm-full-name">{{ clickedRSM.name }} (RSM)</h3>
+                    <div class="zsm-tags">
+                      <span class="zsm-tag">{{ clickedRSM.region }}</span>
+                    </div>
+                  </div>
+                  <div class="zsm-metrics-horizontal">
+                    <div class="zsm-metric-horizontal">
+                      <span class="zsm-metric-value-horizontal">{{ clickedRSM.totalCall }}</span>
+                      <span class="zsm-metric-label-horizontal">Total Call</span>
+                    </div>
+                    <div class="zsm-metric-horizontal">
+                      <span class="zsm-metric-value-horizontal">{{ clickedRSM.productive }}</span>
+                      <span class="zsm-metric-label-horizontal">Productive</span>
+                    </div>
+                    <div class="zsm-metric-horizontal">
+                      <span class="zsm-metric-value-horizontal">{{ clickedRSM.telephonic }}</span>
+                      <span class="zsm-metric-label-horizontal">Telephonic</span>
+                    </div>
+                  </div>
+                  <button class="info-preview-btn">Info / Preview</button>
+                </div>
+              </div>
+
+              <!-- Area Sales Managers Section -->
+              <h2 class="rsm-title">Area Sales Managers (ASM)</h2>
+            }
+            @if (clickedASM && !clickedSO && clickedZSM && clickedRSM && selectedManager) {
+                <!-- Breadcrumbs -->
+                <div class="breadcrumbs">
+                  <span class="breadcrumb-item" (click)="navigateToHome()">NSM</span>
+                  <span class="separator">/</span>
+                  <span class="breadcrumb-item" (click)="navigateToNSM()">{{ selectedManager.name }} (NSM)</span>
+                  <span class="separator">/</span>
+                  <span class="breadcrumb-item" (click)="navigateToZSM()">{{ clickedZSM.name }} (ZSM)</span>
+                  <span class="separator">/</span>
+                  <span class="breadcrumb-item" (click)="navigateToRSM()">{{ clickedRSM.name }} (RSM)</span>
+                  <span class="separator">/</span>
+                  <span class="breadcrumb-item active">{{ clickedASM.name }} (ASM)</span>
+                </div>
+
+                <!-- Selected ASM Details -->
+                <div class="selected-zsm-section">
+                  <div class="zsm-profile-section">
+                    <div class="zsm-avatar-large">
+                      <span class="zsm-initials-large">{{ getInitials(clickedASM.name) }}</span>
+                    </div>
+                    <div class="zsm-info">
+                      <h3 class="zsm-full-name">{{ clickedASM.name }} (ASM)</h3>
+                      <div class="zsm-tags">
+                        <span class="zsm-tag">{{ clickedASM.area }}</span>
+                      </div>
+                    </div>
+                    <div class="zsm-metrics-horizontal">
+                      <div class="zsm-metric-horizontal">
+                        <span class="zsm-metric-value-horizontal">{{ clickedASM.totalCall }}</span>
+                        <span class="zsm-metric-label-horizontal">Total Call</span>
+                      </div>
+                      <div class="zsm-metric-horizontal">
+                        <span class="zsm-metric-value-horizontal">{{ clickedASM.productive }}</span>
+                        <span class="zsm-metric-label-horizontal">Productive</span>
+                      </div>
+                      <div class="zsm-metric-horizontal">
+                        <span class="zsm-metric-value-horizontal">{{ clickedASM.telephonic }}</span>
+                        <span class="zsm-metric-label-horizontal">Telephonic</span>
+                      </div>
+                    </div>
+                    <button class="info-preview-btn">Info / Preview</button>
+                  </div>
+                </div>
+
+              <!-- Sales Officers Section -->
+              <h2 class="rsm-title">Sales Officers (SO)</h2>
+            }
+            @if (clickedSO && clickedZSM && clickedRSM && clickedASM && selectedManager) {
+              <!-- Breadcrumbs -->
+              <div class="breadcrumbs">
+                <span class="breadcrumb-item" (click)="navigateToHome()">NSM</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item" (click)="navigateToNSM()">{{ selectedManager.name }} (NSM)</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item" (click)="navigateToZSM()">{{ clickedZSM.name }} (ZSM)</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item" (click)="navigateToRSM()">{{ clickedRSM.name }} (RSM)</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item" (click)="navigateToASM()">{{ clickedASM.name }} (ASM)</span>
+                <span class="separator">/</span>
+                <span class="breadcrumb-item active">{{ clickedSO.name }} (SO)</span>
+              </div>
+
+              <!-- Selected SO Details -->
+              <div class="selected-zsm-section">
+                <div class="zsm-profile-section">
+                  <div class="zsm-avatar-large">
+                    <span class="zsm-initials-large">{{ getInitials(clickedSO.name) }}</span>
+                  </div>
+                  <div class="zsm-info">
+                    <h3 class="zsm-full-name">{{ clickedSO.name }} (SO)</h3>
+                    <div class="zsm-tags">
+                      <span class="zsm-tag">{{ clickedSO.territory }}</span>
+                    </div>
+                  </div>
+                  <div class="zsm-metrics-horizontal">
+                    <div class="zsm-metric-horizontal">
+                      <span class="zsm-metric-value-horizontal">{{ clickedSO.totalCall }}</span>
+                      <span class="zsm-metric-label-horizontal">Total Call</span>
+                    </div>
+                    <div class="zsm-metric-horizontal">
+                      <span class="zsm-metric-value-horizontal">{{ clickedSO.productive }}</span>
+                      <span class="zsm-metric-label-horizontal">Productive</span>
+                    </div>
+                    <div class="zsm-metric-horizontal">
+                      <span class="zsm-metric-value-horizontal">{{ clickedSO.telephonic }}</span>
+                      <span class="zsm-metric-label-horizontal">Telephonic</span>
+                    </div>
+                  </div>
+                  <button class="info-preview-btn">Info / Preview</button>
+                </div>
+              </div>
+
+              <!-- Sales Representatives Section -->
+              <h2 class="rsm-title">Sales Representatives (SR)</h2>
+            }
+          <div class="zsm-grid">
+            @if (clickedSO) {
+              @for (sr of salesRepresentatives; track sr.name) {
+                <div class="zsm-card">
+                  <div class="zsm-card-header">
+                    <div class="zsm-avatar">
+                      <span class="zsm-initials">{{ getInitials(sr.name) }}</span>
+                    </div>
+                    <div class="zsm-name-zone">
+                      <div class="zsm-name">{{ sr.name }} SR</div>
+                      <div class="zsm-zone">- {{ sr.route }}</div>
+                    </div>
+                  </div>
+                  <div class="zsm-metrics">
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ sr.totalCall }}</span>
+                      <span class="zsm-metric-label">Total Call</span>
+                    </div>
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ sr.productive }}</span>
+                      <span class="zsm-metric-label">Productive</span>
+                    </div>
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ sr.telephonic }}</span>
+                      <span class="zsm-metric-label">Telephonic</span>
+                    </div>
+                  </div>
+                  <div class="zsm-target-section">
+                    <div class="target-info">
+                      <span class="target-label">Target: ₹{{ sr.target.toLocaleString('en-IN') }}</span>
+                      <span class="achieved-label">Achieved: ₹{{ sr.achieved.toLocaleString('en-IN') }}</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div 
+                        class="progress-fill" 
+                        [style.width.%]="getAchievementPercentage(sr.target, sr.achieved)"
+                      ></div>
+                    </div>
+                  </div>
+                  <button class="view-activity-btn" (click)="viewLiveActivity(clickedZSM!, $event)">View Live Activity</button>
+                </div>
+              }
+            } @else if (clickedASM) {
+              @for (so of salesOfficers; track so.name) {
+                <div class="zsm-card" (click)="selectSO(so, $event)" [class.selected]="isSOSelected(so)">
+                  <div class="zsm-card-header">
+                    <div class="zsm-avatar">
+                      <span class="zsm-initials">{{ getInitials(so.name) }}</span>
+                    </div>
+                    <div class="zsm-name-zone">
+                      <div class="zsm-name">{{ so.name }} SO</div>
+                      <div class="zsm-zone">- {{ so.territory }}</div>
+                    </div>
+                  </div>
+                  <div class="zsm-metrics">
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ so.totalCall }}</span>
+                      <span class="zsm-metric-label">Total Call</span>
+                    </div>
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ so.productive }}</span>
+                      <span class="zsm-metric-label">Productive</span>
+                    </div>
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ so.telephonic }}</span>
+                      <span class="zsm-metric-label">Telephonic</span>
+                    </div>
+                  </div>
+                  <div class="zsm-target-section">
+                    <div class="target-info">
+                      <span class="target-label">Target: ₹{{ so.target.toLocaleString('en-IN') }}</span>
+                      <span class="achieved-label">Achieved: ₹{{ so.achieved.toLocaleString('en-IN') }}</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div 
+                        class="progress-fill" 
+                        [style.width.%]="getAchievementPercentage(so.target, so.achieved)"
+                      ></div>
+                    </div>
+                  </div>
+                  <button class="view-activity-btn" (click)="viewLiveActivity(clickedZSM!, $event)">View Live Activity</button>
+                </div>
+              }
+            } @else if (clickedRSM) {
+              @for (asm of areaSalesManagers; track asm.name) {
+                <div class="zsm-card" (click)="selectASM(asm, $event)" [class.selected]="isASMSelected(asm)">
+                  <div class="zsm-card-header">
+                    <div class="zsm-avatar">
+                      <span class="zsm-initials">{{ getInitials(asm.name) }}</span>
+                    </div>
+                    <div class="zsm-name-zone">
+                      <div class="zsm-name">{{ asm.name }} ASM</div>
+                      <div class="zsm-zone">- {{ asm.area }}</div>
+                    </div>
+                  </div>
+                  <div class="zsm-metrics">
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ asm.totalCall }}</span>
+                      <span class="zsm-metric-label">Total Call</span>
+                    </div>
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ asm.productive }}</span>
+                      <span class="zsm-metric-label">Productive</span>
+                    </div>
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ asm.telephonic }}</span>
+                      <span class="zsm-metric-label">Telephonic</span>
+                    </div>
+                  </div>
+                  <div class="zsm-target-section">
+                    <div class="target-info">
+                      <span class="target-label">Target: ₹{{ asm.target.toLocaleString('en-IN') }}</span>
+                      <span class="achieved-label">Achieved: ₹{{ asm.achieved.toLocaleString('en-IN') }}</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div 
+                        class="progress-fill" 
+                        [style.width.%]="getAchievementPercentage(asm.target, asm.achieved)"
+                      ></div>
+                    </div>
+                  </div>
+                  <button class="view-activity-btn" (click)="viewLiveActivity(clickedZSM!, $event)">View Live Activity</button>
+                </div>
+              }
+            } @else if (clickedZSM) {
+              @for (rsm of regionalManagers; track rsm.name) {
+                <div class="zsm-card" (click)="selectRSM(rsm, $event)" [class.selected]="isRSMSelected(rsm)">
+                  <div class="zsm-card-header">
+                    <div class="zsm-avatar">
+                      <span class="zsm-initials">{{ getInitials(rsm.name) }}</span>
+                    </div>
+                    <div class="zsm-name-zone">
+                      <div class="zsm-name">{{ rsm.name }} RSM</div>
+                      <div class="zsm-zone">- {{ rsm.region }}</div>
+                    </div>
+                  </div>
+                  <div class="zsm-metrics">
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ rsm.totalCall }}</span>
+                      <span class="zsm-metric-label">Total Call</span>
+                    </div>
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ rsm.productive }}</span>
+                      <span class="zsm-metric-label">Productive</span>
+                    </div>
+                    <div class="zsm-metric">
+                      <span class="zsm-metric-value">{{ rsm.telephonic }}</span>
+                      <span class="zsm-metric-label">Telephonic</span>
+                    </div>
+                  </div>
+                  <div class="zsm-target-section">
+                    <div class="target-info">
+                      <span class="target-label">Target: ₹{{ rsm.target.toLocaleString('en-IN') }}</span>
+                      <span class="achieved-label">Achieved: ₹{{ rsm.achieved.toLocaleString('en-IN') }}</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div 
+                        class="progress-fill" 
+                        [style.width.%]="getAchievementPercentage(rsm.target, rsm.achieved)"
+                      ></div>
+                    </div>
+                  </div>
+                  <button class="view-activity-btn" (click)="viewLiveActivity(clickedZSM!, $event)">View Live Activity</button>
+                </div>
+              }
+            } @else {
+              @for (zsmItem of zonalManagers; track zsmItem.name) {
+                <div class="zsm-card" (click)="selectZSM(zsmItem)" [class.selected]="isZSMSelected(zsmItem)">
+                <div class="zsm-card-header">
+                  <div class="zsm-avatar">
+                    <span class="zsm-initials">{{ getInitials(zsmItem.name) }}</span>
+                  </div>
+                  <div class="zsm-name-zone">
+                    <div class="zsm-name">{{ zsmItem.name }} ZSM</div>
+                    <div class="zsm-zone">- {{ zsmItem.zone }}</div>
+                  </div>
+                </div>
+                <div class="zsm-metrics">
+                  <div class="zsm-metric">
+                    <span class="zsm-metric-value">{{ zsmItem.totalCall }}</span>
+                    <span class="zsm-metric-label">Total Call</span>
+                  </div>
+                  <div class="zsm-metric">
+                    <span class="zsm-metric-value">{{ zsmItem.productive }}</span>
+                    <span class="zsm-metric-label">Productive</span>
+                  </div>
+                  <div class="zsm-metric">
+                    <span class="zsm-metric-value">{{ zsmItem.telephonic }}</span>
+                    <span class="zsm-metric-label">Telephonic</span>
+                  </div>
+                </div>
+                <div class="zsm-target-section">
+                  <div class="target-info">
+                    <span class="target-label">Target: ₹{{ zsmItem.target.toLocaleString('en-IN') }}</span>
+                    <span class="achieved-label">Achieved: ₹{{ zsmItem.achieved.toLocaleString('en-IN') }}</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div 
+                      class="progress-fill" 
+                      [style.width.%]="getAchievementPercentage(zsmItem.target, zsmItem.achieved)"
+                    ></div>
+                  </div>
+                </div>
+                <button class="view-activity-btn" (click)="viewLiveActivity(zsmItem, $event)">View Live Activity</button>
+              </div>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Visit Timeline Sidebar -->
+        @if (isTimelineOpen) {
+          <aside class="visit-timeline-sidebar">
+            <div class="timeline-header">
+              <h3 class="timeline-title">Visit Timeline</h3>
+              <button class="close-timeline-btn" (click)="closeTimeline()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="timeline-date-selector">
+              <input 
+                type="date" 
+                class="date-input" 
+                [(ngModel)]="selectedDate"
+                name="selectedDate"
+              >
+            </div>
+
+            <div class="timeline-content">
+              @for (item of timelineData; track item.time) {
+                <div class="timeline-item" [class]="'timeline-' + item.type">
+                  <div class="timeline-details">
+                    <div class="timeline-title-row">
+                      <span class="timeline-title-text">{{ item.time }} - {{ item.title }}</span>
+                      @if (item.amount) {
+                        <span class="timeline-amount">{{ item.amount }}</span>
+                      }
+                    </div>
+                    @if (item.location) {
+                      <div class="timeline-location">Location: {{ item.location }}</div>
+                    }
+                    @if (item.checkIn && item.checkOut) {
+                      <div class="timeline-times">
+                        Check-In: {{ item.checkIn }} | Check-Out: {{ item.checkOut }}
+                      </div>
+                    }
+                    @if (item.duration) {
+                      <div class="timeline-duration">Duration: {{ item.duration }}</div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="timeline-footer">
+              <button class="view-live-map-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+                </svg>
+                View Live Map
+              </button>
+            </div>
+          </aside>
+        }
+
+      </div>
+    }
+  </div>
+</div>
+

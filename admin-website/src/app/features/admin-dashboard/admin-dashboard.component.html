@@ -9,42 +9,52 @@
 
     <!-- Dashboard Content -->
     <div class="dashboard-content">
-      <!-- Page Title -->
-      <h1 class="page-title">Dashboard</h1>
+      <!-- Dashboard Title -->
+      <h1 class="dashboard-title">Dashboard</h1>
+      
+      <!-- Stats Cards Section -->
+      <div class="stats-section">
+        <app-stats-card
+          title="Total Sales (Today)"
+          value="₹ 4,50,000"
+          [trend]="{ value: '12% vs yesterday', isPositive: true }"
+        ></app-stats-card>
+        
+        <app-stats-card
+          title="Active Workers"
+          value="124"
+          subtitle="Last Update 5 minutes ago."
+        ></app-stats-card>
+        
+        <app-stats-card
+          title="Active Routes"
+          value="8 Routes Live"
+          subtitle="3 Sales Reps currently active"
+        ></app-stats-card>
+      </div>
 
-      <!-- Stats Cards Row -->
-      <section class="stats-section">
-        @for (stat of stats; track stat.title) {
-          <app-stats-card
-            [title]="stat.title"
-            [value]="stat.value"
-            [subtitle]="stat.subtitle ?? ''"
-            [trend]="stat.trend"
-          ></app-stats-card>
-        }
-      </section>
-
-      <!-- Content Grid -->
-      <div class="content-grid">
+      <!-- Main Content Grid: Chart and Actions -->
+      <div class="main-grid">
         <!-- Sales Chart Section -->
-        <section class="chart-section">
+        <div class="chart-section">
           <app-sales-chart></app-sales-chart>
-        </section>
+        </div>
 
         <!-- Actions Required Section -->
-        <section class="actions-section">
-          <h2 class="section-title">Actions Required</h2>
+        <div class="actions-section">
+          <div class="actions-header">
+            <h3 class="actions-title">Actions Required</h3>
+          </div>
           <div class="actions-list">
-            @for (action of actions; track action.id) {
+            @for (action of actionItems; track action.id) {
               <app-action-item
                 [action]="action"
                 (actionClick)="onActionClick($event)"
               ></app-action-item>
             }
           </div>
-        </section>
+        </div>
       </div>
     </div>
   </div>
 </div>
-

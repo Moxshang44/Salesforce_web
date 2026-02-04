@@ -10,8 +10,6 @@ import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CategoryFormStep1Component } from './components/category-form-step1/category-form-step1.component';
 
-const API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1';
-
 interface Company {
   id: string;
   name: string;

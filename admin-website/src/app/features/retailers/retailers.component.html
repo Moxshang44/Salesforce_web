@@ -251,10 +251,13 @@
           </table>
         </div>
 
-        <!-- Table Footer -->
-        <div class="table-footer">
-          <p>Showing 1 to 9 of 15 entries</p>
-        </div>
+      </div>
+
+      <!-- Pagination Bottom -->
+      <div class="pagination-bottom">
+        <span class="pagination-text">
+          Showing {{ getStartEntry() }} to {{ getEndEntry() }} of {{ totalCount }} entries
+        </span>
       </div>
     </div>
 

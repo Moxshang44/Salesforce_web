@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
+import { ChatService, ChatHistoryItem } from './services/chat.service';
 
 interface ChatMessage {
   id: number;
   role: 'user' | 'assistant';
   content: string;
+  formattedContent?: SafeHtml;
   timestamp: Date;
 }
 
@@ -17,6 +19,7 @@ interface ChatHistory {
   title: string;
   timestamp: Date;
   preview: string;
+  sessionId?: string;
 }
 
 type ChatMode = 'ask' | 'do' | 'plan';
@@ -54,8 +57,12 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
   @ViewChild('modeDropdownContainer', { static: false }) modeDropdownContainer?: ElementRef;
 
   modes: ModeItem[] = [];
+  currentSessionId: string = '';
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(
+    private sanitizer: DomSanitizer,
+    private chatService: ChatService
+  ) {}
 
   ngOnInit() {
     // Initialize modes with sanitized SVG icons
@@ -96,55 +103,281 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
 
   initializeChatbot(): void {
     // Add welcome message
+    const welcomeContent = 'Hello! I\'m your AI assistant. How can I help you with your admin tasks, product management, routes, distributors, employees, or any questions about the admin system?';
     this.chatMessages = [
       {
         id: 1,
         role: 'assistant',
-        content: 'Hello! I\'m your AI assistant. How can I help you with your admin tasks, product management, routes, distributors, employees, or any questions about the admin system?',
+        content: welcomeContent,
+        formattedContent: this.formatMessageContent(welcomeContent),
         timestamp: new Date()
       }
     ];
   }
 
   loadChatHistory(): void {
-    // Load chat history (mock data - replace with actual storage/API)
-    this.chatHistory = [
-      {
-        id: 1,
-        title: 'New Chat',
-        timestamp: new Date(),
-        preview: 'Hello! I\'m your AI assistant...'
-      }
-    ];
-    if (this.chatHistory.length > 0) {
-      this.currentChatId = this.chatHistory[0].id;
+    try {
+      this.chatService.getChatHistory().subscribe({
+        next: (response: any) => {
+          console.log('Chat history response:', response);
+          
+          // Handle the sessions array response structure
+          if (response.sessions && Array.isArray(response.sessions) && response.sessions.length > 0) {
+            // Convert session IDs to ChatHistory format
+            this.chatHistory = response.sessions.map((sessionId: string, index: number) => {
+              // Extract timestamp from session ID if it follows the pattern session_timestamp_random
+              let timestamp = new Date();
+              const sessionParts = sessionId.split('_');
+              if (sessionParts.length >= 2 && sessionParts[1]) {
+                const sessionTimestamp = parseInt(sessionParts[1]);
+                if (!isNaN(sessionTimestamp)) {
+                  timestamp = new Date(sessionTimestamp);
+                }
+              }
+              
+              return {
+                id: index + 1,
+                title: `Chat ${index + 1}`,
+                timestamp: timestamp,
+                preview: 'Click to view messages...',
+                sessionId: sessionId
+              };
+            });
+            
+            // Sort by timestamp (newest first) - sessions are likely already in order, but sort to be sure
+            this.chatHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+            
+            // Update titles with better names
+            this.chatHistory.forEach((chat, index) => {
+              chat.title = `Chat ${this.chatHistory.length - index}`;
+            });
+            
+            // Load previews for all sessions (in parallel)
+            this.loadPreviewsForAllSessions();
+            
+            // Select the most recent chat and load its messages
+            if (this.chatHistory.length > 0) {
+              this.currentChatId = this.chatHistory[0].id;
+              this.currentSessionId = this.chatHistory[0].sessionId || '';
+              // Load messages for the selected chat
+              this.loadMessagesForSession(this.currentSessionId);
+            } else {
+              // No history, create new chat
+              this.createNewChat();
+            }
+          } 
+          // Fallback: Handle old data structure if API changes
+          else if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+            // Group messages by session_id
+            const sessionsMap = new Map<string, ChatHistoryItem[]>();
+            
+            response.data.forEach((item: ChatHistoryItem) => {
+              if (item.session_id) {
+                if (!sessionsMap.has(item.session_id)) {
+                  sessionsMap.set(item.session_id, []);
+                }
+                sessionsMap.get(item.session_id)!.push(item);
+              }
+            });
+            
+            // Convert to ChatHistory format
+            this.chatHistory = Array.from(sessionsMap.entries()).map(([sessionId, messages], index) => {
+              // Sort messages by timestamp
+              const sortedMessages = messages.sort((a, b) => {
+                const timeA = a.timestamp || a.created_at || '';
+                const timeB = b.timestamp || b.created_at || '';
+                return new Date(timeA).getTime() - new Date(timeB).getTime();
+              });
+              
+              // Get the first user message as preview
+              const firstUserMessage = sortedMessages.find(m => m.user_message);
+              const preview = firstUserMessage?.user_message?.substring(0, 50) || 
+                            sortedMessages[0]?.assistant_message?.substring(0, 50) || 
+                            'New Chat';
+              
+              // Get the latest timestamp
+              const latestMessage = sortedMessages[sortedMessages.length - 1];
+              const timestamp = latestMessage?.timestamp || latestMessage?.created_at || new Date().toISOString();
+              
+              return {
+                id: index + 1,
+                title: preview.length > 30 ? preview.substring(0, 30) + '...' : preview,
+                timestamp: new Date(timestamp),
+                preview: preview + (preview.length >= 50 ? '...' : ''),
+                sessionId: sessionId
+              };
+            });
+            
+            // Sort by timestamp (newest first)
+            this.chatHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+            
+            // Select the most recent chat
+            if (this.chatHistory.length > 0) {
+              this.currentChatId = this.chatHistory[0].id;
+              this.currentSessionId = this.chatHistory[0].sessionId || '';
+              // Load messages for the selected chat
+              this.loadMessagesForSession(this.currentSessionId);
+            } else {
+              // No history, create new chat
+              this.createNewChat();
+            }
+          } else {
+            // No history found, create new chat
+            this.createNewChat();
+          }
+        },
+        error: (error) => {
+          console.error('Error loading chat history:', error);
+          // On error, create a new chat
+          this.createNewChat();
+        }
+      });
+    } catch (error: any) {
+      console.error('Error initializing chat history:', error);
+      // On error, create a new chat
+      this.createNewChat();
     }
   }
 
+  loadPreviewsForAllSessions(): void {
+    // Load previews for all sessions to update their titles
+    this.chatHistory.forEach((chat, index) => {
+      if (chat.sessionId) {
+        this.chatService.getChatSession(chat.sessionId).subscribe({
+          next: (response) => {
+            if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+              // Get the first user message as preview
+              const sortedMessages = response.data.sort((a, b) => {
+                const timeA = a.timestamp || a.created_at || '';
+                const timeB = b.timestamp || b.created_at || '';
+                return new Date(timeA).getTime() - new Date(timeB).getTime();
+              });
+              
+              const firstUserMessage = sortedMessages.find(m => m.user_message);
+              const preview = firstUserMessage?.user_message?.substring(0, 50) || 
+                            sortedMessages[0]?.assistant_message?.substring(0, 50) || 
+                            `Chat ${index + 1}`;
+              
+              // Update the chat history item with preview
+              const chatItem = this.chatHistory.find(c => c.sessionId === chat.sessionId);
+              if (chatItem) {
+                chatItem.title = preview.length > 30 ? preview.substring(0, 30) + '...' : preview;
+                chatItem.preview = preview + (preview.length >= 50 ? '...' : '');
+                
+                // Update timestamp from first message if available
+                if (sortedMessages[0]) {
+                  const msgTimestamp = sortedMessages[0].timestamp || sortedMessages[0].created_at;
+                  if (msgTimestamp) {
+                    chatItem.timestamp = new Date(msgTimestamp);
+                  }
+                }
+              }
+            }
+          },
+          error: (error) => {
+            // Silently fail for preview loading - don't show error to user
+            console.log('Could not load preview for session:', chat.sessionId);
+          }
+        });
+      }
+    });
+  }
+
   createNewChat(): void {
+    const newSessionId = this.chatService.generateSessionId();
     const newChat: ChatHistory = {
       id: Date.now(),
       title: 'New Chat',
       timestamp: new Date(),
-      preview: ''
+      preview: '',
+      sessionId: newSessionId
     };
     this.chatHistory.unshift(newChat);
     this.currentChatId = newChat.id;
+    this.currentSessionId = newSessionId;
     this.chatMessages = [];
     this.initializeChatbot();
   }
 
   selectChat(chatId: number): void {
     this.currentChatId = chatId;
-    // In a real app, load messages for this chat
-    // For now, just reset to welcome message
-    this.chatMessages = [];
-    this.initializeChatbot();
     const chat = this.chatHistory.find(c => c.id === chatId);
-    if (chat) {
-      chat.preview = this.chatMessages.length > 0 
-        ? this.chatMessages[this.chatMessages.length - 1].content.substring(0, 50) + '...'
-        : '';
+    if (chat && chat.sessionId) {
+      this.currentSessionId = chat.sessionId;
+      // Load messages for this chat session
+      this.loadMessagesForSession(chat.sessionId);
+    } else {
+      // Fallback: create new session
+      this.currentSessionId = this.chatService.generateSessionId();
+      this.chatMessages = [];
+      this.initializeChatbot();
+    }
+  }
+
+  loadMessagesForSession(sessionId: string): void {
+    try {
+      this.chatService.getChatSession(sessionId).subscribe({
+        next: (response) => {
+          console.log('Chat session response:', response);
+          
+          if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+            // Sort messages by timestamp
+            const sessionMessages = response.data.sort((a, b) => {
+              const timeA = a.timestamp || a.created_at || '';
+              const timeB = b.timestamp || b.created_at || '';
+              return new Date(timeA).getTime() - new Date(timeB).getTime();
+            });
+            
+            // Convert to ChatMessage format
+            this.chatMessages = [];
+            let messageIndex = 1;
+            
+            sessionMessages.forEach((item) => {
+              // Add user message if exists
+              if (item.user_message) {
+                this.chatMessages.push({
+                  id: messageIndex++,
+                  role: 'user',
+                  content: item.user_message,
+                  timestamp: item.timestamp ? new Date(item.timestamp) : 
+                            (item.created_at ? new Date(item.created_at) : new Date())
+                });
+              }
+              
+              // Add assistant message if exists
+              if (item.assistant_message) {
+                this.chatMessages.push({
+                  id: messageIndex++,
+                  role: 'assistant',
+                  content: item.assistant_message,
+                  formattedContent: this.formatMessageContent(item.assistant_message),
+                  timestamp: item.timestamp ? new Date(item.timestamp) : 
+                            (item.created_at ? new Date(item.created_at) : new Date())
+                });
+              }
+            });
+            
+            // If no messages found, show welcome message
+            if (this.chatMessages.length === 0) {
+              this.initializeChatbot();
+            }
+            
+            // Scroll to bottom after loading
+            setTimeout(() => this.scrollToBottom(), 100);
+          } else {
+            // No messages, show welcome
+            this.initializeChatbot();
+          }
+        },
+        error: (error) => {
+          console.error('Error loading messages for session:', error);
+          // On error, show welcome message
+          this.initializeChatbot();
+        }
+      });
+    } catch (error: any) {
+      console.error('Error loading messages:', error);
+      this.initializeChatbot();
     }
   }
 
@@ -199,7 +432,7 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
     }
 
     // Create new chat if none exists
-    if (this.currentChatId === null) {
+    if (this.currentChatId === null || !this.currentSessionId) {
       this.createNewChat();
     }
 
@@ -211,26 +444,390 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
       timestamp: new Date()
     };
     this.chatMessages.push(userMessage);
-    const currentInput = this.chatInput;
+    const currentInput = this.chatInput.trim();
     this.chatInput = '';
     this.isTyping = true;
 
     // Update chat history preview
     this.updateChatPreview(currentInput);
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const assistantMessage: ChatMessage = {
+    // Call the API
+    try {
+      this.chatService.sendMessage(currentInput, this.currentSessionId).subscribe({
+        next: (response) => {
+          // Update session ID from response (in case it changed)
+          if (response.session_id) {
+            this.currentSessionId = response.session_id;
+            // Update session ID in chat history
+            if (this.currentChatId) {
+              const chat = this.chatHistory.find(c => c.id === this.currentChatId);
+              if (chat) {
+                chat.sessionId = response.session_id;
+              }
+            }
+          }
+
+          // Format and add assistant response
+          const responseContent = response.message || 'No response received.';
+          const assistantMessage: ChatMessage = {
+            id: Date.now() + 1,
+            role: 'assistant',
+            content: responseContent,
+            formattedContent: this.formatMessageContent(responseContent),
+            timestamp: new Date()
+          };
+          this.chatMessages.push(assistantMessage);
+          this.isTyping = false;
+          this.scrollToBottom();
+          this.updateChatPreview(assistantMessage.content);
+
+          // Handle follow-up question if needed
+          if (response.needs_followup && response.followup_question) {
+            // Optionally show follow-up question or handle it
+            console.log('Follow-up question:', response.followup_question);
+          }
+        },
+        error: (error) => {
+          console.error('Error sending message:', error);
+          this.isTyping = false;
+          
+          // Show error message to user
+          let errorContent = 'Sorry, I encountered an error processing your request. Please try again.';
+          if (error.error?.message) {
+            errorContent = error.error.message;
+          } else if (error.message) {
+            errorContent = error.message;
+          }
+          
+          const errorMessage: ChatMessage = {
+            id: Date.now() + 1,
+            role: 'assistant',
+            content: errorContent,
+            formattedContent: this.formatMessageContent(errorContent),
+            timestamp: new Date()
+          };
+          this.chatMessages.push(errorMessage);
+          this.scrollToBottom();
+        }
+      });
+    } catch (error: any) {
+      console.error('Error initializing chat request:', error);
+      this.isTyping = false;
+      
+      const errorContent = error.message || 'Unable to send message. Please ensure you are logged in and try again.';
+      const errorMessage: ChatMessage = {
         id: Date.now() + 1,
         role: 'assistant',
-        content: this.generateResponse(currentInput, this.selectedMode),
+        content: errorContent,
+        formattedContent: this.formatMessageContent(errorContent),
         timestamp: new Date()
       };
-      this.chatMessages.push(assistantMessage);
-      this.isTyping = false;
+      this.chatMessages.push(errorMessage);
       this.scrollToBottom();
-      this.updateChatPreview(assistantMessage.content);
-    }, 1000);
+    }
+  }
+
+  // Format message content to detect and render tables
+  formatMessageContent(content: string): SafeHtml {
+    // Check if content already contains HTML table tags
+    if (content.includes('<table') || content.includes('<TABLE') || content.includes('<Table')) {
+      // Wrap existing HTML table with our styling wrapper
+      let wrapped = content;
+      
+      // Remove rows that contain only dashes, dots, or separator characters
+      wrapped = wrapped.replace(
+        /<tr[^>]*>[\s\S]*?<\/tr>/gi,
+        (match) => {
+          // Check if all cells in this row contain only dashes, dots, or separators
+          const cellContent = match.replace(/<[^>]+>/g, '').trim();
+          if (cellContent.match(/^[\s\-\.:]+$/)) {
+            return ''; // Remove separator rows
+          }
+          return match;
+        }
+      );
+      
+      // Wrap each table with our wrapper
+      wrapped = wrapped.replace(
+        /<table([^>]*)>/gi, 
+        '<div class="chat-table-wrapper"><table class="chat-table"$1>'
+      );
+      wrapped = wrapped.replace(
+        /<\/table>/gi,
+        '</table></div>'
+      );
+      
+      // Also ensure proper styling for existing tables
+      wrapped = wrapped.replace(
+        /<th([^>]*)>/gi,
+        '<th class="chat-table-header"$1>'
+      );
+      
+      // Preserve line breaks for non-table content
+      wrapped = wrapped.replace(/\n/g, '<br>');
+      
+      return this.sanitizer.bypassSecurityTrustHtml(wrapped);
+    }
+    
+    // Check if content contains table-like structures
+    // Pattern 1: Markdown table (| separated with --- separator)
+    if (content.includes('|') && (content.includes('---') || content.includes('|--'))) {
+      return this.sanitizer.bypassSecurityTrustHtml(this.formatMarkdownTable(content));
+    }
+    
+    // Pattern 2: Pipe-separated table without markdown
+    if (content.includes('|') && this.looksLikeTable(content)) {
+      return this.sanitizer.bypassSecurityTrustHtml(this.formatPipeTable(content));
+    }
+    
+    // Pattern 3: Line-separated data that could be a table
+    if (this.looksLikeDataTable(content)) {
+      return this.sanitizer.bypassSecurityTrustHtml(this.formatDataTable(content));
+    }
+    
+    // Default: return as plain text with line breaks preserved
+    const formatted = content
+      .replace(/\n/g, '<br>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+    return this.sanitizer.bypassSecurityTrustHtml(formatted);
+  }
+
+  looksLikeTable(content: string): boolean {
+    const lines = content.split('\n').filter(line => line.trim());
+    if (lines.length < 2) return false;
+    
+    // Check if multiple lines contain pipes
+    const linesWithPipes = lines.filter(line => {
+      const trimmed = line.trim();
+      if (!trimmed.includes('|')) return false;
+      const cells = trimmed.split('|').filter(c => c.trim());
+      return cells.length >= 2; // At least 2 columns
+    });
+    
+    // Need at least 2 rows with pipes to be considered a table
+    if (linesWithPipes.length >= 2) {
+      // Check if columns are consistent (similar number of cells)
+      const firstRowCells = linesWithPipes[0].split('|').filter(c => c.trim()).length;
+      const consistentRows = linesWithPipes.filter(line => {
+        const cellCount = line.split('|').filter(c => c.trim()).length;
+        return Math.abs(cellCount - firstRowCells) <= 1; // Allow 1 column difference
+      });
+      return consistentRows.length >= 2;
+    }
+    
+    return false;
+  }
+
+  looksLikeDataTable(content: string): boolean {
+    // Check for patterns like "Route Name: value" or structured data
+    const lines = content.split('\n').filter(line => line.trim());
+    if (lines.length < 3) return false;
+    
+    // Check for colon-separated key-value pairs or structured format
+    const structuredLines = lines.filter(line => 
+      line.includes(':') || 
+      line.match(/^\s*\w+\s+\w+/) // Pattern like "test 423DFKA"
+    );
+    
+    return structuredLines.length >= 3;
+  }
+
+  formatMarkdownTable(content: string): string {
+    const lines = content.split('\n');
+    let inTable = false;
+    let tableHtml = '';
+    let result = '';
+    let headerProcessed = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Check if it's a table separator line (skip it completely, don't render)
+      if (line.match(/^\|[\s\-:]+\|$/) || line.match(/^[\s\-:|]+$/)) {
+        if (inTable && !headerProcessed) {
+          headerProcessed = true;
+          // Convert the last row to header
+          tableHtml = tableHtml.replace(/<tr>(.*?)<\/tr>/, '<thead><tr>$1</tr></thead><tbody>');
+        }
+        continue; // Skip separator line completely
+      }
+      
+      if (line.includes('|') && line.split('|').filter(c => c.trim()).length > 1) {
+        // Extract cells from the row
+        const cells = line.split('|')
+          .map(cell => cell.trim())
+          .filter(cell => cell.length > 0);
+        
+        // Skip rows where all cells are only dashes, dots, or separator characters
+        if (this.isSeparatorRow(cells)) {
+          if (inTable && !headerProcessed) {
+            headerProcessed = true;
+            // Convert the last row to header
+            tableHtml = tableHtml.replace(/<tr>(.*?)<\/tr>/, '<thead><tr>$1</tr></thead><tbody>');
+          }
+          continue; // Skip separator row
+        }
+        
+        // Table row
+        if (!inTable) {
+          inTable = true;
+          tableHtml = '<div class="chat-table-wrapper"><table class="chat-table">';
+          headerProcessed = false;
+        }
+        
+        if (cells.length > 0) {
+          tableHtml += `<tr>${cells.map(cell => `<td>${this.escapeHtml(cell)}</td>`).join('')}</tr>`;
+        }
+      } else {
+        // End of table
+        if (inTable) {
+          if (!headerProcessed) {
+            // No header separator found, treat first row as header
+            tableHtml = tableHtml.replace(/<tr>(.*?)<\/tr>/, '<thead><tr>$1</tr></thead><tbody>');
+          } else {
+            tableHtml += '</tbody>';
+          }
+          tableHtml += '</table></div>';
+          result += tableHtml;
+          tableHtml = '';
+          inTable = false;
+          headerProcessed = false;
+        }
+        if (line.trim()) {
+          result += this.escapeHtml(line) + '<br>';
+        }
+      }
+    }
+    
+    if (inTable) {
+      if (!headerProcessed) {
+        tableHtml = tableHtml.replace(/<tr>(.*?)<\/tr>/, '<thead><tr>$1</tr></thead><tbody>');
+      } else {
+        tableHtml += '</tbody>';
+      }
+      tableHtml += '</table></div>';
+      result += tableHtml;
+    }
+    
+    return result || this.escapeHtml(content).replace(/\n/g, '<br>');
+  }
+
+  formatPipeTable(content: string): string {
+    const lines = content.split('\n');
+    const result: string[] = [];
+    let tableLines: string[] = [];
+    let inTable = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const hasPipes = line.includes('|');
+      const cellCount = line.split('|').filter(c => c.trim()).length;
+      
+      if (hasPipes && cellCount > 1) {
+        // This is a table row
+        if (!inTable) {
+          inTable = true;
+          tableLines = [];
+        }
+        tableLines.push(line);
+      } else {
+        // End of table or non-table line
+        if (inTable && tableLines.length > 0) {
+          result.push(this.buildTableFromLines(tableLines));
+          tableLines = [];
+          inTable = false;
+        }
+        if (line) {
+          result.push(this.escapeHtml(line) + '<br>');
+        }
+      }
+    }
+    
+    // Handle table at end of content
+    if (inTable && tableLines.length > 0) {
+      result.push(this.buildTableFromLines(tableLines));
+    }
+    
+    return result.join('');
+  }
+  
+  buildTableFromLines(lines: string[]): string {
+    if (lines.length === 0) return '';
+    
+    let tableHtml = '<div class="chat-table-wrapper"><table class="chat-table">';
+    let firstRow = true;
+    
+    for (const line of lines) {
+      const cells = line.split('|')
+        .map(cell => cell.trim())
+        .filter(cell => cell.length > 0);
+      
+      // Skip rows where all cells are only dashes, dots, or separator characters
+      if (this.isSeparatorRow(cells)) {
+        if (firstRow) {
+          // If first row is a separator, treat next row as header
+          continue;
+        } else {
+          // Skip separator rows in body
+          continue;
+        }
+      }
+      
+      if (cells.length > 0) {
+        if (firstRow) {
+          // First row is header
+          tableHtml += `<thead><tr>${cells.map(cell => `<th>${this.escapeHtml(cell)}</th>`).join('')}</tr></thead><tbody>`;
+          firstRow = false;
+        } else {
+          tableHtml += `<tr>${cells.map(cell => `<td>${this.escapeHtml(cell)}</td>`).join('')}</tr>`;
+        }
+      }
+    }
+    
+    tableHtml += '</tbody></table></div>';
+    return tableHtml;
+  }
+
+  formatDataTable(content: string): string {
+    // For structured data like "Route Name: test, Code: 423DFKA"
+    const lines = content.split('\n').filter(line => line.trim());
+    let result = '';
+    
+    // Try to detect if it's a list format
+    if (lines.some(line => line.includes(':'))) {
+      result = '<div class="chat-data-list">';
+      for (const line of lines) {
+        if (line.includes(':')) {
+          const [key, ...valueParts] = line.split(':');
+          const value = valueParts.join(':').trim();
+          result += `<div class="chat-data-item"><strong>${this.escapeHtml(key.trim())}:</strong> <span>${this.escapeHtml(value)}</span></div>`;
+        } else {
+          result += `<div class="chat-data-item">${this.escapeHtml(line)}</div>`;
+        }
+      }
+      result += '</div>';
+    } else {
+      result = this.escapeHtml(content).replace(/\n/g, '<br>');
+    }
+    
+    return result;
+  }
+
+  escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Check if a row contains only separator characters (dashes, dots, etc.)
+  isSeparatorRow(cells: string[]): boolean {
+    if (cells.length === 0) return true;
+    
+    // Check if all cells are only dashes, dots, colons, spaces, or empty
+    return cells.every(cell => {
+      const trimmed = cell.trim();
+      return trimmed.length === 0 || trimmed.match(/^[\s\-\.:]+$/);
+    });
   }
 
   updateChatPreview(content: string): void {

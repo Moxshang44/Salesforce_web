@@ -13,8 +13,6 @@ import { DistributorFormStep3Component } from './components/distributor-form-ste
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
 
-const API_URL = 'http://ec2-13-203-193-170.ap-south-1.compute.amazonaws.com/api/v1';
-
 interface DistributorApiResponse {
   id: string;
   name: string;
@@ -129,7 +127,7 @@ export class DistributorsComponent implements OnInit {
       .map(key => `${key}=${encodeURIComponent(params[key])}`)
       .join('&');
 
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/distributors?${queryString}`;
+    const url = `${this.apiService.getApiUrl('companies')}/${this.selectedCompanyId}/distributors?${queryString}`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -284,7 +282,7 @@ export class DistributorsComponent implements OnInit {
       route_ids: Array.isArray(this.step3FormData.route_ids) ? this.step3FormData.route_ids : []
     };
 
-    const url = `${API_URL}/companies/${this.selectedCompanyId}/distributors`;
+    const url = `${this.apiService.getApiUrl('companies')}/${this.selectedCompanyId}/distributors`;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });

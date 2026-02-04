@@ -6,8 +6,10 @@
   border-radius: var(--radius-lg);
   padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xl);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  max-width: 500px;
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-header {
@@ -134,11 +136,11 @@
   border-radius: 2px;
   
   &.sales {
-    background: #4CAF50;
+    background: #2196F3; // Blue for Sales
   }
   
   &.target {
-    background: #FF9800;
+    background: #4CAF50; // Green for Target
   }
 }
 
@@ -188,22 +190,48 @@
   }
 }
 
-.bar {
+.chart-line {
   transition: opacity 0.2s ease;
   
-  &.sales-bar {
-    fill: #4CAF50;
+  &.sales-line {
+    stroke: #2196F3; // Blue for Sales
+    stroke-width: 3;
     
     &:hover {
       opacity: 0.8;
     }
   }
   
-  &.target-bar {
-    fill: #FF9800;
+  &.target-line {
+    stroke: #4CAF50; // Green for Target
+    stroke-width: 3;
     
     &:hover {
       opacity: 0.8;
+    }
+  }
+}
+
+.data-point {
+  transition: r 0.2s ease;
+  
+  &.sales-point {
+    fill: #2196F3;
+    stroke: white;
+    stroke-width: 2;
+    
+    &:hover {
+      r: 6;
+    }
+  }
+  
+  &.target-point {
+    fill: #4CAF50;
+    stroke: white;
+    stroke-width: 2;
+    
+    &:hover {
+      r: 6;
     }
   }
 }

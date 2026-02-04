@@ -96,10 +96,10 @@
             <table class="product-table">
               <thead>
                 <tr>
-                  <th class="col-action">Action</th>
+                  <th class="col-action">Actions</th>
                   <th class="col-active">Active</th>
-                  <th class="col-brand">Brand/Type-Code</th>
-                  <th class="col-name">Name/size/Category</th>
+                  <th class="col-brand">Brand | Type-Code</th>
+                  <th class="col-name">Name | Size | Category</th>
                 </tr>
               </thead>
               <tbody>
@@ -155,24 +155,26 @@
               </tbody>
             </table>
           </div>
-
-          <!-- Table Footer -->
-          <div class="table-footer">
-            @if (totalCount > 0) {
-              @if (totalCount <= recordsPerPage) {
-                <p>Showing 1 to {{ totalCount }} of {{ totalCount }} entries</p>
-              } @else {
-                @if (currentPage === totalPages) {
-                  <p>Showing {{ ((currentPage - 1) * recordsPerPage) + 1 }} to {{ totalCount }} of {{ totalCount }} entries</p>
-                } @else {
-                  <p>Showing {{ ((currentPage - 1) * recordsPerPage) + 1 }} to {{ currentPage * recordsPerPage }} of {{ totalCount }} entries</p>
-                }
-              }
-            } @else {
-              <p>No entries</p>
-            }
-          </div>
         }
+      </div>
+
+      <!-- Pagination Bottom -->
+      <div class="pagination-bottom">
+        <span class="pagination-text">
+          @if (totalCount > 0) {
+            @if (totalCount <= recordsPerPage) {
+              Showing 1 to {{ totalCount }} of {{ totalCount }} entries
+            } @else {
+              @if (currentPage === totalPages) {
+                Showing {{ ((currentPage - 1) * recordsPerPage) + 1 }} to {{ totalCount }} of {{ totalCount }} entries
+              } @else {
+                Showing {{ ((currentPage - 1) * recordsPerPage) + 1 }} to {{ currentPage * recordsPerPage }} of {{ totalCount }} entries
+              }
+            }
+          } @else {
+            No entries
+          }
+        </span>
       </div>
     </div>
   </div>

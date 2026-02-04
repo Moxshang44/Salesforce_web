@@ -3,7 +3,7 @@
 .distributors-layout {
   display: flex;
   min-height: 100vh;
-  background: #f8f9fa;
+  background: #FFF9F3;
 }
 
 .main-content {
@@ -406,16 +406,14 @@
   text-align: center;
 }
 
-.table-footer {
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-top: 1px solid #f0ebe5;
-  background: #fdfbf9;
-  
-  p {
-    margin: 0;
-    font-size: 13px;
-    color: #666;
-  }
+.pagination-bottom {
+  text-align: center;
+  padding: 15px 0;
+}
+
+.pagination-text {
+  font-size: 14px;
+  color: #6c757d;
 }
 
 // Modal transparency overrides for distributor form

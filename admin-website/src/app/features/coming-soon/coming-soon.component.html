@@ -1,0 +1,29 @@
+<div class="coming-soon-layout">
+  <app-sidebar></app-sidebar>
+  
+  <div class="main-content">
+    <app-header></app-header>
+    
+    <div class="coming-soon-content">
+      <div class="coming-soon-card">
+        <div class="icon-container">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#664423" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="#664423" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="#664423" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1 class="coming-soon-title">Coming Soon</h1>
+        <p class="coming-soon-message">
+          @if (pageName) {
+            The {{ pageName }} page is under development.
+          } @else {
+            This page is under development.
+          }
+        </p>
+        <p class="coming-soon-submessage">We're working hard to bring you this feature. Please check back soon!</p>
+      </div>
+    </div>
+  </div>
+</div>
+

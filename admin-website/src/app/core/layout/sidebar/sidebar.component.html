@@ -1,6 +1,6 @@
-<aside class="sidebar" [class.collapsed]="isCollapsed">
+<aside class="sidebar" [class.collapsed]="isCollapsed" #sidebarElement>
   <div class="sidebar-header">
-    <img src="assets/images/gaa-tha logo.jpeg" alt="Company Logo" class="company-logo">
+    <img src="assets/images/company-logo.svg" alt="Company Logo" class="company-logo">
     <h1 class="company-name" *ngIf="!isCollapsed">{{ companyName }}</h1>
     <button class="collapse-btn" (click)="toggleSidebar()" [title]="isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" [class.rotate]="isCollapsed">
@@ -18,13 +18,16 @@
             class="nav-item"
             [class.active]="isParentRouteActive(item) || item.isExpanded"
             [class.has-submenu]="true"
-            (click)="toggleSubMenu(item)"
+            (click)="toggleSubMenu(item, $event)"
           >
             @if (item.iconImage) {
               <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
             }
             <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
             <span class="expand-icon" [class.expanded]="item.isExpanded" *ngIf="!isCollapsed">▸</span>
+            @if (isCollapsed) {
+              <span class="nav-tooltip">{{ item.label }}</span>
+            }
           </div>
           
           <!-- Sub-menu items -->
@@ -56,10 +59,40 @@
               <img [src]="item.iconImage" [alt]="item.label" class="nav-icon-img">
             }
             <span class="nav-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+            @if (isCollapsed) {
+              <span class="nav-tooltip">{{ item.label }}</span>
+            }
           </a>
         }
       </div>
     }
   </nav>
+
+  <!-- Product Master Popup (when sidebar is collapsed) -->
+  @if (showProductMasterPopup && isCollapsed) {
+    <div class="product-master-popup" 
+         [style.top.px]="popupPosition.top"
+         [style.left.px]="popupPosition.left">
+      <div class="popup-header">
+        <span class="popup-title">Product Master</span>
+        <button class="popup-close" (click)="closeProductMasterPopup()">×</button>
+      </div>
+      <div class="popup-content">
+        @for (item of navItems; track item.label) {
+          @if (item.label === 'Product Master' && item.subItems) {
+            @for (subItem of item.subItems; track subItem.route) {
+              <a 
+                class="popup-item"
+                (click)="navigateToSubItem(subItem)"
+                [class.active]="currentRoute === subItem.route"
+              >
+                {{ subItem.label }}
+              </a>
+            }
+          }
+        }
+      </div>
+    </div>
+  }
 </aside>
 

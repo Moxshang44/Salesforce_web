@@ -16,12 +16,21 @@ export class HeaderComponent {
   hasNotifications = true;
   searchQuery = '';
   showProfileMenu = false;
+  aiAssistantEnabled = true;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private chatWidgetService: ChatWidgetService
-  ) {}
+  ) {
+    // Subscribe to enabled state
+    this.chatWidgetService.enabled$.subscribe(enabled => {
+      this.aiAssistantEnabled = enabled;
+    });
+    
+    // Get initial state
+    this.aiAssistantEnabled = this.chatWidgetService.isEnabled;
+  }
 
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -35,6 +44,11 @@ export class HeaderComponent {
 
   onAiClick() {
     this.chatWidgetService.toggle();
+  }
+
+  onAiToggle(event: Event) {
+    event.stopPropagation();
+    this.chatWidgetService.toggleEnabled();
   }
 
   onProfileClick() {

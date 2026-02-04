@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ChatWidgetComponent } from './shared/components/chat-widget/chat-widget.component';
+import { ChatWidgetService } from './shared/services/chat-widget.service';
 import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +13,15 @@ import { filter } from 'rxjs/operators';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Admin Website';
   showChatWidget = true;
+  private enabledSubscription?: Subscription;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private chatWidgetService: ChatWidgetService
+  ) {}
 
   ngOnInit() {
     // Check initial route
@@ -27,13 +33,38 @@ export class AppComponent implements OnInit {
       .subscribe((event: any) => {
         this.checkRoute(event.url);
       });
+
+    // Subscribe to AI Assistant enabled state
+    this.enabledSubscription = this.chatWidgetService.enabled$.subscribe(enabled => {
+      this.updateChatWidgetVisibility();
+    });
+    
+    // Initial check
+    this.updateChatWidgetVisibility();
+  }
+
+  ngOnDestroy() {
+    if (this.enabledSubscription) {
+      this.enabledSubscription.unsubscribe();
+    }
   }
 
   private checkRoute(url: string) {
     // Hide chat widget on login page and super admin routes
     const isLoginPage = url === '/login' || url.startsWith('/login?');
     const isSuperAdminRoute = url === '/superadmin' || url.startsWith('/super-admin');
-    this.showChatWidget = !isLoginPage && !isSuperAdminRoute;
+    const shouldShowByRoute = !isLoginPage && !isSuperAdminRoute;
+    this.updateChatWidgetVisibility(shouldShowByRoute);
+  }
+
+  private updateChatWidgetVisibility(shouldShowByRoute?: boolean) {
+    const routeCheck = shouldShowByRoute !== undefined ? shouldShowByRoute : 
+      !this.router.url.startsWith('/login') && 
+      !this.router.url.startsWith('/superadmin') && 
+      !this.router.url.startsWith('/super-admin');
+    
+    const isEnabled = this.chatWidgetService.isEnabled;
+    this.showChatWidget = routeCheck && isEnabled;
   }
 }
 

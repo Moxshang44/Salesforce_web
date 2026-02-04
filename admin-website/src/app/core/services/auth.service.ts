@@ -10,6 +10,9 @@ export class AuthService {
   private readonly SUPER_ADMIN_AUTH_KEY = 'isSuperAdminAuthenticated';
   private readonly TOKEN_KEY = 'auth_token';
   private readonly COMPANY_KEY = 'company_info';
+  private readonly USER_ID_KEY = 'user_id';
+  private readonly USER_INFO_KEY = 'user_info';
+  private readonly ACCESS_TOKEN_KEY = 'access_token';
   
   // Store OTPs temporarily (in production, this would be handled by backend)
   // Format: { mobileNumber: { otp: string, expiresAt: number } }
@@ -151,6 +154,9 @@ export class AuthService {
     localStorage.removeItem('dmsUserMobile');
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.COMPANY_KEY);
+    localStorage.removeItem(this.USER_ID_KEY);
+    localStorage.removeItem(this.USER_INFO_KEY);
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     this.router.navigate(['/login']);
   }
 
@@ -162,6 +168,9 @@ export class AuthService {
     localStorage.removeItem('dmsUserMobile');
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.COMPANY_KEY);
+    localStorage.removeItem(this.USER_ID_KEY);
+    localStorage.removeItem(this.USER_INFO_KEY);
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     this.router.navigate(['/login']);
   }
 
@@ -223,5 +232,36 @@ export class AuthService {
   getCompanyName(): string {
     const companyInfo = this.getCompanyInfo();
     return companyInfo?.company_name || 'Company Name';
+  }
+
+  // Store user info after successful authentication
+  setUserInfo(userInfo: { user_id: string; area_id?: number; company_id: string; role?: string }): void {
+    localStorage.setItem(this.USER_ID_KEY, userInfo.user_id);
+    localStorage.setItem(this.USER_INFO_KEY, JSON.stringify(userInfo));
+  }
+
+  getUserId(): string | null {
+    return localStorage.getItem(this.USER_ID_KEY);
+  }
+
+  getUserInfo(): { user_id: string; area_id?: number; company_id: string; role?: string } | null {
+    const userInfo = localStorage.getItem(this.USER_INFO_KEY);
+    if (userInfo) {
+      try {
+        return JSON.parse(userInfo);
+      } catch (e) {
+        console.error('Error parsing user info:', e);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  setAccessToken(accessToken: string): void {
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
+  }
+
+  getAccessToken(): string | null {
+    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 }

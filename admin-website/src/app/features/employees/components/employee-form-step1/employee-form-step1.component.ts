@@ -117,6 +117,13 @@ export class EmployeeFormStep1Component implements OnInit, OnChanges {
   isLoadingRoutes = false;
   routesError = '';
 
+  // Route Assignment
+  routeAssignmentFromDate: string = '';
+  routeAssignmentToDate: string = '';
+  isAssigningRoutes = false;
+  assignRoutesError = '';
+  assignRoutesSuccess = '';
+
   // Account types
   accountTypes: ('SAVINGS' | 'CURRENT')[] = ['SAVINGS', 'CURRENT'];
 
@@ -498,6 +505,101 @@ export class EmployeeFormStep1Component implements OnInit, OnChanges {
         this.routes = [];
       }
     });
+  }
+
+  // Assign routes to employee
+  onAssignRoutes(): void {
+    // Clear previous messages
+    this.assignRoutesError = '';
+    this.assignRoutesSuccess = '';
+    this.errors['from_date'] = '';
+    this.errors['to_date'] = '';
+
+    // Validate
+    if (!this.isEditMode || !this.employeeData?.id) {
+      this.assignRoutesError = 'Please save the employee first before assigning routes.';
+      return;
+    }
+
+    if (!this.routeAssignmentFromDate) {
+      this.errors['from_date'] = 'From date is required';
+      return;
+    }
+
+    // Validate to_date is after from_date if provided
+    if (this.routeAssignmentToDate && this.routeAssignmentToDate < this.routeAssignmentFromDate) {
+      this.errors['to_date'] = 'To date must be after from date';
+      return;
+    }
+
+    // Get routes to assign (days with selected routes)
+    const routesToAssign = this.weekSchedule
+      .map((schedule, index) => ({
+        route_id: schedule.route_id,
+        day: index // 0=Monday, 1=Tuesday, etc.
+      }))
+      .filter(item => item.route_id !== null && item.route_id !== undefined);
+
+    if (routesToAssign.length === 0) {
+      this.assignRoutesError = 'Please select at least one route to assign.';
+      return;
+    }
+
+    this.isAssigningRoutes = true;
+    const userId = this.employeeData.id;
+    const url = this.apiService.getApiUrl(`companies/${this.selectedCompanyId}/route-assignments`);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    // Create all route assignment requests
+    let completedRequests = 0;
+    let failedRequests = 0;
+    const totalRequests = routesToAssign.length;
+
+    routesToAssign.forEach((route) => {
+      const payload: any = {
+        route_id: Number(route.route_id),
+        user_id: userId,
+        from_date: this.routeAssignmentFromDate,
+        day: route.day,
+        is_active: true
+      };
+
+      // Add to_date only if provided
+      if (this.routeAssignmentToDate) {
+        payload.to_date = this.routeAssignmentToDate;
+      }
+
+      console.log('Assigning route:', payload);
+
+      this.http.post<any>(url, payload, { headers }).subscribe({
+        next: (response) => {
+          console.log('Route assignment success:', response);
+          completedRequests++;
+          this.checkAssignmentCompletion(completedRequests, failedRequests, totalRequests);
+        },
+        error: (error) => {
+          console.error('Route assignment error:', error);
+          failedRequests++;
+          completedRequests++;
+          this.checkAssignmentCompletion(completedRequests, failedRequests, totalRequests);
+        }
+      });
+    });
+  }
+
+  checkAssignmentCompletion(completed: number, failed: number, total: number): void {
+    if (completed === total) {
+      this.isAssigningRoutes = false;
+      if (failed === 0) {
+        this.assignRoutesSuccess = `Successfully assigned ${total} route(s) to the employee.`;
+      } else if (failed < total) {
+        this.assignRoutesSuccess = `Assigned ${total - failed} route(s) successfully. ${failed} assignment(s) failed.`;
+      } else {
+        this.assignRoutesError = 'Failed to assign routes. Please try again.';
+      }
+    }
   }
 
   toNumber(value: any): number | null {
