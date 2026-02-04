@@ -7,6 +7,7 @@ import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { LogoLoaderComponent } from '../../shared/components/logo-loader/logo-loader.component';
 import { DistributorFormStep1Component } from './components/distributor-form-step1/distributor-form-step1.component';
 import { DistributorFormStep2Component } from './components/distributor-form-step2/distributor-form-step2.component';
 import { DistributorFormStep3Component } from './components/distributor-form-step3/distributor-form-step3.component';
@@ -51,7 +52,7 @@ interface Company {
 @Component({
   selector: 'app-distributors',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, DistributorFormStep1Component, DistributorFormStep2Component, DistributorFormStep3Component],
+  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, DistributorFormStep1Component, DistributorFormStep2Component, DistributorFormStep3Component, LogoLoaderComponent],
   templateUrl: './distributors.component.html',
   styleUrl: './distributors.component.scss'
 })

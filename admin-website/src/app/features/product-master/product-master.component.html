@@ -79,7 +79,7 @@
       <div class="table-card">
         @if (isLoadingProducts) {
           <div class="loading-state-container">
-            <p>Loading products...</p>
+            <app-logo-loader message="Loading products..."></app-logo-loader>
           </div>
         } @else if (productsError) {
           <div class="error-state-container">
@@ -225,7 +225,7 @@
   >
     @if (isLoadingView) {
       <div class="loading-state">
-        <p>Loading product details...</p>
+        <app-logo-loader message="Loading product details..."></app-logo-loader>
       </div>
     } @else if (viewErrorMessage) {
       <div class="alert alert-error">

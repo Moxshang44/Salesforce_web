@@ -7,6 +7,7 @@ import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { RouteFormStep1Component } from './components/route-form-step1/route-form-step1.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
+import { LogoLoaderComponent } from '../../shared/components/logo-loader/logo-loader.component';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -48,7 +49,7 @@ interface Route {
 @Component({
   selector: 'app-routes',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ModalComponent, RouteFormStep1Component, ButtonComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ModalComponent, RouteFormStep1Component, ButtonComponent, LogoLoaderComponent],
   templateUrl: './routes.component.html',
   styleUrl: './routes.component.scss'
 })

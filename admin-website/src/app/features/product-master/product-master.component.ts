@@ -6,6 +6,7 @@ import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { LogoLoaderComponent } from '../../shared/components/logo-loader/logo-loader.component';
 import { ProductFormComponent, ProductFormStep1Data } from './components/product-form/product-form.component';
 import { ProductFormStep2Component, ProductFormStep2Data } from './components/product-form-step2/product-form-step2.component';
 import { ProductFormStep3Component, ProductFormStep3Data } from './components/product-form-step3/product-form-step3.component';
@@ -41,7 +42,8 @@ interface Company {
     ProductFormComponent, 
     ProductFormStep2Component, 
     ProductFormStep3Component, 
-    ProductFormStep4Component
+    ProductFormStep4Component,
+    LogoLoaderComponent
   ],
   templateUrl: './product-master.component.html',
   styleUrl: './product-master.component.scss'

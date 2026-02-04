@@ -68,7 +68,7 @@
       <div class="table-container">
         @if (isLoadingBrands) {
           <div class="loading-state-container">
-            <p>Loading brands...</p>
+            <app-logo-loader message="Loading brands..."></app-logo-loader>
           </div>
         } @else if (brandsError) {
           <div class="error-state-container">
@@ -212,7 +212,7 @@
     >
       @if (isLoadingView) {
         <div class="loading-state">
-          <p>Loading brand details...</p>
+          <app-logo-loader message="Loading brand details..."></app-logo-loader>
         </div>
       } @else if (viewErrorMessage) {
         <div class="alert alert-error">

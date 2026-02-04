@@ -72,7 +72,7 @@
       <div class="table-container">
         @if (isLoadingRoutes) {
           <div class="loading-state-container">
-            <p>Loading routes...</p>
+            <app-logo-loader message="Loading routes..."></app-logo-loader>
           </div>
         } @else if (routesError) {
           <div class="error-state-container">
@@ -199,11 +199,11 @@
       width="800px"
       (close)="closeViewModal()"
     >
-      @if (isLoadingView) {
-        <div class="loading-state">
-          <p>Loading route details...</p>
-        </div>
-      } @else if (viewErrorMessage) {
+    @if (isLoadingView) {
+      <div class="loading-state">
+        <app-logo-loader message="Loading route details..."></app-logo-loader>
+      </div>
+    } @else if (viewErrorMessage) {
         <div class="alert alert-error">
           <strong>Error:</strong>
           <pre class="error-pre">{{ viewErrorMessage }}</pre>

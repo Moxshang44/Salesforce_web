@@ -938,11 +938,10 @@
   }
 }
 
-// Adjust main content when sidebar is open
+// Keep main content width fixed when sidebar is open
 .sales-layout.sidebar-open {
   .page-content {
-    margin-right: 320px;
-    transition: margin-right 0.3s ease;
+    margin-right: 0;
   }
 }
 

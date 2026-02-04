@@ -6,6 +6,7 @@ import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { LogoLoaderComponent } from '../../shared/components/logo-loader/logo-loader.component';
 import { BrandFormStep1Component, BrandFormStep1Data } from './components/brand-form-step1/brand-form-step1.component';
 import { BrandFormStep2Component, BrandFormStep2Data } from './components/brand-form-step2/brand-form-step2.component';
 import { ApiService } from '../../core/services/api.service';
@@ -41,7 +42,7 @@ interface Brand {
 @Component({
   selector: 'app-brand',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, BrandFormStep1Component, BrandFormStep2Component],
+  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, BrandFormStep1Component, BrandFormStep2Component, LogoLoaderComponent],
   templateUrl: './brand.component.html',
   styleUrl: './brand.component.scss'
 })
