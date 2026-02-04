@@ -122,7 +122,7 @@
       <div class="table-card">
         @if (isLoading) {
           <div class="loading-state" style="padding: 40px; text-align: center;">
-            <p>Loading distributors...</p>
+            <app-logo-loader message="Loading distributors..."></app-logo-loader>
           </div>
         } @else if (loadError) {
           <div class="error-state" style="padding: 40px; text-align: center; color: #c33;">

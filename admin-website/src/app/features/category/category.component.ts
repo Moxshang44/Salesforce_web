@@ -6,6 +6,7 @@ import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { LogoLoaderComponent } from '../../shared/components/logo-loader/logo-loader.component';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CategoryFormStep1Component } from './components/category-form-step1/category-form-step1.component';
@@ -49,7 +50,7 @@ interface CategoryFormStep1Data {
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, CategoryFormStep1Component],
+  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, CategoryFormStep1Component, LogoLoaderComponent],
   templateUrl: './category.component.html',
   styleUrl: './category.component.scss'
 })

@@ -74,7 +74,7 @@
       <div class="table-container">
         @if (isLoadingEmployees) {
           <div class="loading-state">
-            <p>Loading employees...</p>
+            <app-logo-loader message="Loading employees..."></app-logo-loader>
           </div>
         } @else if (employeesError) {
           <div class="error-state">
@@ -195,11 +195,11 @@
       width="1000px"
       (close)="closeViewModal()"
     >
-      @if (isLoadingView) {
-        <div class="loading-state">
-          <p>Loading employee details...</p>
-        </div>
-      } @else if (viewErrorMessage) {
+    @if (isLoadingView) {
+      <div class="loading-state">
+        <app-logo-loader message="Loading employee details..."></app-logo-loader>
+      </div>
+    } @else if (viewErrorMessage) {
         <div class="alert alert-error">
           <strong>Error:</strong>
           <pre class="error-pre">{{ viewErrorMessage }}</pre>

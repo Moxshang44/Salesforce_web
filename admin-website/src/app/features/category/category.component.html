@@ -48,7 +48,7 @@
       <div class="table-container">
         @if (isLoadingCategories) {
           <div class="loading-state-container">
-            <p>Loading categories...</p>
+            <app-logo-loader message="Loading categories..."></app-logo-loader>
           </div>
         } @else if (categoriesError) {
           <div class="error-state-container">
@@ -162,7 +162,7 @@
   >
     @if (isLoadingView) {
       <div class="loading-state">
-        <p>Loading category details...</p>
+        <app-logo-loader message="Loading category details..."></app-logo-loader>
       </div>
     } @else if (viewErrorMessage) {
       <div class="alert alert-error">

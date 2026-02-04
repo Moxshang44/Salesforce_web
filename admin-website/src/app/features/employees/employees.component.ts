@@ -6,6 +6,7 @@ import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { EmployeeFormStep1Component, EmployeeFormData } from './components/employee-form-step1/employee-form-step1.component';
+import { LogoLoaderComponent } from '../../shared/components/logo-loader/logo-loader.component';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { forkJoin } from 'rxjs';
@@ -43,7 +44,7 @@ interface RouteAssignment {
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, EmployeeFormStep1Component],
+  imports: [CommonModule, SidebarComponent, HeaderComponent, ButtonComponent, ModalComponent, EmployeeFormStep1Component, LogoLoaderComponent],
   templateUrl: './employees.component.html',
   styleUrl: './employees.component.scss'
 })
