@@ -31,7 +31,7 @@
           <p class="page-subtitle">Orders to Super Stockist</p>
         </div>
         <app-button variant="primary" size="sm" (click)="onCreateOrder()">
-          <img src="assets/images/add.png" alt="Add" class="button-icon">
+          <img src="assets/images/add.svg" alt="Add" class="button-icon">
           Create Order
         </app-button>
       </div>
@@ -91,7 +91,7 @@
         </label>
 
         <app-button variant="primary" size="sm" (click)="onExcel()">
-          <img src="assets/images/export.png" alt="Export" class="button-icon">
+          <img src="assets/images/Export.svg" alt="Export" class="button-icon">
           Excel
         </app-button>
         <app-button 
@@ -99,7 +99,7 @@
           size="sm" 
           (click)="onSyncWithTally()"
           [disabled]="selectedOrders.size === 0 || syncingToTally">
-          <img src="assets/images/export.png" alt="Sync" class="button-icon" *ngIf="!syncingToTally">
+          <img src="assets/images/Export.svg" alt="Sync" class="button-icon" *ngIf="!syncingToTally">
           <span *ngIf="syncingToTally">Syncing...</span>
           <span *ngIf="!syncingToTally">Sync with Tally</span>
         </app-button>

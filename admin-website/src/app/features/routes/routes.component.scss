@@ -55,7 +55,7 @@
     }
   }
 
-  // Make the Assign Routes button icon white (first app-button with routes.png icon)
+  // Make the Assign Routes button icon white (first app-button with Routes.svg icon)
   ::ng-deep app-button:first-of-type .button-icon {
     filter: brightness(0) invert(1);
   }

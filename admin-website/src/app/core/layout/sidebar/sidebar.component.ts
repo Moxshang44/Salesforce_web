@@ -37,11 +37,11 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   popupPosition = { top: 0, left: 0 };
   
   navItems: NavItem[] = [
-    { label: 'Dashboard', route: '/admin/dashboard', iconImage: 'assets/images/dashboard.png' },
+    { label: 'Dashboard', route: '/admin/dashboard', iconImage: 'assets/images/Dashboard.svg' },
     { 
       label: 'Product Master', 
       route: '/admin/products', 
-      iconImage: 'assets/images/productmastericonadmin.png',
+      iconImage: 'assets/images/Productmaster.svg',
       isExpanded: false,
       subItems: [
         { label: 'Brand', route: '/admin/brand' },
@@ -52,20 +52,20 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
         { label: 'Incentives', route: '/admin/incentives' }
       ]
     },
-    { label: 'Routes', route: '/admin/routes', iconImage: 'assets/images/routes.png' },
-    { label: 'Super Stockist', route: '/admin/super-stockist', iconImage: 'assets/images/superstockist.png' },
-    { label: 'Distributors', route: '/admin/distributors', iconImage: 'assets/images/Distributor.png' },
-    { label: 'Retailers', route: '/admin/retailer', iconImage: 'assets/images/finance.png' },
-    { label: 'Employee Master', route: '/admin/employees', iconImage: 'assets/images/employees.png' },
-    { label: 'Finance', route: '/admin/finance', iconImage: 'assets/images/finance.png' },
-    { label: 'Marketing', route: '/admin/marketing', iconImage: 'assets/images/marketing.png' },
-    { label: 'Assign Task', route: '/admin/tasks', iconImage: 'assets/images/assigntask.png' },
-    { label: 'AI chat bot', route: '/admin/ai-chat', iconImage: 'assets/images/aichatbot.png' },
-    { label: 'Assets', route: '/admin/assets', iconImage: 'assets/images/assets.png' },
-    { label: 'Targets', route: '/admin/targets', iconImage: 'assets/images/finance.png' },
+    { label: 'Routes', route: '/admin/routes', iconImage: 'assets/images/Routes.svg' },
+    { label: 'Super Stockist', route: '/admin/super-stockist', iconImage: 'assets/images/SuperStockist.svg' },
+    { label: 'Distributors', route: '/admin/distributors', iconImage: 'assets/images/Distributors.svg' },
+    { label: 'Retailers', route: '/admin/retailer', iconImage: 'assets/images/Finance.svg' },
+    { label: 'Employee Master', route: '/admin/employees', iconImage: 'assets/images/Employees.svg' },
+    { label: 'Finance', route: '/admin/finance', iconImage: 'assets/images/Finance.svg' },
+    { label: 'Marketing', route: '/admin/marketing', iconImage: 'assets/images/Marketing.svg' },
+    { label: 'Assign Task', route: '/admin/tasks', iconImage: 'assets/images/TaskManager.svg' },
+    { label: 'AI chat bot', route: '/admin/ai-chat', iconImage: 'assets/images/AiBot.svg' },
+    { label: 'Assets', route: '/admin/assets', iconImage: 'assets/images/Assets.svg' },
+    { label: 'Targets', route: '/admin/targets', iconImage: 'assets/images/Finance.svg' },
     { label: 'Sales Insights', route: '/admin/sales-insights', iconImage: 'assets/images/sales-insights.svg' },
-    { label: 'Live View', route: '/admin/live-view', iconImage: 'assets/images/live-view.svg' },
-    { label: 'Settings', route: '/admin/settings', iconImage: 'assets/images/settings.png' },
+    { label: 'Live View', route: '/admin/live-view', iconImage: 'assets/images/LiveView.svg' },
+    { label: 'Settings', route: '/admin/settings', iconImage: 'assets/images/Settings.svg' },
   ];
 
   constructor(
