@@ -20,7 +20,7 @@ interface NavItem {
 export class SuperAdminSidebarComponent {
   companyName = 'Super Admin';
   currentRoute = '';
-  isCollapsed = false;
+  isCollapsed = true;
   
   navItems: NavItem[] = [];
   
@@ -29,8 +29,8 @@ export class SuperAdminSidebarComponent {
     private sanitizer: DomSanitizer
   ) {
     this.currentRoute = this.router.url;
-    // Initialize CSS variable
-    document.documentElement.style.setProperty('--sidebar-width', '220px');
+    // Initialize CSS variable - sidebar is collapsed by default
+    document.documentElement.style.setProperty('--sidebar-width', '70px');
     
     // Initialize nav items with sanitized SVG icons
     this.initializeNavItems();

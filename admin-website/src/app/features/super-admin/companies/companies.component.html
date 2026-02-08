@@ -102,7 +102,10 @@
                   } @else if (company.admins && company.admins.length > 0) {
                     <div class="admins-list">
                       @for (admin of company.admins; track admin.id || admin.username) {
-                        <span class="admin-badge">{{ admin.name || admin.username }}</span>
+                        <div class="admin-info">
+                          <div class="admin-name">{{ admin.name || admin.username || 'N/A' }}</div>
+                          <div class="admin-contact">{{ admin.contact_no || 'N/A' }}</div>
+                        </div>
                       }
                     </div>
                   } @else {
@@ -625,20 +628,6 @@
       }
 
       <div class="form-group">
-        <label for="assign_username" class="form-label">Username <span class="required">*</span></label>
-        <app-input
-          id="assign_username"
-          type="text"
-          [(ngModel)]="assignAdminForm.username"
-          name="assign_username"
-          placeholder="Enter username"
-          [required]="true"
-          [error]="assignFormErrors['username']"
-        ></app-input>
-        <small class="form-hint">1-100 characters</small>
-      </div>
-
-      <div class="form-group">
         <label for="assign_name" class="form-label">Name <span class="required">*</span></label>
         <app-input
           id="assign_name"
@@ -680,8 +669,10 @@
           type="text"
           [(ngModel)]="assignAdminForm.role"
           name="assign_role"
-          placeholder="Enter role (optional)"
+          [disabled]="true"
+          placeholder="ADMIN"
         ></app-input>
+        <small class="form-hint">Role is set to ADMIN</small>
       </div>
 
       <div class="form-actions">

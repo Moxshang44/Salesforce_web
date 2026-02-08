@@ -57,23 +57,10 @@ export class LoginComponent implements OnDestroy {
       return;
     }
 
-    // Check if this is a demo credential
-    const isDemoCredential = this.mobileNumber === '9876543210' || this.mobileNumber === '9999999999';
-    
-    // For demo credentials, skip API call and show OTP input directly
-    if (isDemoCredential) {
-      this.otpSent = true;
-      this.otpSentTime = Date.now();
-      this.startResendTimer();
-      this.errorMessage = '';
-      // Store OTP for demo credentials
-      this.authService.sendOtp(this.mobileNumber);
-      return;
-    }
-
+    // Always call API to generate OTP
     this.isSendingOtp = true;
     
-    // Call API to generate OTP for non-demo credentials
+    // Call API to generate OTP
     const url = this.apiService.getApiUrl('auth/generate-otp');
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
@@ -96,9 +83,6 @@ export class LoginComponent implements OnDestroy {
         this.otpSentTime = Date.now();
         this.startResendTimer();
         this.errorMessage = '';
-        
-        // Also update the local auth service for backward compatibility
-        this.authService.sendOtp(this.mobileNumber);
       },
       error: (error: any) => {
         this.isSendingOtp = false;
@@ -150,30 +134,7 @@ export class LoginComponent implements OnDestroy {
       return;
     }
 
-    // Check if this is a demo credential
-    const isDemoCredential = this.mobileNumber === '9876543210' || this.mobileNumber === '9999999999';
-    
-    // For demo credentials, use local verification
-    if (isDemoCredential && this.otp === '123456') {
-    this.isSubmitting = true;
-    const loginResult = this.authService.loginWithOtp(this.mobileNumber, this.otp);
-    
-    if (loginResult.success) {
-      // Route based on mobile number (admin or DMS)
-      if (loginResult.isDms) {
-        this.router.navigate(['/dms/dashboard']);
-      } else {
-        this.router.navigate(['/admin/dashboard']);
-      }
-    } else {
-      this.errorMessage = 'Invalid OTP. Please try again.';
-      this.otp = '';
-      this.isSubmitting = false;
-    }
-      return;
-    }
-
-    // For other credentials, call verify-otp API
+    // Always call verify-otp API
     this.isSubmitting = true;
     
     const url = this.apiService.getApiUrl('auth/verify-otp');
@@ -308,38 +269,56 @@ export class LoginComponent implements OnDestroy {
     this.http.post<any>(authUrl, payload, { headers }).subscribe({
       next: (authResponse: any) => {
         console.log('Auth user to company response:', authResponse);
+        this.isSubmitting = false;
         
         // Since HTTP 200 means success, process the response if it has data
         // Accept any status_code (1, 200, or undefined) as long as we have data
-        if (authResponse.data) {
+        // Also accept success if status_code is 200 or 1, or if success is true
+        const isSuccess = authResponse.status_code === 200 || 
+                         authResponse.status_code === 1 || 
+                         authResponse.success === true || 
+                         authResponse.data;
+        
+        if (isSuccess) {
           // Store user_id and access_token
-          if (authResponse.data.user) {
+          let userRole = null;
+          if (authResponse.data && authResponse.data.user) {
             this.authService.setUserInfo(authResponse.data.user);
+            // Get the role from user object
+            userRole = authResponse.data.user.role;
           }
           
-          if (authResponse.data.access_token) {
+          if (authResponse.data && authResponse.data.access_token) {
             this.authService.setAccessToken(authResponse.data.access_token);
             // Update the main auth token with access_token
             this.authService.setAuthToken(authResponse.data.access_token);
           }
           
-          // Now login using auth service
-          const loginResult = this.authService.loginWithOtp(this.mobileNumber, this.otp);
+          // Directly set authentication state since both APIs succeeded
+          // Determine if this is DMS or Admin based on user role from API
+          // Check if role is DMS (case-insensitive)
+          const isDms = userRole && userRole.toLowerCase() === 'dms';
           
-          if (loginResult.success) {
-            // Route based on mobile number (admin or DMS)
-            if (loginResult.isDms) {
-              this.router.navigate(['/dms/dashboard']);
-            } else {
-              this.router.navigate(['/admin/dashboard']);
-            }
+          if (isDms) {
+            // DMS login
+            localStorage.setItem('isDmsAuthenticated', 'true');
+            localStorage.setItem('dmsUserMobile', this.mobileNumber);
+            // Clear any admin auth that might exist
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('userMobile');
+            this.router.navigate(['/dms/dashboard']);
           } else {
-            this.errorMessage = 'Login failed. Please try again.';
-            this.otp = '';
+            // Admin login (default for non-DMS users)
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('userMobile', this.mobileNumber);
+            // Clear any DMS auth that might exist
+            localStorage.removeItem('isDmsAuthenticated');
+            localStorage.removeItem('dmsUserMobile');
+            this.router.navigate(['/admin/dashboard']);
           }
         } else {
           // Log the actual response for debugging
-          console.error('Unexpected response structure - no data field:', authResponse);
+          console.error('Unexpected response structure:', authResponse);
           this.errorMessage = authResponse.message || 'Authentication failed. Invalid response format.';
           this.otp = '';
         }

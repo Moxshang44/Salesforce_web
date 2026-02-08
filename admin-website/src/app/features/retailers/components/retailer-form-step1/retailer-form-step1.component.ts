@@ -184,21 +184,84 @@ export class RetailerFormStep1Component {
     this.errors = {};
     let hasErrors = false;
 
-    // Basic validation
+    // Required field validations according to API
     if (!this.formData.storeName || this.formData.storeName.trim() === '') {
-      this.errors['storeName'] = 'Please enter retailer store name';
+      this.errors['storeName'] = 'Retailer store name is required';
+      hasErrors = true;
+    } else if (this.formData.storeName.trim().length < 1 || this.formData.storeName.trim().length > 255) {
+      this.errors['storeName'] = 'Retailer store name must be between 1 and 255 characters';
       hasErrors = true;
     }
+
     if (!this.formData.retailerId || this.formData.retailerId.trim() === '') {
-      this.errors['retailerId'] = 'Please enter retailer ID';
+      this.errors['retailerId'] = 'Retailer ID is required';
+      hasErrors = true;
+    } else if (this.formData.retailerId.trim().length < 1 || this.formData.retailerId.trim().length > 50) {
+      this.errors['retailerId'] = 'Retailer ID must be between 1 and 50 characters';
       hasErrors = true;
     }
+
     if (!this.formData.contactPersonName || this.formData.contactPersonName.trim() === '') {
-      this.errors['contactPersonName'] = 'Please enter contact person name';
+      this.errors['contactPersonName'] = 'Contact person name is required';
+      hasErrors = true;
+    } else if (this.formData.contactPersonName.trim().length < 1 || this.formData.contactPersonName.trim().length > 255) {
+      this.errors['contactPersonName'] = 'Contact person name must be between 1 and 255 characters';
       hasErrors = true;
     }
+
+    // Mobile number validation - combine country code and mobile number
+    const mobileNumber = this.formData.countryCode && this.formData.mobileNumber 
+      ? `${this.formData.countryCode.replace('+', '')}${this.formData.mobileNumber}`
+      : this.formData.mobileNumber || '';
+    
     if (!this.formData.mobileNumber || this.formData.mobileNumber.trim() === '') {
-      this.errors['mobileNumber'] = 'Please enter mobile number';
+      this.errors['mobileNumber'] = 'Mobile number is required';
+      hasErrors = true;
+    } else if (mobileNumber.length < 10 || mobileNumber.length > 15) {
+      this.errors['mobileNumber'] = 'Mobile number must be between 10 and 15 characters';
+      hasErrors = true;
+    }
+
+    if (!this.formData.gstNumber || this.formData.gstNumber.trim() === '') {
+      this.errors['gstNumber'] = 'GST number is required';
+      hasErrors = true;
+    } else if (this.formData.gstNumber.trim().length !== 15) {
+      this.errors['gstNumber'] = 'GST number must be exactly 15 characters';
+      hasErrors = true;
+    }
+
+    if (!this.formData.panCardNumber || this.formData.panCardNumber.trim() === '') {
+      this.errors['panCardNumber'] = 'PAN number is required';
+      hasErrors = true;
+    } else if (this.formData.panCardNumber.trim().length !== 10) {
+      this.errors['panCardNumber'] = 'PAN number must be exactly 10 characters';
+      hasErrors = true;
+    }
+
+    if (!this.formData.fullAddress || this.formData.fullAddress.trim() === '') {
+      this.errors['fullAddress'] = 'Address is required';
+      hasErrors = true;
+    } else if (this.formData.fullAddress.trim().length < 1) {
+      this.errors['fullAddress'] = 'Address must be at least 1 character';
+      hasErrors = true;
+    }
+
+    if (!this.formData.pinCode || this.formData.pinCode.trim() === '') {
+      this.errors['pinCode'] = 'PIN code is required';
+      hasErrors = true;
+    } else if (this.formData.pinCode.trim().length !== 6 || !/^\d{6}$/.test(this.formData.pinCode.trim())) {
+      this.errors['pinCode'] = 'PIN code must be exactly 6 digits';
+      hasErrors = true;
+    }
+
+    // Optional field validations
+    if (this.formData.licenseNumber && this.formData.licenseNumber.trim().length > 255) {
+      this.errors['licenseNumber'] = 'License number must not exceed 255 characters';
+      hasErrors = true;
+    }
+
+    if (this.formData.email && this.formData.email.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.formData.email.trim())) {
+      this.errors['email'] = 'Please enter a valid email address';
       hasErrors = true;
     }
 

@@ -51,15 +51,6 @@ export class DmsLoginComponent implements OnDestroy {
       return;
     }
 
-    // Check if this is an admin mobile number - redirect to admin login
-    if (this.mobileNumber === '9876543210') {
-      this.errorMessage = 'This mobile number is for Admin login. Redirecting to Admin login page...';
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 1500);
-      return;
-    }
-
     this.isSendingOtp = true;
     
     // Simulate OTP sending (replace with actual API call)
@@ -86,15 +77,6 @@ export class DmsLoginComponent implements OnDestroy {
 
     if (!this.validateMobileNumber(this.mobileNumber)) {
       this.errorMessage = 'Please enter a valid 10-digit mobile number';
-      return;
-    }
-
-    // Check if this is an admin mobile number - redirect to admin login
-    if (this.mobileNumber === '9876543210') {
-      this.errorMessage = 'This mobile number is for Admin login. Redirecting to Admin login page...';
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 1500);
       return;
     }
 

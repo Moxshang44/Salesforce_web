@@ -110,7 +110,7 @@ export class CompaniesComponent implements OnInit {
     name: '',
     contact_no: '',
     company_id: '',
-    role: '',
+    role: 'ADMIN',
     area_id: 1,
     bank_details: {
       account_number: '',
@@ -180,8 +180,7 @@ export class CompaniesComponent implements OnInit {
         
         console.log('Companies loaded:', this.companies);
         
-        // Check for admin users and roles for each company
-        this.checkAdminsForAllCompanies();
+        // Load roles for each company first, then check admins (admins check happens after roles are loaded)
         this.loadRolesForAllCompanies();
       },
       error: (error: any) => {
@@ -204,63 +203,68 @@ export class CompaniesComponent implements OnInit {
   checkCompanyHasAdmin(companyId: string): void {
     if (!companyId) return;
     
+    // Find the company and get the Admin role name (case-insensitive match)
+    const company = this.companies.find(c => c.id === companyId);
+    if (!company) {
+      return;
+    }
+    
+    // Find the Admin role (case-insensitive match)
+    const adminRole = company.roles?.find(role => 
+      role.name && role.name.toLowerCase() === 'admin'
+    );
+    
+    // If no Admin role found, set empty and return
+    if (!adminRole || !adminRole.name) {
+      this.isLoadingAdmins[companyId] = false;
+      company.admins = [];
+      company.hasAdmin = false;
+      return;
+    }
+    
+    // Use the actual role name as it was entered (preserving case)
+    const roleName = adminRole.name;
     this.isLoadingAdmins[companyId] = true;
     
-    // Try both "Admin" and "ADMIN" as role names
-    const roleNames = ['Admin', 'ADMIN'];
-    let attempts = 0;
-    
-    const tryFetchAdmin = (roleName: string) => {
-      const url = this.apiService.getApiUrl(`users/companies/${companyId}/roles/${roleName}/users`);
-      const headers = new HttpHeaders({
-        'Content-Type': 'application/json'
-      });
+    const url = this.apiService.getApiUrl(`users/companies/${companyId}/roles/${roleName}/users`);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
 
-      const params = new HttpParams()
-        .set('is_active', 'true')
-        .set('limit', '20')
-        .set('offset', '0');
+    const params = new HttpParams()
+      .set('is_active', 'true')
+      .set('limit', '20')
+      .set('offset', '0');
 
-      this.http.get<any>(url, { headers, params }).subscribe({
-        next: (response: any) => {
-          this.isLoadingAdmins[companyId] = false;
-          
-          // Get admin users list
-          let admins: any[] = [];
-          if (response.data && Array.isArray(response.data)) {
-            admins = response.data;
-          } else if (response.status_code === 1 && response.data) {
-            admins = Array.isArray(response.data) ? response.data : [];
-          }
-          
-          // Update the company's admin data
-          const company = this.companies.find(c => c.id === companyId);
-          if (company) {
-            company.admins = admins;
-            company.hasAdmin = admins.length > 0;
-          }
-        },
-        error: (error: any) => {
-          attempts++;
-          // Try the other role name if first attempt failed
-          if (attempts < roleNames.length) {
-            tryFetchAdmin(roleNames[attempts]);
-          } else {
-            this.isLoadingAdmins[companyId] = false;
-            console.error(`Error fetching admins for company ${companyId}:`, error);
-            
-            // On error, set empty
-            const company = this.companies.find(c => c.id === companyId);
-            if (company) {
-              company.admins = [];
-              company.hasAdmin = false;
-            }
-          }
+    this.http.get<any>(url, { headers, params }).subscribe({
+      next: (response: any) => {
+        this.isLoadingAdmins[companyId] = false;
+        
+        // Get admin users list
+        let admins: any[] = [];
+        if (response.status_code === 1 && response.data && Array.isArray(response.data)) {
+          admins = response.data;
+        } else if (response.data && Array.isArray(response.data)) {
+          admins = response.data;
         }
-      });
-    };
-    
-    tryFetchAdmin(roleNames[0]);
+        
+        // Update the company's admin data
+        if (company) {
+          company.admins = admins;
+          company.hasAdmin = admins.length > 0;
+        }
+      },
+      error: (error: any) => {
+        this.isLoadingAdmins[companyId] = false;
+        console.error(`Error fetching admins for company ${companyId}:`, error);
+        
+        // On error, set empty
+        if (company) {
+          company.admins = [];
+          company.hasAdmin = false;
+        }
+      }
+    });
   }
 
   loadRolesForAllCompanies(): void {
@@ -303,6 +307,8 @@ export class CompaniesComponent implements OnInit {
         const company = this.companies.find(c => c.id === companyId);
         if (company) {
           company.roles = roles;
+          // After roles are loaded, check for admins
+          this.checkCompanyHasAdmin(companyId);
         }
       },
       error: (error: any) => {
@@ -313,6 +319,8 @@ export class CompaniesComponent implements OnInit {
         const company = this.companies.find(c => c.id === companyId);
         if (company) {
           company.roles = [];
+          // Still try to check for admins even if roles failed
+          this.checkCompanyHasAdmin(companyId);
         }
       }
     });
@@ -779,7 +787,7 @@ export class CompaniesComponent implements OnInit {
       name: '',
       contact_no: '',
       company_id: this.selectedCompany?.id || '',
-      role: '',
+      role: 'ADMIN',
       area_id: 1,
       bank_details: {
         account_number: '',
@@ -800,12 +808,12 @@ export class CompaniesComponent implements OnInit {
     this.assignFormErrors = {};
     let isValid = true;
 
-    if (!this.assignAdminForm.username || this.assignAdminForm.username.trim() === '') {
-      this.assignFormErrors['username'] = 'Username is required';
-      isValid = false;
-    } else if (this.assignAdminForm.username.trim().length < 1 || this.assignAdminForm.username.trim().length > 100) {
-      this.assignFormErrors['username'] = 'Username must be between 1 and 100 characters';
-      isValid = false;
+    // Username is now optional, but if provided, validate length
+    if (this.assignAdminForm.username && this.assignAdminForm.username.trim() !== '') {
+      if (this.assignAdminForm.username.trim().length < 1 || this.assignAdminForm.username.trim().length > 100) {
+        this.assignFormErrors['username'] = 'Username must be between 1 and 100 characters';
+        isValid = false;
+      }
     }
 
     if (!this.assignAdminForm.name || this.assignAdminForm.name.trim() === '') {
@@ -845,21 +853,10 @@ export class CompaniesComponent implements OnInit {
     });
 
     const payload = {
-      username: this.assignAdminForm.username.trim(),
       name: this.assignAdminForm.name.trim(),
       contact_no: this.assignAdminForm.contact_no.trim(),
       company_id: this.assignAdminForm.company_id,
-      role: this.assignAdminForm.role.trim() || '',
-      area_id: this.assignAdminForm.area_id,
-      bank_details: {
-        account_number: this.assignAdminForm.bank_details.account_number.trim() || '',
-        account_name: this.assignAdminForm.bank_details.account_name.trim() || '',
-        bank_name: this.assignAdminForm.bank_details.bank_name.trim() || '',
-        bank_branch: this.assignAdminForm.bank_details.bank_branch.trim() || '',
-        account_type: this.assignAdminForm.bank_details.account_type,
-        ifsc_code: this.assignAdminForm.bank_details.ifsc_code.trim() || ''
-      },
-      is_super_admin: this.assignAdminForm.is_super_admin
+      role: 'ADMIN'
     };
 
     console.log('Sending assign admin payload:', payload);

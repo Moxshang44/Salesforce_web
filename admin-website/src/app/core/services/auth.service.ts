@@ -14,123 +14,44 @@ export class AuthService {
   private readonly USER_INFO_KEY = 'user_info';
   private readonly ACCESS_TOKEN_KEY = 'access_token';
   
-  // Store OTPs temporarily (in production, this would be handled by backend)
+  // Store OTPs temporarily (deprecated - OTPs are now handled by backend API)
   // Format: { mobileNumber: { otp: string, expiresAt: number } }
   private otpStorage: Map<string, { otp: string; expiresAt: number }> = new Map();
-  
-  // Valid mobile numbers for demo (in production, this would be validated against database)
-  private readonly VALID_ADMIN_MOBILE = '9876543210';
-  private readonly VALID_DMS_MOBILE = '9999999999';
   
   // Super admin password
   private readonly SUPER_ADMIN_PASSWORD = '111111';
   
-  // OTP validity duration (5 minutes)
+  // OTP validity duration (5 minutes) - deprecated, handled by backend
   private readonly OTP_VALIDITY_MS = 5 * 60 * 1000;
 
   constructor(private router: Router) {}
 
-  // Unified OTP method - works for both Admin and DMS
+  // Unified OTP method - DEPRECATED: OTPs are now handled by backend API
+  // This method is kept for backward compatibility but should not be used
   sendOtp(mobileNumber: string): boolean {
-    // In production, this would call an API to send OTP via SMS
-    // For demo, we'll generate a static OTP for the valid mobile number
-    try {
-      // Generate a 6-digit OTP (for demo, using static '123456')
-      // In production, generate random OTP and send via SMS service
-      const otp = '123456';
-      const expiresAt = Date.now() + this.OTP_VALIDITY_MS;
-      
-      this.otpStorage.set(mobileNumber, { otp, expiresAt });
-      
-      // Log for demo purposes (remove in production)
-      console.log(`[DEMO] OTP sent to ${mobileNumber}: ${otp}`);
-      
-      return true;
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      return false;
-    }
+    // Deprecated: OTPs are now handled by backend API
+    // This method always returns false as OTPs should come from the API
+    console.warn('sendOtp is deprecated. Use API endpoints for OTP generation.');
+    return false;
   }
 
-  // Unified login method - determines admin or DMS based on mobile number
+  // Unified login method - DEPRECATED: Authentication is now handled by backend API
+  // This method is kept for backward compatibility but should not be used
   loginWithOtp(mobileNumber: string, otp: string): { success: boolean; isDms: boolean } {
-    // Validate mobile number format (10 digits)
-    if (!/^\d{10}$/.test(mobileNumber)) {
-      return { success: false, isDms: false };
-    }
-
-    // Determine if this is DMS or Admin based on mobile number
-    const isDms = mobileNumber === this.VALID_DMS_MOBILE;
-    const isDemoCredential = mobileNumber === this.VALID_ADMIN_MOBILE || mobileNumber === this.VALID_DMS_MOBILE;
-    
-    // Allow demo credentials to bypass OTP verification (temporary until OTP is fully implemented)
-    if (isDemoCredential && otp === '123456') {
-      // Direct login for demo credentials
-      if (isDms) {
-        // DMS login
-        localStorage.setItem(this.DMS_AUTH_KEY, 'true');
-        localStorage.setItem('dmsUserMobile', mobileNumber);
-        // Clear any admin auth that might exist
-        localStorage.removeItem(this.AUTH_KEY);
-        localStorage.removeItem('userMobile');
-      } else {
-        // Admin login
-        localStorage.setItem(this.AUTH_KEY, 'true');
-        localStorage.setItem('userMobile', mobileNumber);
-        // Clear any DMS auth that might exist
-        localStorage.removeItem(this.DMS_AUTH_KEY);
-        localStorage.removeItem('dmsUserMobile');
-      }
-      
-      return { success: true, isDms };
-    }
-
-    // For non-demo credentials, check OTP from storage
-    const otpData = this.otpStorage.get(mobileNumber);
-    
-    if (!otpData) {
-      return { success: false, isDms: false };
-    }
-
-    // Check if OTP has expired
-    if (Date.now() > otpData.expiresAt) {
-      this.otpStorage.delete(mobileNumber);
-      return { success: false, isDms: false };
-    }
-
-    // Verify OTP
-    if (otpData.otp !== otp) {
-      return { success: false, isDms: false };
-    }
-    
-    // Clear OTP after successful login
-    this.otpStorage.delete(mobileNumber);
-    
-    if (isDms) {
-      // DMS login
-      localStorage.setItem(this.DMS_AUTH_KEY, 'true');
-      localStorage.setItem('dmsUserMobile', mobileNumber);
-      // Clear any admin auth that might exist
-      localStorage.removeItem(this.AUTH_KEY);
-      localStorage.removeItem('userMobile');
-    } else {
-      // Admin login
-      localStorage.setItem(this.AUTH_KEY, 'true');
-      localStorage.setItem('userMobile', mobileNumber);
-      // Clear any DMS auth that might exist
-      localStorage.removeItem(this.DMS_AUTH_KEY);
-      localStorage.removeItem('dmsUserMobile');
-    }
-    
-    return { success: true, isDms };
+    // Deprecated: Authentication is now handled by backend API
+    // This method always returns false as authentication should go through API
+    console.warn('loginWithOtp is deprecated. Use API endpoints for authentication.');
+    return { success: false, isDms: false };
   }
 
-  // Legacy methods for backward compatibility
+  // Legacy methods for backward compatibility - DEPRECATED
   sendDmsOtp(mobileNumber: string): boolean {
+    // Deprecated: OTPs are now handled by backend API
     return this.sendOtp(mobileNumber);
   }
 
   dmsLoginWithOtp(mobileNumber: string, otp: string): boolean {
+    // Deprecated: Authentication is now handled by backend API
     const result = this.loginWithOtp(mobileNumber, otp);
     return result.success && result.isDms;
   }

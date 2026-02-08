@@ -32,7 +32,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   companyName = 'Company Name';
 
   currentRoute = '';
-  isCollapsed = false;
+  isCollapsed = true;
   showProductMasterPopup = false;
   popupPosition = { top: 0, left: 0 };
   
@@ -74,8 +74,8 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     private elementRef: ElementRef
   ) {
     this.currentRoute = this.router.url;
-    // Initialize CSS variable
-    document.documentElement.style.setProperty('--sidebar-width', '220px');
+    // Initialize CSS variable - sidebar is collapsed by default
+    document.documentElement.style.setProperty('--sidebar-width', '70px');
     
     // Listen to route changes
     this.router.events

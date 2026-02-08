@@ -690,9 +690,9 @@
 .roles-list,
 .admins-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .role-badge,
@@ -712,6 +712,28 @@
   background: #f3e5f5;
   color: #7b1fa2;
   border-color: #ce93d8;
+}
+
+.admin-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  min-width: 180px;
+  
+  .admin-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+  
+  .admin-contact {
+    font-size: 13px;
+    color: #666;
+  }
 }
 
 .no-data {
