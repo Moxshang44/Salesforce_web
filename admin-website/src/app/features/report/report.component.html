@@ -1,0 +1,562 @@
+<div class="report-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <app-header></app-header>
+
+    <div class="report-content">
+      <div class="employee-info-card glass-card">
+        <div class="employee-profile">
+          <img
+            src="assets/images/Profile1.svg"
+            alt="Employee profile"
+            class="employee-avatar"
+          >
+        </div>
+
+        <div class="employee-details">
+          <div class="employee-primary-row">
+            <div class="employee-name">
+              {{ employeeName || 'Rajnath Singh' }}
+            </div>
+          </div>
+
+          <div class="employee-detail-columns">
+            <div class="detail-column">
+              <div class="employee-inline">
+                <img
+                  src="assets/images/Verify.svg"
+                  alt="ID icon"
+                  class="info-icon"
+                >
+                <span>ID : {{ employeeCode || 'SR-2024-892' }}</span>
+              </div>
+              <div class="employee-inline">
+                <img
+                  src="assets/images/User.svg"
+                  alt="Manager icon"
+                  class="info-icon"
+                >
+                <span>Manager: Amit Verma (ASM)</span>
+              </div>
+            </div>
+
+            <div class="detail-column">
+              <div class="employee-inline">
+                <img
+                  src="assets/images/Sales.svg"
+                  alt="Designation icon"
+                  class="info-icon"
+                >
+                <span>Sales Representative</span>
+              </div>
+              <div class="employee-inline">
+                <img
+                  src="assets/images/Sync.svg"
+                  alt="Last sync icon"
+                  class="info-icon"
+                >
+                <span>Last Sync: 10 mins ago</span>
+              </div>
+            </div>
+
+            <div class="detail-column">
+              <div class="employee-inline">
+                <img
+                  src="assets/images/Location.svg"
+                  alt="Location icon"
+                  class="info-icon"
+                >
+                <span>Andheri-West Route</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="employee-actions">
+          <button
+            type="button"
+            class="download-report-btn"
+          >
+            <img
+              src="assets/images/Download.svg"
+              alt="Download icon"
+              class="btn-icon"
+            >
+            <span>Download Report</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="report-filters-card glass-card">
+        <div class="filters-left">
+          <label class="filter-label">Routes</label>
+          <div class="filter-select-wrapper">
+            <select class="filter-select">
+              <option>All Routes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filters-right">
+          <div class="range-toggle-group">
+            <button
+              type="button"
+              class="range-toggle-btn"
+              [class.active]="activeRange === 'FTD'"
+              (click)="setRange('FTD')"
+            >
+              FTD
+            </button>
+            <button
+              type="button"
+              class="range-toggle-btn"
+              [class.active]="activeRange === 'MTD'"
+              (click)="setRange('MTD')"
+            >
+              MTD
+            </button>
+            <button
+              type="button"
+              class="range-toggle-btn"
+              [class.active]="activeRange === 'YTD'"
+              (click)="setRange('YTD')"
+            >
+              YTD
+            </button>
+            <button
+              type="button"
+              class="range-toggle-btn"
+              [class.active]="activeRange === 'CUSTOM'"
+              (click)="setRange('CUSTOM')"
+            >
+              Custome Range
+            </button>
+          </div>
+
+          @if (activeRange === 'CUSTOM') {
+            <div class="custom-range-card">
+              <div class="custom-field">
+                <span class="custom-label">From</span>
+                <div class="custom-input-wrapper">
+                  <input
+                    type="text"
+                    class="custom-input"
+                    placeholder="01 Jan 2024"
+                    readonly
+                  >
+                  <span class="custom-calendar-icon">📅</span>
+                </div>
+              </div>
+              <span class="custom-to-separator">to</span>
+              <div class="custom-field">
+                <span class="custom-label">To</span>
+                <div class="custom-input-wrapper">
+                  <input
+                    type="text"
+                    class="custom-input"
+                    placeholder="31 Jan 2024"
+                    readonly
+                  >
+                  <span class="custom-calendar-icon">📅</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="performance-card glass-card">
+        <div class="performance-row">
+          <div class="donut-chart-card glass-card">
+            <div class="donut-chart-container">
+              <canvas
+                baseChart
+                [data]="donutChartData"
+                [type]="'doughnut'"
+                [options]="donutChartOptions"
+              ></canvas>
+              <div class="donut-center-label">
+                <div class="donut-center-title">Target Achieved</div>
+                <div class="donut-center-value">{{ donutPercentage }}%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="column-chart-card glass-card">
+            <div class="column-chart-container">
+              <canvas
+                baseChart
+                [data]="barChartData"
+                [type]="'bar'"
+                [options]="barChartOptions"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        @for (kpi of kpiCards; track kpi.title) {
+          <div class="kpi-card glass-card">
+            <div class="kpi-title">
+              {{ kpi.title }}
+            </div>
+            <div
+              class="kpi-value"
+              [style.color]="kpi.valueColor"
+            >
+              {{ kpi.value }}
+            </div>
+            <div class="kpi-insight-row">
+              @if (kpi.icon === 'up') {
+                <svg
+                  class="kpi-icon kpi-icon-positive"
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M8 3l4 5H9v5H7V8H4l4-5z"
+                    fill="currentColor"
+                  />
+                </svg>
+              } @else if (kpi.icon === 'info') {
+                <svg
+                  class="kpi-icon kpi-icon-negative"
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                >
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" />
+                  <circle cx="8" cy="4.5" r="0.8" fill="currentColor" />
+                  <path
+                    d="M8 7v4"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              } @else if (kpi.icon === 'warning') {
+                <svg
+                  class="kpi-icon kpi-icon-negative"
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M8 2l6 11H2L8 2z"
+                    stroke="currentColor"
+                    fill="none"
+                  />
+                  <path
+                    d="M8 6v4"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                  />
+                  <circle cx="8" cy="11.2" r="0.8" fill="currentColor" />
+                </svg>
+              }
+              <span
+                class="kpi-insight-text"
+                [style.color]="kpi.insightColor"
+              >
+                {{ kpi.insightText }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="report-lower-grid">
+        <div class="report-left-column">
+          <div class="attendance-card glass-card">
+            <!-- Attendance & Time Utilization header -->
+            <div class="card-header-row">
+              <h3 class="card-title">Attendance & Time Utilization</h3>
+            </div>
+
+            <!-- Summary stats -->
+            <div class="attendance-summary-row">
+              <div class="attendance-stat-card glass-card">
+                <div class="attendance-stat">
+                  <div class="attendance-value">
+                    {{ attendanceSummary.presentDays }}
+                  </div>
+                  <div class="attendance-label">Present Days</div>
+                </div>
+              </div>
+              <div class="attendance-stat-card glass-card">
+                <div class="attendance-stat">
+                  <div class="attendance-value">
+                    {{ attendanceSummary.absentDays | number:'2.0' }}
+                  </div>
+                  <div class="attendance-label">Absent Days</div>
+                </div>
+              </div>
+              <div class="attendance-stat-card glass-card">
+                <div class="attendance-stat">
+                  <div class="attendance-value">
+                    {{ attendanceSummary.totalHours }} Hrs
+                  </div>
+                  <div class="attendance-label">Total Time</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Time distribution -->
+            <div class="time-distribution-section">
+              <div class="time-distribution-header">
+                Time Distribution
+              </div>
+              <div class="time-distribution-bar">
+                @for (segment of timeDistribution; track segment.label) {
+                  <div
+                    class="time-segment"
+                    [ngClass]="'segment--' + segment.colorKey"
+                    [style.flex]="segment.percentage"
+                  >
+                    <span class="time-segment-label">
+                      {{ segment.label }} ({{ segment.percentage }}%)
+                    </span>
+                  </div>
+                }
+              </div>
+              <div class="time-distribution-legend">
+                <div class="legend-item">
+                  <span class="legend-dot legend-dot--inStore"></span>
+                  <span>In-store</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot legend-dot--travel"></span>
+                  <span>Travel</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot legend-dot--meetings"></span>
+                  <span>Meetings / Trainings / Lunch etc</span>
+                </div>
+              </div>
+              <div class="attendance-insight">
+                <span class="attendance-insight-icon">!</span>
+                <span class="attendance-insight-text">
+                  Insight: {{ attendanceInsight }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="route-performance-card glass-card">
+            <div class="card-header-row">
+              <h3 class="card-title">Route-wise Performance</h3>
+              <div class="view-all-wrap glass-card">
+                <button type="button" class="card-cta-button">View All</button>
+              </div>
+            </div>
+            <div class="route-table">
+              <div class="route-table-header">
+                <div class="col-route">Route Name</div>
+                <div class="col-coverage">Outlet Coverage</div>
+                <div class="col-sales">Total Sales</div>
+                <div class="col-avg-order">Avg. Order Value</div>
+                <div class="col-visit-bill">Visit/Bill Ratio</div>
+              </div>
+              <div class="route-table-body">
+                @for (route of routePerformanceRows; track route.routeName + route.outletCoveragePercent) {
+                  <div class="route-row">
+                    <div class="col-route route-name">
+                      {{ route.routeName }}
+                    </div>
+                    <div class="col-coverage coverage-inline">
+                      <span class="coverage-pct">{{ route.outletCoveragePercent }}%</span>
+                      <div class="coverage-bar">
+                        <div
+                          class="coverage-fill"
+                          [ngClass]="'coverage--' + route.outletCoverageState"
+                          [style.width.%]="route.outletCoveragePercent"
+                        ></div>
+                      </div>
+                    </div>
+                    <div class="col-sales">
+                      ₹ {{ route.totalSales | number:'1.0' }}
+                    </div>
+                    <div class="col-avg-order">
+                      ₹ {{ route.avgOrderValue | number:'1.0' }}
+                    </div>
+                    <div class="col-visit-bill">
+                      <span
+                        class="visit-bill-value"
+                        [ngClass]="'visit-bill--' + route.visitBillState"
+                      >
+                        {{ route.visitBillRatioPercent }}%
+                      </span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="product-performance-card glass-card">
+            <div class="card-header-row">
+              <h3 class="card-title">Product Performance Issues</h3>
+            </div>
+            <div class="product-performance-columns">
+              <div class="product-performance-column">
+                <div class="product-column-title">Zero Sales Products</div>
+                <div class="product-tag-list">
+                  @for (tag of productPerformance.zeroSales; track tag.productName) {
+                    <div class="product-tag product-tag--zero">
+                      <span class="product-tag-name">{{ tag.productName }}</span>
+                      <span class="product-tag-badge">{{ tag.unitsLabel }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="product-performance-column">
+                <div class="product-column-title">Low Sales Products</div>
+                <div class="product-tag-list">
+                  @for (tag of productPerformance.lowSales; track tag.productName) {
+                    <div class="product-tag product-tag--low">
+                      <span class="product-tag-name">{{ tag.productName }}</span>
+                      <span class="product-tag-badge">{{ tag.unitsLabel }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="product-performance-column">
+                <div class="product-column-title">High Sales Products</div>
+                <div class="product-tag-list">
+                  @for (tag of productPerformance.highSales; track tag.productName) {
+                    <div class="product-tag product-tag--high">
+                      <span class="product-tag-name">{{ tag.productName }}</span>
+                      <span class="product-tag-badge">{{ tag.unitsLabel }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="report-right-column">
+          <div class="productivity-card glass-card">
+            <div class="card-header-row">
+              <h3 class="card-title">Productivity Score</h3>
+            </div>
+            <div class="productivity-inner-card glass-card">
+              <div class="productivity-body">
+                <div class="productivity-gauge">
+                  <div class="gauge-circle">
+                    <div class="gauge-inner-circle">
+                      <div class="gauge-score">
+                        {{ productivityScore.score }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="productivity-text">
+                  <div class="productivity-status">
+                    {{ productivityScore.statusText }}
+                  </div>
+                  <p class="productivity-description">
+                    {{ productivityScore.description }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="outlet-not-visited-card glass-card">
+            <div class="card-header-row">
+              <h3 class="card-title">Outlet Not Visited</h3>
+              <div class="view-all-wrap glass-card">
+                <button type="button" class="card-cta-button">View All</button>
+              </div>
+            </div>
+            <div class="outlet-badge-row">
+              <div class="outlet-badge-label">
+                <span class="outlet-badge-pill">
+                  <span class="outlet-badge-icon"></span>
+                  {{ outletNotVisited.label }}
+                </span>
+              </div>
+              <div class="outlet-badge-count">
+                {{ outletNotVisited.count }}
+              </div>
+            </div>
+            <div class="outlet-list-title">
+              Top 'No Order' Outlets
+            </div>
+            <div class="outlet-list">
+              @for (outlet of outletNotVisited.topOutlets; track outlet.name) {
+                <div class="outlet-row">
+                  <div class="outlet-row-main">
+                    <div class="outlet-name">{{ outlet.name }}</div>
+                    <div class="outlet-meta">
+                      Last Order: {{ outlet.lastOrderDaysAgo }} days ago
+                    </div>
+                  </div>
+                  <div class="outlet-row-chevron">
+                    <svg
+                      class="outlet-chevron-icon"
+                      viewBox="0 0 16 16"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M6 3l4 5-4 5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="return-claims-card glass-card">
+            <div class="card-header-row">
+              <h3 class="card-title">Return & Claims</h3>
+            </div>
+            <div class="return-summary-row">
+              <div class="return-summary-block">
+                <div class="return-summary-label">Total Value</div>
+                <div class="return-summary-value">
+                  ₹ {{ returnClaims.totalValue | number:'1.0' }}
+                </div>
+              </div>
+              <div class="return-summary-block return-summary-block--right">
+                <div class="return-summary-label">Return Rate</div>
+                <div class="return-summary-rate">
+                  {{ returnClaims.returnRatePercent }}%
+                </div>
+              </div>
+            </div>
+            <div class="return-reasons">
+              @for (reason of returnClaims.reasons; track reason.label) {
+                <div class="return-reason-row">
+                  <div class="return-reason-label">
+                    {{ reason.label }}
+                  </div>
+                  <div class="return-reason-percentage">
+                    {{ reason.percentage }}%
+                  </div>
+                  <div class="return-reason-bar">
+                    <div
+                      class="return-reason-fill"
+                      [ngClass]="'return--' + reason.colorKey"
+                      [style.width.%]="reason.percentage"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-body-placeholder"></div>
+    </div>
+  </div>
+</div>

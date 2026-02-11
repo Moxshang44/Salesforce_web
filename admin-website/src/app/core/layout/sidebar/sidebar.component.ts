@@ -60,6 +60,8 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     { label: 'Finance', route: '/admin/finance', iconImage: 'assets/images/Finance.svg' },
     { label: 'Marketing', route: '/admin/marketing', iconImage: 'assets/images/Marketing.svg' },
     { label: 'Assign Task', route: '/admin/tasks', iconImage: 'assets/images/TaskManager.svg' },
+    // New static Report feature (UI-only)
+    { label: 'Report', route: '/admin/report', iconImage: 'assets/images/Report.svg' },
     { label: 'AI chat bot', route: '/admin/ai-chat', iconImage: 'assets/images/AiBot.svg' },
     { label: 'Assets', route: '/admin/assets', iconImage: 'assets/images/Assets.svg' },
     { label: 'Targets', route: '/admin/targets', iconImage: 'assets/images/Finance.svg' },

@@ -133,7 +133,7 @@
                   </span>
                 </td>
                 <td class="col-employee">
-                  <div class="employee-info">
+                  <div class="employee-info" (click)="navigateToReport(employee)">
                     <div class="employee-name">{{ employee.name }}</div>
                     <div class="employee-code">{{ employee.code || employee.username || 'N/A' }}</div>
                   </div>
