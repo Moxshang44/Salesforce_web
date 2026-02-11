@@ -15,7 +15,7 @@
 
   <div class="header-right">
     <button class="ai-button" (click)="onAiClick()" [class.disabled]="!aiAssistantEnabled">
-      <img src="assets/images/talktoai.png" alt="AI" class="ai-icon">
+      <img src="assets/images/TalkToAi.svg" alt="AI" class="ai-icon">
       <span>AI Assistant</span>
       <label class="ai-toggle-switch" (click)="$event.stopPropagation()">
         <input type="checkbox" [checked]="aiAssistantEnabled" (change)="onAiToggle($event)">
