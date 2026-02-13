@@ -4,7 +4,7 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background: #FFF9F3;
+  background: #FFFCF8;
 }
 
 .main-content {
@@ -48,13 +48,13 @@
     gap: 4px;
     
     &:hover:not(.active) {
-      color: #664423;
+      color: #6C4423;
       text-decoration: underline;
     }
 
     &.active {
       cursor: default;
-      color: #664423;
+      color: #6C4423;
       font-weight: 600;
     }
 
@@ -116,7 +116,7 @@
   transition: all 0.2s ease;
 
   &:focus-within {
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -124,7 +124,7 @@
 .currency-symbol {
   font-size: 16px;
   font-weight: 600;
-  color: #664423;
+  color: #6C4423;
   margin-right: 8px;
 }
 
@@ -150,7 +150,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   border-radius: 8px;
@@ -233,7 +233,7 @@
   display: inline-flex;
   align-items: center;
   padding: 4px 10px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border-radius: 4px;
   font-size: 11px;
@@ -286,7 +286,7 @@
   .amount {
     font-size: 28px;
     font-weight: 700;
-    color: #664423;
+    color: #6C4423;
     font-family: 'DM Sans', sans-serif;
   }
 }
@@ -307,7 +307,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #664423 0%, #8B6914 100%);
+  background: linear-gradient(90deg, #6C4423 0%, #8B6914 100%);
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -338,7 +338,7 @@
 
   &:hover {
     background: #f5f0e8;
-    color: #664423;
+    color: #6C4423;
   }
 
   svg {
@@ -350,7 +350,7 @@
 .percentage {
   font-size: 14px;
   font-weight: 600;
-  color: #664423;
+  color: #6C4423;
 }
 
 // Percentage Adjustment Popup
@@ -359,7 +359,7 @@
   top: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%);
-  background: #FFF9F3;
+  background: #FFFCF8;
   border: 1px solid #e8e0d5;
   border-radius: 12px;
   padding: 16px;
@@ -376,7 +376,7 @@
     transform: translateX(-50%) rotate(45deg);
     width: 16px;
     height: 16px;
-    background: #FFF9F3;
+    background: #FFFCF8;
     border-left: 1px solid #e8e0d5;
     border-top: 1px solid #e8e0d5;
   }
@@ -409,7 +409,7 @@
 .popup-percentage {
   font-size: 14px;
   font-weight: 600;
-  color: #664423;
+  color: #6C4423;
 }
 
 .popup-slider-container {
@@ -433,7 +433,7 @@
     height: 20px;
     border-radius: 50%;
     background: white;
-    border: 2px solid #664423;
+    border: 2px solid #6C4423;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
@@ -445,7 +445,7 @@
     height: 20px;
     border-radius: 50%;
     background: white;
-    border: 2px solid #664423;
+    border: 2px solid #6C4423;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: relative;
@@ -497,7 +497,7 @@
     top: 0;
     width: var(--value, 50%);
     height: 6px;
-    background: #664423;
+    background: #6C4423;
     border-radius: 3px 0 0 3px;
     pointer-events: none;
     z-index: 1;
@@ -527,14 +527,14 @@
 
   &:hover {
     background: #faf6f1;
-    border-color: #664423;
-    color: #664423;
+    border-color: #6C4423;
+    color: #6C4423;
   }
 
   &.locked {
     background: #faf6f1;
-    border-color: #664423;
-    color: #664423;
+    border-color: #6C4423;
+    color: #6C4423;
   }
 
   svg {
@@ -546,7 +546,7 @@
 .apply-btn {
   flex: 1;
   padding: 8px 16px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   border-radius: 6px;
@@ -575,7 +575,7 @@
   width: 100%;
   padding: 0;
   background: transparent;
-  color: #664423;
+  color: #6C4423;
   border: none;
   font-size: 13px;
   font-weight: 600;
@@ -601,7 +601,7 @@
 
 // Selected card state
 .allocation-card.selected {
-  border-color: #664423;
+  border-color: #6C4423;
   box-shadow: 0 4px 16px rgba(102, 68, 35, 0.15);
 }
 
@@ -673,7 +673,7 @@
   margin: 0;
 
   .highlight {
-    color: #664423;
+    color: #6C4423;
     font-weight: 600;
   }
 }
@@ -693,7 +693,7 @@
 
   &:hover {
     background: rgba(102, 68, 35, 0.1);
-    color: #664423;
+    color: #6C4423;
   }
 }
 
@@ -725,7 +725,7 @@
   }
 
   &.remaining {
-    color: #664423;
+    color: #6C4423;
   }
 }
 
@@ -756,7 +756,7 @@
   }
 
   &.auto-split {
-    background: #664423;
+    background: #6C4423;
     color: white;
     border: none;
 
@@ -767,12 +767,12 @@
 
   &.match-ly {
     background: white;
-    color: #664423;
+    color: #6C4423;
     border: 1.5px solid #d4c4a8;
 
     &:hover {
       background: #faf6f1;
-      border-color: #664423;
+      border-color: #6C4423;
     }
   }
 }
@@ -799,7 +799,7 @@
   width: 40px;
   font-size: 13px;
   font-weight: 600;
-  color: #664423;
+  color: #6C4423;
 }
 
 .month-input-wrapper {
@@ -813,7 +813,7 @@
   transition: all 0.2s ease;
 
   &:focus-within {
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 2px rgba(102, 68, 35, 0.1);
   }
 }
@@ -882,13 +882,13 @@
 
     &:hover {
       background: #faf6f1;
-      color: #664423;
-      border-color: #664423;
+      color: #6C4423;
+      border-color: #6C4423;
     }
   }
 
   &.save-btn {
-    background: #664423;
+    background: #6C4423;
     color: white;
     border: none;
 

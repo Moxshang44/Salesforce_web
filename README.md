@@ -63,10 +63,10 @@ Open http://localhost:4200 to view the dashboard.
 ## 🎨 Design System
 
 ### Colors (Extracted from Figma)
-- **Primary**: `#664423` (Brown)
+- **Primary**: `#6C4423` (Brown)
 - **Success**: `#16a34a` (Green)
 - **Error**: `#de3b40` (Red)
-- **Background**: `#fff9f3` (Cream)
+- **Background**: `#FFFCF8` (Cream)
 - **Text**: `#000000`, `#5a5a5b`
 
 ### Layout

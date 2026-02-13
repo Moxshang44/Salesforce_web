@@ -4,13 +4,13 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background: #fff9f3;
+  background: #FFFCF8;
 }
 
 // NSM Panel
 .nsm-panel {
   width: 200px;
-  background: #FFF9F3;
+  background: #FFFCF8;
   border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
@@ -65,7 +65,7 @@
   }
 
   &.selected {
-    background: #664423;
+    background: #6C4423;
     
     .manager-name,
     .manager-region {
@@ -290,13 +290,13 @@
   height: calc(100vh - 56px);
   margin-top: 56px;
   overflow-y: auto;
-  background: #fff9f3;
+  background: #FFFCF8;
   padding: 24px;
 }
 
 // Selected Manager Section
 .selected-manager-section {
-  background: #fff9f3;
+  background: #FFFCF8;
   margin-bottom: 32px;
 }
 
@@ -318,7 +318,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #664423;
+  background: #6C4423;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -386,7 +386,7 @@
 
 .info-preview-btn {
   padding: 10px 24px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   border-radius: 8px;
@@ -428,7 +428,7 @@
   gap: 8px;
   margin-bottom: 24px;
   font-size: 14px;
-  color: #664423;
+  color: #6C4423;
 
   .separator {
     color: #999;
@@ -437,7 +437,7 @@
 
   .breadcrumb-item {
     cursor: pointer;
-    color: #664423;
+    color: #6C4423;
     transition: color 0.2s ease, text-decoration 0.2s ease;
     
     &:hover {
@@ -447,7 +447,7 @@
 
     &.active {
       cursor: default;
-      color: #664423;
+      color: #6C4423;
       font-weight: 600;
       
       &:hover {
@@ -477,7 +477,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: #664423;
+  background: #6C4423;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -572,7 +572,7 @@
   }
 
   &.selected {
-    border: 2px solid #664423;
+    border: 2px solid #6C4423;
     box-shadow: 0 4px 12px rgba(102, 68, 35, 0.2);
   }
 }
@@ -588,7 +588,7 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #664423;
+  background: #6C4423;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -663,7 +663,7 @@
 }
 
 .achieved-label {
-  color: #664423;
+  color: #6C4423;
   font-weight: 700;
 }
 
@@ -677,7 +677,7 @@
 
 .progress-fill {
   height: 100%;
-  background: #664423;
+  background: #6C4423;
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -686,8 +686,8 @@
   width: 100%;
   padding: 10px;
   background: #FFFFFF;
-  color: #664423;
-  border: 1px solid #664423;
+  color: #6C4423;
+  border: 1px solid #6C4423;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -724,13 +724,13 @@
   align-items: center;
   padding: 20px;
   border-bottom: 1px solid #e0e0e0;
-  background: #fff9f3;
+  background: #FFFCF8;
 }
 
 .timeline-title {
   font-size: 18px;
   font-weight: 700;
-  color: #664423;
+  color: #6C4423;
   margin: 0;
 }
 
@@ -744,7 +744,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #664423;
+  color: #6C4423;
   transition: all 0.2s ease;
 
   &:hover {
@@ -769,14 +769,14 @@
   border: 1.5px solid #d4c4a8;
   border-radius: 8px;
   font-size: 14px;
-  color: #664423;
+  color: #6C4423;
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -785,7 +785,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  background: #fff9f3;
+  background: #FFFCF8;
 }
 
 .timeline-item {
@@ -816,9 +816,9 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #664423;
+    background: #6C4423;
     border: 2px solid white;
-    box-shadow: 0 0 0 2px #664423;
+    box-shadow: 0 0 0 2px #6C4423;
   }
 
   &.timeline-store::after {
@@ -863,7 +863,7 @@
 .timeline-title-text {
   font-size: 14px;
   font-weight: 600;
-  color: #664423;
+  color: #6C4423;
   flex: 1;
 }
 
@@ -906,7 +906,7 @@
 .view-live-map-btn {
   width: 100%;
   padding: 12px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   border-radius: 8px;

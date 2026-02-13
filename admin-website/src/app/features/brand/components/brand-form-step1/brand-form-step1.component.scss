@@ -69,7 +69,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
@@ -134,7 +134,7 @@
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #664423;
+  accent-color: #6C4423;
 }
 
 .checkbox-label {
@@ -165,19 +165,19 @@
   position: relative;
 
   &.dragging {
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(102, 68, 35, 0.05);
   }
 
   &:hover {
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(255, 255, 255, 0.4);
   }
 }
 
 .upload-icon {
   margin-bottom: 16px;
-  color: #664423;
+  color: #6C4423;
 }
 
 .upload-text {
@@ -204,7 +204,7 @@
 
 .browse-btn {
   padding: 10px 24px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   border-radius: 6px;

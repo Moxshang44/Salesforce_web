@@ -79,7 +79,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -103,7 +103,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -251,7 +251,7 @@
 
 .view-btn {
   padding: 6px 16px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   border-radius: 6px;
@@ -612,7 +612,7 @@
   transition: color 0.2s ease;
 
   &:hover {
-    color: #664423;
+    color: #6C4423;
   }
 
   &.active {
@@ -922,7 +922,7 @@
   cursor: pointer;
 
   &:hover {
-    color: #664423;
+    color: #6C4423;
   }
 }
 
@@ -1015,7 +1015,7 @@
 
 .progress-fill {
   height: 100%;
-  background: #664423;
+  background: #6C4423;
   transition: width 0.3s ease;
 }
 
@@ -1057,7 +1057,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 
@@ -1130,7 +1130,7 @@
   background: #fafafa;
 
   &:hover {
-    border-color: #664423;
+    border-color: #6C4423;
     background: #f5f0e8;
   }
 
@@ -1147,7 +1147,7 @@
 
   .file-name {
     font-size: 13px;
-    color: #664423;
+    color: #6C4423;
     margin-top: 8px;
     font-weight: 500;
   }
@@ -1219,7 +1219,7 @@
   height: 0;
 
   &:checked + .toggle-slider {
-    background: #664423;
+    background: #6C4423;
 
     &:before {
       transform: translateX(24px);
@@ -1259,7 +1259,7 @@
 .switch-manual-link {
   background: none;
   border: none;
-  color: #664423;
+  color: #6C4423;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -1330,7 +1330,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 2px rgba(102, 68, 35, 0.1);
   }
 
@@ -1387,14 +1387,14 @@
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: #664423;
+    accent-color: #6C4423;
   }
 }
 
 .remaining-amount {
   font-size: 14px;
   font-weight: 600;
-  color: #664423;
+  color: #6C4423;
 }
 
 // Column widths for allocation table

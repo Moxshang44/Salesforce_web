@@ -48,13 +48,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
     }
     
     .tally-nav a:hover {
-      color: #664423;
+      color: #6C4423;
       background: rgba(102, 68, 35, 0.05);
     }
     
     .tally-nav a.active {
-      color: #664423;
-      border-bottom-color: #664423;
+      color: #6C4423;
+      border-bottom-color: #6C4423;
       background: rgba(102, 68, 35, 0.05);
     }
     
@@ -65,7 +65,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       left: 0;
       right: 0;
       height: 3px;
-      background: #664423;
+      background: #6C4423;
       z-index: 1;
     }
   `]

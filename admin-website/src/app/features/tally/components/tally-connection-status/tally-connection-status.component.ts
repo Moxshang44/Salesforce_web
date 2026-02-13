@@ -110,7 +110,7 @@ import { TallyService } from '../../services/tally.service';
 
     .refresh-button:hover {
       background: rgba(102, 68, 35, 0.1);
-      color: #664423;
+      color: #6C4423;
     }
 
     .refresh-button:disabled {

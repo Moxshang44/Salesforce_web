@@ -13,7 +13,7 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   cursor: pointer;
@@ -110,7 +110,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #664423;
+  background: #6C4423;
   color: white;
   display: flex;
   align-items: center;
@@ -203,7 +203,7 @@
     flex-direction: row-reverse;
     
     .message-content {
-      background: #664423;
+      background: #6C4423;
       color: white;
       border-radius: 12px 12px 2px 12px;
     }
@@ -234,13 +234,13 @@
   justify-content: center;
   
   &.user-avatar {
-    background: #664423;
+    background: #6C4423;
     color: white;
   }
   
   &.assistant-avatar {
     background: #e8e5e1;
-    color: #664423;
+    color: #6C4423;
   }
   
   svg {
@@ -312,7 +312,7 @@
   transition: all 0.2s ease;
   
   &:focus-within {
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -354,7 +354,7 @@
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: #664423;
+  background: #6C4423;
   color: white;
   display: flex;
   align-items: center;

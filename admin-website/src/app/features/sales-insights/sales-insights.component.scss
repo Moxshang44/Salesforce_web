@@ -11,7 +11,7 @@
   flex: 1;
   margin-top: 56px;
   padding: 20px 24px 24px;
-  background: #FFF9F3;
+  background: #FFFCF8;
   min-height: calc(100vh - 56px);
 }
 
@@ -61,9 +61,9 @@
   }
 
   &.active {
-    background: #664423;
+    background: #6C4423;
     color: white;
-    border-color: #664423;
+    border-color: #6C4423;
   }
 }
 
@@ -101,7 +101,7 @@
 
 // ZSM Profile Card
 .zsm-profile-card {
-  background: #664423;
+  background: #6C4423;
   border-radius: 12px;
   padding: 16px 20px;
   color: white;
@@ -294,9 +294,9 @@
 
 .excel-btn {
   padding: 6px 14px;
-  border: 1px solid #664423;
+  border: 1px solid #6C4423;
   border-radius: 6px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   font-size: 13px;
   font-weight: 500;
@@ -305,8 +305,8 @@
 
   &:hover {
     background: white;
-    color: #664423;
-    border: 2px solid #664423;
+    color: #6C4423;
+    border: 2px solid #6C4423;
   }
 }
 
@@ -336,9 +336,9 @@
   }
 
   &.active {
-    background: #664423;
+    background: #6C4423;
     color: white;
-    border-color: #664423;
+    border-color: #6C4423;
   }
 }
 
@@ -356,17 +356,17 @@
 
 .view-more-btn {
   padding: 8px 20px;
-  border: 1px solid #664423;
+  border: 1px solid #6C4423;
   border-radius: 6px;
   background: white;
-  color: #664423;
+  color: #6C4423;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #664423;
+    background: #6C4423;
     color: white;
   }
 }

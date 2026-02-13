@@ -19,7 +19,7 @@
 .step-text {
   font-size: 14px;
   font-weight: 600;
-  color: #664423;
+  color: #6C4423;
 }
 
 .close-btn {
@@ -87,7 +87,7 @@
 }
 
 .auto-badge {
-  background: #664423;
+  background: #6C4423;
   color: white;
   font-size: 10px;
   padding: 2px 8px;
@@ -117,7 +117,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
@@ -161,7 +161,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
@@ -181,7 +181,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
@@ -225,12 +225,12 @@
   background: rgba(255, 255, 255, 0.2);
 
   &:hover {
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(255, 255, 255, 0.35);
   }
 
   &.dragging {
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(255, 255, 255, 0.4);
   }
 }
@@ -333,7 +333,7 @@
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #664423;
+    border-color: #6C4423;
     background: rgba(255, 255, 255, 0.35);
   }
 
@@ -387,7 +387,7 @@
 }
 
 .btn-save {
-  background: #664423;
+  background: #6C4423;
   color: white;
 
   &:hover {

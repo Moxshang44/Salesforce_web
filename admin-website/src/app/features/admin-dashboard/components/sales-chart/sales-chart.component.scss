@@ -68,7 +68,7 @@
   
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 2px rgba(102, 68, 35, 0.1);
   }
   
@@ -100,9 +100,9 @@
   }
   
   &.active {
-    background: #664423;
+    background: #6C4423;
     color: white;
-    border-color: #664423;
+    border-color: #6C4423;
   }
 }
 

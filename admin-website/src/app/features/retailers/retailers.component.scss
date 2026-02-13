@@ -3,7 +3,7 @@
 .retailers-layout {
   display: flex;
   min-height: 100vh;
-  background: #FFF9F3;
+  background: #FFFCF8;
 }
 
 .main-content {
@@ -62,7 +62,7 @@
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    background: #664423;
+    background: #6C4423;
     color: #ffffff;
     border: none;
     border-radius: 6px;
@@ -159,7 +159,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 
@@ -261,7 +261,7 @@
 
   &:focus {
     outline: none;
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -281,7 +281,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 700;
-  color: #664423;
+  color: #6C4423;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -316,7 +316,7 @@
   }
   
   &.active {
-    background: #664423;
+    background: #6C4423;
     color: white;
   }
 }
@@ -445,7 +445,7 @@
 
 .view-details-btn {
   padding: 6px 12px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   border-radius: 6px;

@@ -27,7 +27,7 @@
   background: #d4c4b4;
   
   &.active {
-    background: #664423;
+    background: #6C4423;
   }
 }
 
@@ -95,7 +95,7 @@
   }
   
   &:focus {
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -153,7 +153,7 @@
   }
   
   &:focus {
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -268,7 +268,7 @@
   background: white;
   
   &:focus {
-    border-color: #664423;
+    border-color: #6C4423;
   }
 }
 
@@ -310,7 +310,7 @@
 
 .btn-secondary {
   background: white;
-  color: #664423;
+  color: #6C4423;
   border: 1px solid #d4c4b4;
   
   &:hover {
@@ -319,7 +319,7 @@
 }
 
 .btn-primary {
-  background: #664423;
+  background: #6C4423;
   color: white;
   
   &:hover {
@@ -330,7 +330,7 @@
 .add-territory-btn {
   padding: 12px 24px;
   background: white;
-  color: #664423;
+  color: #6C4423;
   border: 2px dashed #d4c4b4;
   border-radius: 8px;
   font-size: 14px;

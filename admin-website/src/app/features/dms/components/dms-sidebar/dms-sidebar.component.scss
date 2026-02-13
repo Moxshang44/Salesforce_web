@@ -79,7 +79,7 @@
 .company-name {
   font-size: 14px;
   font-weight: 600;
-  color: #664423;
+  color: #6C4423;
   margin: 0;
   padding: 15px 10px;
   flex: 1;
@@ -117,7 +117,7 @@
   }
   
   &.active {
-    background: #664423;
+    background: #6C4423;
     color: white;
     box-shadow: 0 2px 8px rgba(102, 68, 35, 0.3);
     
@@ -177,7 +177,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  color: #664423;
+  color: #6C4423;
 
   &:hover {
     background: rgba(102, 68, 35, 0.2);

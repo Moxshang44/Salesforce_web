@@ -3,7 +3,7 @@
 .ai-chatbot-layout {
   display: flex;
   min-height: 100vh;
-  background: #FFF9F3;
+  background: #FFFCF8;
 }
 
 .main-content {
@@ -70,7 +70,7 @@
 .new-chat-button {
   margin: 16px;
   padding: 10px 12px;
-  background: #664423;
+  background: #6C4423;
   color: white;
   border: none;
   border-radius: 8px;
@@ -146,7 +146,7 @@
     
     .chat-item-title {
       font-weight: 600;
-      color: #664423;
+      color: #6C4423;
     }
   }
 }
@@ -269,7 +269,7 @@
     flex-direction: row-reverse;
     
     .message-content {
-      background: #664423;
+      background: #6C4423;
       color: white;
       border-radius: 18px 18px 4px 18px;
     }
@@ -300,13 +300,13 @@
   justify-content: center;
   
   &.user-avatar {
-    background: #664423;
+    background: #6C4423;
     color: white;
   }
   
   &.assistant-avatar {
     background: #e8e5e1;
-    color: #664423;
+    color: #6C4423;
   }
   
   svg {
@@ -513,7 +513,7 @@
   font-size: 13px;
   
   strong {
-    color: #664423;
+    color: #6C4423;
     margin-right: 8px;
   }
 }
@@ -571,7 +571,7 @@
   position: relative;
   
   &:focus-within {
-    border-color: #664423;
+    border-color: #6C4423;
     box-shadow: 0 0 0 3px rgba(102, 68, 35, 0.1);
   }
 }
@@ -593,8 +593,8 @@
   
   &:hover {
     background: #f5f0e8;
-    border-color: #664423;
-    color: #664423;
+    border-color: #6C4423;
+    color: #6C4423;
   }
   
   &:active {
@@ -619,7 +619,7 @@
   border-radius: 50%;
   border: 1px solid #e8e5e1;
   background: white;
-  color: #664423;
+  color: #6C4423;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -630,7 +630,7 @@
   
   &:hover {
     background: #f5f0e8;
-    border-color: #664423;
+    border-color: #6C4423;
   }
   
   .mode-icon {
@@ -710,7 +710,7 @@
     background: #f5f0e8;
     
     .mode-option-label {
-      color: #664423;
+      color: #6C4423;
       font-weight: 600;
     }
   }
@@ -763,7 +763,7 @@
 .mode-check {
   width: 16px;
   height: 16px;
-  color: #664423;
+  color: #6C4423;
   flex-shrink: 0;
 }
 
@@ -804,7 +804,7 @@
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: #664423;
+  background: #6C4423;
   color: white;
   display: flex;
   align-items: center;
