@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostListener } fro
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
 import { SidebarComponent } from '../../core/layout/sidebar/sidebar.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
 import { ChatService, ChatHistoryItem } from './services/chat.service';
@@ -58,6 +59,7 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
 
   modes: ModeItem[] = [];
   currentSessionId: string = '';
+  private sessionSubscription?: Subscription;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -244,25 +246,48 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
     this.chatHistory.forEach((chat, index) => {
       if (chat.sessionId) {
         this.chatService.getChatSession(chat.sessionId).subscribe({
-          next: (response) => {
-            if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-              // Get the first user message as preview
-              const sortedMessages = response.data.sort((a, b) => {
+          next: (response: any) => {
+            // Handle new API format: {items: [{role: "user", message: "..."}, ...]}
+            let messages: any[] = [];
+            
+            if (response.items && Array.isArray(response.items) && response.items.length > 0) {
+              messages = response.items;
+            } else if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+              messages = response.data;
+            }
+            
+            if (messages.length > 0) {
+              // Sort messages by timestamp
+              const sortedMessages = messages.sort((a, b) => {
                 const timeA = a.timestamp || a.created_at || '';
                 const timeB = b.timestamp || b.created_at || '';
                 return new Date(timeA).getTime() - new Date(timeB).getTime();
               });
               
-              const firstUserMessage = sortedMessages.find(m => m.user_message);
-              const preview = firstUserMessage?.user_message?.substring(0, 50) || 
-                            sortedMessages[0]?.assistant_message?.substring(0, 50) || 
-                            `Chat ${index + 1}`;
+              // Get the first user message as preview
+              let preview = '';
+              
+              // Handle new format: {role: "user" | "assistant", message: "..."}
+              const firstUserMessage = sortedMessages.find((m: any) => 
+                (m.role === 'user' && m.message) || m.user_message
+              );
+              
+              if (firstUserMessage) {
+                preview = firstUserMessage.message || firstUserMessage.user_message || '';
+              } else if (sortedMessages[0]) {
+                // Fallback to first message
+                preview = sortedMessages[0].message || sortedMessages[0].assistant_message || '';
+              }
+              
+              if (!preview) {
+                preview = `Chat ${index + 1}`;
+              }
               
               // Update the chat history item with preview
               const chatItem = this.chatHistory.find(c => c.sessionId === chat.sessionId);
               if (chatItem) {
                 chatItem.title = preview.length > 30 ? preview.substring(0, 30) + '...' : preview;
-                chatItem.preview = preview + (preview.length >= 50 ? '...' : '');
+                chatItem.preview = preview.substring(0, 50) + (preview.length >= 50 ? '...' : '');
                 
                 // Update timestamp from first message if available
                 if (sortedMessages[0]) {
@@ -300,6 +325,15 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
   }
 
   selectChat(chatId: number): void {
+    // Cancel any pending subscription from previous chat
+    if (this.sessionSubscription) {
+      this.sessionSubscription.unsubscribe();
+      this.sessionSubscription = undefined;
+    }
+    
+    // Clear messages immediately to prevent mixing
+    this.chatMessages = [];
+    
     this.currentChatId = chatId;
     const chat = this.chatHistory.find(c => c.id === chatId);
     if (chat && chat.sessionId) {
@@ -316,63 +350,101 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
 
   loadMessagesForSession(sessionId: string): void {
     try {
-      this.chatService.getChatSession(sessionId).subscribe({
-        next: (response) => {
+      // Cancel any existing subscription
+      if (this.sessionSubscription) {
+        this.sessionSubscription.unsubscribe();
+      }
+      
+      // Store the session ID we're loading to verify response matches
+      const loadingSessionId = sessionId;
+      
+      // Clear messages before loading new ones
+      this.chatMessages = [];
+      
+      this.sessionSubscription = this.chatService.getChatSession(sessionId).subscribe({
+        next: (response: any) => {
+          // Verify this response is for the currently selected session
+          if (this.currentSessionId !== loadingSessionId) {
+            console.log('Ignoring response for different session:', loadingSessionId, 'Current:', this.currentSessionId);
+            return;
+          }
+          
           console.log('Chat session response:', response);
           
-          if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-            // Sort messages by timestamp
-            const sessionMessages = response.data.sort((a, b) => {
-              const timeA = a.timestamp || a.created_at || '';
-              const timeB = b.timestamp || b.created_at || '';
-              return new Date(timeA).getTime() - new Date(timeB).getTime();
-            });
-            
-            // Convert to ChatMessage format
+          // Handle new API format: {items: [{role: "user", message: "..."}, {role: "assistant", message: "..."}]}
+          let messages: any[] = [];
+          
+          if (response.items && Array.isArray(response.items) && response.items.length > 0) {
+            // New format: items array with role and message
+            messages = response.items;
+          } else if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+            // Old format: data array with user_message and assistant_message
+            messages = response.data;
+          }
+          
+          if (messages.length > 0) {
+            // Convert to ChatMessage format - clear first to ensure clean state
             this.chatMessages = [];
             let messageIndex = 1;
             
-            sessionMessages.forEach((item) => {
-              // Add user message if exists
-              if (item.user_message) {
+            messages.forEach((item: any) => {
+              // Handle new format: {role: "user" | "assistant", message: "..."}
+              if (item.role && item.message) {
                 this.chatMessages.push({
                   id: messageIndex++,
-                  role: 'user',
-                  content: item.user_message,
+                  role: item.role === 'user' ? 'user' : 'assistant',
+                  content: item.message,
+                  formattedContent: item.role === 'assistant' ? this.formatMessageContent(item.message) : undefined,
                   timestamp: item.timestamp ? new Date(item.timestamp) : 
                             (item.created_at ? new Date(item.created_at) : new Date())
                 });
               }
-              
-              // Add assistant message if exists
-              if (item.assistant_message) {
-                this.chatMessages.push({
-                  id: messageIndex++,
-                  role: 'assistant',
-                  content: item.assistant_message,
-                  formattedContent: this.formatMessageContent(item.assistant_message),
-                  timestamp: item.timestamp ? new Date(item.timestamp) : 
-                            (item.created_at ? new Date(item.created_at) : new Date())
-                });
+              // Handle old format: {user_message: "...", assistant_message: "..."}
+              else {
+                // Add user message if exists
+                if (item.user_message) {
+                  this.chatMessages.push({
+                    id: messageIndex++,
+                    role: 'user',
+                    content: item.user_message,
+                    timestamp: item.timestamp ? new Date(item.timestamp) : 
+                              (item.created_at ? new Date(item.created_at) : new Date())
+                  });
+                }
+                
+                // Add assistant message if exists
+                if (item.assistant_message) {
+                  this.chatMessages.push({
+                    id: messageIndex++,
+                    role: 'assistant',
+                    content: item.assistant_message,
+                    formattedContent: this.formatMessageContent(item.assistant_message),
+                    timestamp: item.timestamp ? new Date(item.timestamp) : 
+                              (item.created_at ? new Date(item.created_at) : new Date())
+                  });
+                }
               }
             });
             
             // If no messages found, show welcome message
             if (this.chatMessages.length === 0) {
               this.initializeChatbot();
+            } else {
+              // Scroll to bottom after loading
+              setTimeout(() => this.scrollToBottom(), 100);
             }
-            
-            // Scroll to bottom after loading
-            setTimeout(() => this.scrollToBottom(), 100);
           } else {
             // No messages, show welcome
             this.initializeChatbot();
           }
         },
         error: (error) => {
-          console.error('Error loading messages for session:', error);
-          // On error, show welcome message
-          this.initializeChatbot();
+          // Only show error if this is still the current session
+          if (this.currentSessionId === loadingSessionId) {
+            console.error('Error loading messages for session:', error);
+            // On error, show welcome message
+            this.initializeChatbot();
+          }
         }
       });
     } catch (error: any) {
@@ -423,7 +495,10 @@ export class AiChatbotComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cleanup if needed
+    // Cleanup subscriptions
+    if (this.sessionSubscription) {
+      this.sessionSubscription.unsubscribe();
+    }
   }
 
   sendMessage(): void {

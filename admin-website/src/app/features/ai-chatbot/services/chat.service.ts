@@ -36,6 +36,12 @@ export interface ChatHistoryResponse {
 export interface ChatSessionResponse {
   status_code?: number;
   data?: ChatHistoryItem[];
+  items?: Array<{
+    role: 'user' | 'assistant';
+    message: string;
+    timestamp?: string;
+    created_at?: string;
+  }>;
   message?: string;
 }
 
