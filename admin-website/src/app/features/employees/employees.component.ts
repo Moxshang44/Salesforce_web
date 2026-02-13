@@ -7,6 +7,7 @@ import { ButtonComponent } from '../../shared/components/button/button.component
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { EmployeeFormStep1Component, EmployeeFormData } from './components/employee-form-step1/employee-form-step1.component';
 import { LogoLoaderComponent } from '../../shared/components/logo-loader/logo-loader.component';
+import { Router } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { forkJoin } from 'rxjs';
@@ -77,7 +78,8 @@ export class EmployeesComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -183,6 +185,20 @@ export class EmployeesComponent implements OnInit {
 
   getRouteCountForUser(userId: string): number {
     return this.routeAssignments.filter(ra => ra.user_id === userId && ra.is_active).length;
+  }
+
+  navigateToReport(employee: Employee): void {
+    if (!employee) {
+      return;
+    }
+
+    this.router.navigate(['/admin/report'], {
+      queryParams: {
+        employeeId: employee.id,
+        employeeName: employee.name,
+        employeeCode: employee.code || employee.username || 'N/A'
+      }
+    });
   }
 
   mapApiEmployeeToEmployee(apiEmployee: any): Employee {

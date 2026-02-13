@@ -315,6 +315,13 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  align-items: flex-start;
+  cursor: pointer;
+
+  &:hover .employee-name {
+    color: #664423;
+    text-decoration: underline;
+  }
 }
 
 .employee-name {
